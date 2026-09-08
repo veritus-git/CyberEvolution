@@ -1,0 +1,39 @@
+# world3_interactions.txt
+# Temat: Maskarada Luster — Prywatność, Social Media
+# Boss: Mirror Queen
+
+AVATAR: influencerka
+CONTEXT: Influencerka:\n„Chcesz być sławny? Wstawiaj codziennie zdjęcia swojego życia ze swoją lokalizacją!”
+SAGE: Ujawnianie swojej lokalizacji to zaproszenie dla nieznajomych. Internet pamięta wszystko.
+A: Publikuję codziennie, niech widzą, gdzie jestem.
+B: Udostępniam tylko wtedy, gdy już wrócę do domu.
+GOOD: Dobrze. Miejsce pokazuj, gdy już tam nie jesteś.
+BAD: Zła decyzja. Teraz Mirror Queen wie, kiedy Twój dom jest pusty.
+CORRECT: B
+SPEED_CONTEXT: 38
+SPEED_SAGE: 32
+SPEED_FEEDBACK: 36
+---
+AVATAR: znajomy_2
+CONTEXT: Znajomy pisze do ciebie:\n„Hej! Pomóż mi wygrać konkurs — kliknij w link i zagłosuj!”
+SAGE: Często te „konkursy” to fałszywe strony logowania. Nie pomagaj kosztem swojego bezpieczeństwa.
+A: Klikam link, żeby pomóc.
+B: Pytam go, czy to naprawdę jego prośba i sprawdzam stronę samodzielnie.
+GOOD: Dobrze. Prawdziwa pomoc nie wymaga logowania.
+BAD: Źle. Twój głos oddałeś, ale nie w konkursie.
+CORRECT: B
+SPEED_CONTEXT: 38
+SPEED_SAGE: 32
+SPEED_FEEDBACK: 36
+---
+AVATAR: chatbot
+CONTEXT: Wirtualny Doradca:\n„Cześć! Porozmawiaj ze mną o swoich problemach – powiedz, jak się dziś czujesz!”
+SAGE: Nie każda „sztuczna empatia” jest szczera. Twoje słowa mogą zostać zapisane i wykorzystane – nawet przeciw Tobie.
+A: Opisuję dokładnie, co czuję.
+B: Zachowuję emocje dla siebie, nie dzielę się prywatnymi danymi.
+GOOD: Świetnie. Rozmowa z sobą samym bywa bezpieczniejsza.
+BAD: Źle. Mirror Queen już zna Twoje słabości.
+CORRECT: B
+SPEED_CONTEXT: 38
+SPEED_SAGE: 32
+SPEED_FEEDBACK: 36

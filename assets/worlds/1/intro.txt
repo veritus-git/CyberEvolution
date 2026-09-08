@@ -1,0 +1,5 @@
+WORLDNAME: Miasto Iluzji
+INTROTEXT: To Miasto Iluzji — świat pozorów i fałszu.
+Tutaj każde słowo może być pułapką, a każdy link — przepaścią.
+Patrz uważnie i nie wierz wszystkiemu, co wygląda prawdziwie.
+Tylko czujność oddzieli cię od tych, którzy już dali się zwieść.

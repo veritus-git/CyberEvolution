@@ -1,0 +1,123 @@
+BOSSNAME: Mirror Queen
+INTRO: Jestem Mirror Queen — widzę cię dokładniej niż ty sam.\nKażdy filtr, każdy post, każda iluzja, którą stworzyłeś, należy teraz do mnie. \nPowiedz, kim jesteś bez swojego odbicia… jeśli w ogóle potrafisz to jeszcze powiedzieć.
+
+Q: Dlaczego nie należy publikować swojej lokalizacji w czasie rzeczywistym?
+A: Bo może to ujawnić, gdzie przebywasz i kiedy Twój dom jest pusty.
+B: Bo algorytmy źle pokazują mapę.
+C: Bo posty z lokalizacją mają mniej wyświetleń.
+CORRECT: A
+---
+Q: Co grozi osobie, która regularnie pokazuje swoje codzienne życie online?
+A: Ułatwia śledzenie jej nawyków i miejsc, w których bywa.
+B: Zyskuje mniej obserwujących.
+C: Może zgubić telefon przez przeładowanie aplikacji.
+CORRECT: A
+---
+Q: Dlaczego nie warto klikać w linki przesyłane w wiadomościach konkursowych?
+A: Bo mogą prowadzić do fałszywych stron logowania i kradzieży danych.
+B: Bo zajmują dużo czasu.
+C: Bo są nudne.
+CORRECT: A
+---
+Q: Co jest bezpieczniejsze: publikować zdjęcia z podróży w trakcie wyjazdu, czy po powrocie?
+A: Po powrocie – wtedy nie zdradzasz, że Twój dom stoi pusty.
+B: W trakcie – bo wtedy post jest bardziej aktualny.
+C: Nie ma różnicy.
+CORRECT: A
+---
+Q: Dlaczego należy uważać na quizy i ankiety w social media?
+A: Bo mogą zbierać dane osobowe i odpowiedzi do budowania profilu użytkownika.
+B: Bo nie mają sensu merytorycznego.
+C: Bo są zbyt długie.
+CORRECT: A
+---
+Q: Jak można sprawdzić, czy prośba o pomoc online jest prawdziwa?
+A: Potwierdzić to z osobą innym kanałem – np. dzwoniąc lub pisząc bezpośrednio.
+B: Kliknąć w link i zobaczyć, co się stanie.
+C: Udostępnić ją znajomym, by szybciej pomóc.
+CORRECT: A
+---
+Q: Dlaczego warto ograniczać liczbę informacji o sobie w sieci?
+A: Bo każda informacja może zostać wykorzystana przeciwko Tobie.
+B: Bo posty się nie ładują przy zbyt dużej ilości danych.
+C: Bo Internet nie lubi długich opisów.
+CORRECT: A
+---
+Q: Co robić, gdy aplikacja prosi o dostęp do galerii lub mikrofonu?
+A: Zastanowić się, czy naprawdę jest to potrzebne i odmówić, jeśli nie.
+B: Zawsze zezwolić, bo inaczej aplikacja nie zadziała.
+C: Nie czytać komunikatu i nacisnąć OK.
+CORRECT: A
+---
+Q: Dlaczego nie warto opowiadać chatbotowi o swoich prywatnych problemach?
+A: Bo rozmowy mogą być zapisywane i analizowane.
+B: Bo chatbot nie odpowie poprawnie.
+C: Bo sztuczna inteligencja nie rozumie emocji.
+CORRECT: A
+---
+Q: Jak zachować prywatność w social mediach?
+A: Ustawiając widoczność postów tylko dla znajomych i unikając danych osobowych.
+B: Usuwając wszystkie komentarze innych użytkowników.
+C: Wstawiając jak najwięcej zdjęć, by zmylić algorytmy.
+CORRECT: A
+---
+Q: Dlaczego nie powinno się udostępniać cudzych zdjęć bez zgody?
+A: Bo to narusza prywatność i prawa wizerunku tej osoby.
+B: Bo post z cudzym zdjęciem może być zablokowany.
+C: Bo zdjęcia innych zajmują miejsce w pamięci telefonu.
+CORRECT: A
+---
+Q: Co może się stać, jeśli zbyt często uczestniczysz w trendach i wyzwaniach internetowych?
+A: Oddajesz swoje dane (np. zdjęcia, głos, twarz) algorytmom do analizy.
+B: Zwiększasz zasięgi, ale obniżasz jakość konta.
+C: Możesz zostać zablokowany za spam.
+CORRECT: A
+---
+Q: Dlaczego emocjonalne posty mogą być niebezpieczne?
+A: Bo pokazują Twoje słabości i ułatwiają manipulację.
+B: Bo nikt ich nie czyta.
+C: Bo mają mniej polubień.
+CORRECT: A
+---
+Q: Co robić, gdy ktoś prosi Cię o repost jego treści z oznaczeniem lokalizacji?
+A: Poprosić o zgodę i nie ujawniać prywatnych miejsc bez przemyślenia.
+B: Udostępnić, by zwiększyć zasięg znajomego.
+C: Nie sprawdzać, tylko kliknąć ‘udostępnij’.
+CORRECT: A
+---
+Q: Jak chronić swoje zdjęcia przed nieautoryzowanym użyciem?
+A: Publikować mniej i używać znaków wodnych lub ustawień prywatności.
+B: Zgłaszać każde zdjęcie, które ktoś udostępnił.
+C: Nigdy nie robić zdjęć.
+CORRECT: A
+---
+Q: Dlaczego lepiej nie publikować starych wspomnień z sieci?
+A: Bo ujawniają zmiany wyglądu i miejsca, które można wykorzystać do identyfikacji.
+B: Bo nikt już nie pamięta tych czasów.
+C: Bo zdjęcia sprzed lat mają gorszą jakość.
+CORRECT: A
+---
+Q: Jak zachować się wobec fałszywego profilu podszywającego się pod Ciebie?
+A: Zgłosić konto jako podszywanie się i ostrzec znajomych.
+B: Napisać do niego, by się przyznał.
+C: Udawać, że to zabawne.
+CORRECT: A
+---
+Q: Co oznacza pojęcie prywatności cyfrowej?
+A: Kontrolowanie tego, jakie informacje o Tobie trafiają do sieci i kto ma do nich dostęp.
+B: Ukrywanie się przed znajomymi w internecie.
+C: Nieposiadanie żadnego konta w social mediach.
+CORRECT: A
+---
+Q: Dlaczego post typu „Wygrałeś telefon, zaloguj się Facebookiem” jest niebezpieczny?
+A: Bo wykorzystuje dane logowania do kradzieży konta.
+B: Bo to tylko reklama, nie konkurs.
+C: Bo Facebook blokuje takie loginy.
+CORRECT: A
+---
+Q: Co jest najważniejszą zasadą bezpieczeństwa w social mediach?
+A: Myśl, zanim opublikujesz – Internet nigdy nie zapomina.
+B: Usuwaj wszystkie posty po tygodniu.
+C: Nie komentuj niczego w sieci.
+CORRECT: A
+---

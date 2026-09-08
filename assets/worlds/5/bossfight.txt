@@ -1,0 +1,123 @@
+BOSSNAME: Mędrzec
+INTRO: Przeszedłeś przez iluzje, klucze, lustra i kopie.\nTeraz czas dowieść, że naprawdę zrozumiałeś, jak chronić siebie i innych.\nNie odpowiadaj na pamięć — odpowiadaj rozumem
+OUTRO: Udało ci się.\nZrozumiałeś, że bezpieczeństwo nie polega na strachu, ale na świadomości.\nKażdy świat był lekcją — o zaufaniu, prywatności, ochronie i odpowiedzialności.\nTeraz to ty jesteś strażnikiem swojego świata.\nCyberEwolucja nie kończy się tu… ona trwa w każdym twoim wyborze.”
+Q: Dlaczego nie powinno się klikać w linki z nieznanych źródeł?
+A: Bo mogą prowadzić do fałszywych stron lub zainstalować złośliwe oprogramowanie.
+B: Bo linki spowalniają internet.
+C: Bo wiadomości z linkami są zawsze spamem.
+CORRECT: A
+---
+Q: Co należy zrobić, jeśli dostaniesz wiadomość z prośbą o dopłatę do przesyłki?
+A: Kliknąć w link, by zapłacić natychmiast.
+B: Wejść na oficjalną stronę firmy i zweryfikować informację samodzielnie.
+C: Odpisać, że przelejesz pieniądze później.
+CORRECT: B
+---
+Q: Dlaczego nie należy podawać swojego hasła nawet komuś, kto podaje się za pracownika pomocy technicznej?
+A: Bo prawdziwi administratorzy nigdy nie proszą o hasła.
+B: Bo hasła można łatwo zmienić, więc nie ma sensu.
+C: Bo administratorzy i tak mają dostęp do wszystkiego.
+CORRECT: A
+---
+Q: Co to jest uwierzytelnianie dwuskładnikowe (2FA)?
+A: Dodatkowa metoda potwierdzania tożsamości, np. kod SMS lub aplikacja.
+B: Hasło, które wpisuje się dwa razy.
+C: Zabezpieczenie, które wymaga dwóch kont użytkownika.
+CORRECT: A
+---
+Q: Co oznacza, gdy strona logowania ma adres różniący się jednym znakiem od prawdziwego?
+A: To może być fałszywa strona próbująca wyłudzić dane.
+B: To tylko literówka, nic groźnego.
+C: To nowa wersja tej samej witryny.
+CORRECT: A
+---
+Q: Jakie hasło jest najbezpieczniejsze?
+A: Długie, unikalne i nieużywane nigdzie indziej.
+B: Krótkie, ale łatwe do zapamiętania.
+C: Takie samo na wszystkich kontach, by nie zapomnieć.
+CORRECT: A
+---
+Q: Co najlepiej zrobić, gdy ktoś prosi Cię o dane logowania przez e-mail?
+A: Zignorować wiadomość i zgłosić ją jako podejrzaną.
+B: Wysłać dane, jeśli wiadomość wygląda profesjonalnie.
+C: Odpisać, by potwierdzić, że to Ty.
+CORRECT: A
+---
+Q: Jak chronić swoją prywatność w social mediach?
+A: Ustawiać widoczność postów dla znajomych i nie publikować danych osobowych.
+B: Publikować wszystko, by zdobyć zaufanie.
+C: Udostępniać lokalizację, by zwiększyć zasięgi.
+CORRECT: A
+---
+Q: Dlaczego nie warto publikować, gdzie aktualnie się znajdujesz?
+A: Bo ujawnia, że Twój dom może być pusty.
+B: Bo takie posty mają mniej polubień.
+C: Bo inni mogą się śmiać z miejsca, w którym jesteś.
+CORRECT: A
+---
+Q: Co zrobić, jeśli ktoś prosi o pomoc przez podejrzany link lub ankietę?
+A: Sprawdzić innym kanałem, czy to naprawdę ta osoba.
+B: Kliknąć, by szybciej pomóc.
+C: Udostępnić dalej, żeby inni też pomogli.
+CORRECT: A
+---
+Q: Dlaczego nie warto rozmawiać z nieznanym chatbotem o prywatnych sprawach?
+A: Bo Twoje dane mogą być zapisywane i wykorzystywane.
+B: Bo chatbot nie zrozumie, co mówisz.
+C: Bo rozmowy z AI są nudne.
+CORRECT: A
+---
+Q: Co zrobić, by chronić swoje konta przed przejęciem?
+A: Włączyć 2FA i używać silnych, różnych haseł.
+B: Używać prostych haseł, by szybciej się logować.
+C: Logować się przez linki z maili.
+CORRECT: A
+---
+Q: Jak najlepiej zabezpieczyć kopie zapasowe danych?
+A: Trzymać je na odłączonym nośniku lub zaszyfrowanej chmurze.
+B: Trzymać je razem z głównymi plikami.
+C: Kopiować wszystko na pendrive bez szyfrowania.
+CORRECT: A
+---
+Q: Co zrobić, gdy komputer zostanie zainfekowany ransomware?
+A: Odłączyć go od sieci i rozpocząć odzyskiwanie z bezpiecznych kopii.
+B: Zapłacić okup, by odzyskać dane szybciej.
+C: Czekać, aż wirus sam zniknie.
+CORRECT: A
+---
+Q: Jak można sprawdzić, czy program zabezpieczający jest prawdziwy?
+A: Pobierać go tylko z oficjalnych źródeł i sprawdzać opinie.
+B: Instalować każdy, który ma logo kłódki.
+C: Kierować się liczbą pobrań.
+CORRECT: A
+---
+Q: Dlaczego nie należy podłączać znalezionego pendrive’a?
+A: Bo może zawierać złośliwe oprogramowanie.
+B: Bo może być pusty.
+C: Bo może nie działać na Twoim komputerze.
+CORRECT: A
+---
+Q: Co daje regularne testowanie przywracania kopii zapasowych?
+A: Pewność, że backup faktycznie działa, gdy będzie potrzebny.
+B: Większe zużycie dysku.
+C: Spowolnienie systemu.
+CORRECT: A
+---
+Q: Co oznacza, że backup jest „offline”?
+A: Jest odłączony od sieci i bezpieczny przed atakiem.
+B: Nie działa, dopóki nie włączysz komputera.
+C: Jest przechowywany w folderze bez internetu.
+CORRECT: A
+---
+Q: Co jest wspólnym błędem w phishingu, social mediach i ransomware?
+A: Zaufanie bez weryfikacji źródła.
+B: Brak wystarczającej ilości danych.
+C: Zbyt długie hasła.
+CORRECT: A
+---
+Q: Czego nauczyła Cię cała podróż przez światy CyberEwolucji?
+A: Że bezpieczeństwo to świadomość i codzienne decyzje.
+B: Że Internet jest całkowicie bezpieczny.
+C: Że wystarczy mieć antywirusa.
+CORRECT: A
+---

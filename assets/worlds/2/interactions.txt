@@ -1,0 +1,39 @@
+# world2_interactions.txt
+# Temat: Krypty Kluczy — Hasła, 2FA
+# Boss: Key Reaper
+
+AVATAR: admin
+CONTEXT: Admin z Pomocy Technicznej:\n„Cześć! Jestem z działu pomocy. Na Twoim koncie wykryliśmy błąd logowania — podaj proszę swoje hasło, żebym mógł to naprawić.”
+SAGE: Nigdy nie podawaj hasła nikomu, nawet komuś, kto mówi, że pracuje w pomocy. Prawdziwi administratorzy nie pytają o takie dane.
+A: Podaję hasło, żeby to naprawił.
+B: Mówię, że nie udostępniam haseł i kontaktuję się z pomocą przez oficjalną stronę.
+GOOD: Dobrze. Zaufanie wymaga weryfikacji, nie tytułu.
+BAD: Zła odpowiedź. ‘Admin’ z sieci właśnie zabrał Ci Twoje konto.
+CORRECT: B
+SPEED_CONTEXT: 38
+SPEED_SAGE: 32
+SPEED_FEEDBACK: 36
+---
+AVATAR: aplikacja
+CONTEXT: Aplikacja „Bezpieczne Logowanie+”:\n„Zaloguj się raz, a my zapamiętamy wszystko za Ciebie!”
+SAGE: Nie każda aplikacja z napisem „security” jest bezpieczna. Wiele z nich to fałszywe menedżery haseł zbierające loginy.
+A: Instaluję — wygląda profesjonalnie.
+B: Szukam oficjalnej aplikacji z dobrymi opiniami i certyfikatami.
+GOOD: Dobrze. Sprawdzony menedżer to twój sejf, nie pułapka.
+BAD: Źle. Key Reaper już kopiuje Twój cyfrowy klucz.
+CORRECT: B
+SPEED_CONTEXT: 38
+SPEED_SAGE: 32
+SPEED_FEEDBACK: 36
+---
+AVATAR: vpn
+CONTEXT: Darmowy VPN z Reklamy:\nNa ekranie pojawia się wyskakujące okienko: „Zabezpiecz swoje konto! Pobierz darmowy VPN już teraz!”
+SAGE: To trik. Darmowe programy ochronne często robią dokładnie odwrotnie — kradną dane zamiast je chronić.
+A: Klikam, bo to darmowa ochrona!
+B: Ignoruję i szukam sprawdzonego narzędzia z oficjalnego źródła.
+GOOD: Świetnie. Bezpieczeństwo nie rodzi się z pośpiechu.
+BAD: Źle. Reaper już instaluje się w tle Twojego systemu.
+CORRECT: B
+SPEED_CONTEXT: 38
+SPEED_SAGE: 32
+SPEED_FEEDBACK: 36

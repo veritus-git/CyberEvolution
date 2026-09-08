@@ -1,0 +1,5 @@
+WORLDNAME: Maskarada Luster
+INTROTEXT: To Maskarada Luster — świat, w którym każdy pokazuje tylko to, co chce zobaczyć.
+Odbicia kłamią, a pozory stają się prawdą.
+Im więcej ujawnisz, tym mniej naprawdę zostaje twojego ja.
+Ostrożnie, bo tu nawet twoje milczenie może zostać opublikowane.

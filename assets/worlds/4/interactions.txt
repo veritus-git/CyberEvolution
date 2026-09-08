@@ -1,0 +1,39 @@
+# world4_interactions.txt
+# Temat: Twierdza Kopii — Backup, Ransomware
+# Boss: Encryptor
+
+AVATAR: fałszywy_naprawiacz
+CONTEXT: Oferta "szybkiego odzysku":\n„Mamy narzędzie, które odszyfruje pliki za 99 zł — pobierz i uruchom.”
+SAGE: Po ataku pojawiają się firmy i narzędzia obiecujące szybki odzysk. Należy zachować ostrożność — wybieraj sprawdzonych specjalistów i raportuj incydent.
+A: Pobieram i uruchamiam oferowane narzędzie, by odzyskać pliki szybko.
+B: Kontaktuję się z oficjalnym zespołem wsparcia lub specjalistyczną firmą z referencjami.
+GOOD: Dobrze. Profesjonalne odzyskiwanie wymaga zweryfikowanych ekspertów.
+BAD: Zła odpowiedź. Nieznane narzędzie może pogłębić problem.
+CORRECT: B
+SPEED_CONTEXT: 38
+SPEED_SAGE: 32
+SPEED_FEEDBACK: 36
+---
+AVATAR: kolega
+CONTEXT: Kolega z Pracy:\n„Hej, możesz mi pomóc? Nie mogę otworzyć pliku z raportem, może u Ciebie zadziała.”
+SAGE: Złośliwe oprogramowanie często przenosi się przez nieświadomych znajomych. Nie otwieraj plików z niepewnego źródła – nawet od znajomych.
+A: Podłączam pendrive i sprawdzam plik.
+B: Skanuję urządzenie i wysyłam mu instrukcję, jak samodzielnie to naprawić.
+GOOD: Dobrze. Pomagasz – ale bez otwierania drzwi dla Encryptora.
+BAD: Źle. Twój komputer już analizuje nowego gościa — ransomware.
+CORRECT: B
+SPEED_CONTEXT: 38
+SPEED_SAGE: 32
+SPEED_FEEDBACK: 36
+---
+AVATAR: system_restart
+CONTEXT: Wyskakujące powiadomienie:\n„System wykrył błąd krytyczny. Kliknij ‘OK’, by przywrócić pliki.”
+SAGE: Fałszywe komunikaty systemowe to podstęp Encryptora. Nigdy nie klikaj bez weryfikacji – nawet jeśli okno wygląda prawdziwie.
+A: Klikam ‘OK’, żeby przywrócić system.
+B: Zamykam wszystko i uruchamiam system w trybie awaryjnym, by przeskanować komputer.
+GOOD: Świetnie. Odwaga to cierpliwość, nie pośpiech.
+BAD: Źle. Encryptor właśnie przywrócił Twój strach, nie pliki.
+CORRECT: B
+SPEED_CONTEXT: 38
+SPEED_SAGE: 32
+SPEED_FEEDBACK: 36

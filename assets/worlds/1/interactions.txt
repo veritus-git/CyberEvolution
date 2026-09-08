@@ -1,0 +1,42 @@
+# world1_interactions.txt
+# Prosty format (3 bloki), KAŻDY blok rozdziel linią z trzema myślnikami: ---
+# Dostępne klucze: CONTEXT, SAGE, A, B, GOOD, BAD, SPEED_CONTEXT, SPEED_SAGE, SPEED_FEEDBACK
+# Uwaga: parser ignoruje linie zaczynające się od '#'
+# Użyj \n aby wymusić nową linię w tekście.
+# Poprawna odpowiedź (A lub B) jest LOSOWA przy każdym wejściu w interakcję.
+
+AVATAR: kurier
+CONTEXT: Kurier:\n"Dzień dobry, mam twoją paczkę. Należy dopłacić 6,70zł aby została dostarczona.\nMożesz zapłacić klikając w ten -> link <-"
+SAGE: To klasyczny chwyt – phishing na kuriera. Prawdziwa firma nigdy nie zażąda płatności przez losowy link.
+A: Otwórz link i zapłać od razu.
+B: Sprawdź numer nadawcy i wejdź na oficjalną stronę firmy.
+GOOD: Słusznie. Zawsze przechodź tylko przez oficjalne źródła, nie z wiadomości.
+BAD: Nie tym razem. Iluzje pieniędzy bywają tanie, ale kosztowne. Spróbuj jeszcze raz.
+CORRECT: B
+SPEED_CONTEXT: 38
+SPEED_SAGE: 32
+SPEED_FEEDBACK: 36
+---
+AVATAR: mail
+CONTEXT: E-Mail od Banku: "Twoj3 konto zostało zab1okowane! Kliknij, aby odzysk@ć dostęp.”
+SAGE: Bank nie straszy blokadą przez link w mailu. Loguj się z aplikacji lub z ręcznie wpisanego adresu.
+A: Wchodzę w link z maila i loguję się.
+B: Loguję się wyłącznie z aplikacji lub wpisując adres ręcznie.
+GOOD: Mędrzec:\n To właśnie postawa świadomego internauty. Bank nigdy nie prosi o dane przez link.
+BAD: Mędrzec:\n To pułapka – otworzyłeś furtkę złudzeniu bezpieczeństwa. Cofnij i popraw
+CORRECT: B
+SPEED_CONTEXT: 38
+SPEED_SAGE: 32
+SPEED_FEEDBACK: 36
+---
+AVATAR: znajomy
+CONTEXT: Znajomy pisze do ciebie: "Hej! Jestem w nagłej potrzebie, pożycz mi 100 zł przelewem, oddam jutro! obiecuję :)"
+SAGE: To częsta próba wyłudzenia po przejęciu konta. Czasem iluzja ma twarz, którą znasz. Co zrobisz?
+A: Wysyłam od razu przecież to mój znajomy w potrzebie!
+B: Dzwonię i potwierdzam tożsamość — nie wysyłam bez weryfikacji.
+GOOD: Rozsądnie. Głos prawdy brzmi tylko z pewnego źródła.
+BAD: Nie ufaj każdemu, kto nosi znajomą maskę. Spróbuj ponownie.
+CORRECT: B
+SPEED_CONTEXT: 38
+SPEED_SAGE: 32
+SPEED_FEEDBACK: 36

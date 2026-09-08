@@ -1,0 +1,6 @@
+MEDRZEC: Hasła i klucze to twoje pierwsze linie obrony — widziałeś, jak łatwo je stracić.
+PLAYER: Uczę się tworzyć długie i unikalne hasła oraz włączać 2FA.
+MEDRZEC: To właściwa droga — pamiętaj, że menedżer haseł to twój sejf, ale klucz leży w nawyku.
+PLAYER: Nie będę podawać haseł przez telefon ani e-mailem i będę regularnie je zmieniać.
+MEDRZEC: Dobrze — dbaj o klucze i nie pozwól, by ktoś kupił je na skróty.
+MEDRZEC: Ruszaj dalej z tą ostrożnością — krypta nie wybacza nieuwagi.

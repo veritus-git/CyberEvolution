@@ -1,0 +1,123 @@
+BOSSNAME: Encryptor
+INTRO: Jestem Encryptor. \nZnam smak ciszy, gdy twoje pliki znikają, a ekran staje się czarny. \nSzyfruję nie tylko dane, ale też twoje wspomnienia. \nPowiedz, ile jesteś gotów stracić, żeby odzyskać to, czego nigdy nie zabezpieczyłeś.
+
+Q: Co jest bezpieczniejsze – kopia plików na tym samym dysku czy na osobnym nośniku?
+A: Na osobnym nośniku lub w zaszyfrowanej chmurze.
+B: Na tym samym dysku, bo to szybciej.
+C: Nie ma znaczenia, kopia to kopia.
+CORRECT: A
+---
+Q: Dlaczego nie warto trzymać dysku z kopią cały czas podłączonego?
+A: Bo może zostać zaszyfrowany razem z głównymi danymi podczas ataku.
+B: Bo szybciej się rozładowuje.
+C: Bo zajmuje miejsce na biurku.
+CORRECT: A
+---
+Q: Co należy zrobić po wykonaniu kopii zapasowej?
+A: Odłączyć nośnik i przechowywać go w bezpiecznym miejscu.
+B: Zostawić podłączony, żeby szybciej działał.
+C: Skasować, żeby zwolnić miejsce.
+CORRECT: A
+---
+Q: Jak najlepiej zabezpieczyć kopie plików w chmurze?
+A: Szyfrować je lokalnie przed wysłaniem.
+B: Wysłać je bez szyfrowania, bo chmura i tak je chroni.
+C: Trzymać wszystko w folderze publicznym.
+CORRECT: A
+---
+Q: Po co testować przywracanie kopii zapasowych?
+A: Żeby mieć pewność, że backup naprawdę działa i można go odtworzyć.
+B: Żeby zająć czas pracownikom.
+C: Żeby stworzyć nowe pliki.
+CORRECT: A
+---
+Q: Co powinieneś zrobić, gdy komputer zostanie zainfekowany ransomware?
+A: Odłączyć go od sieci i rozpocząć odzyskiwanie z czystych kopii.
+B: Czekać, aż problem zniknie sam.
+C: Zapłacić okup, żeby szybciej odzyskać dane.
+CORRECT: A
+---
+Q: Dlaczego nie należy otwierać podejrzanych załączników w e-mailach?
+A: Bo mogą zawierać złośliwe oprogramowanie, które zaszyfruje pliki.
+B: Bo e-maile z załącznikami są zbyt duże.
+C: Bo załączniki spowalniają komputer.
+CORRECT: A
+---
+Q: Jak można uniknąć utraty plików w przypadku ataku ransomware?
+A: Mieć aktualne kopie zapasowe przechowywane offline lub w chmurze.
+B: Wyłączyć komputer na noc.
+C: Nie korzystać z Internetu przez tydzień.
+CORRECT: A
+---
+Q: Co zrobić, jeśli znajdziesz pendrive na korytarzu?
+A: Nie podłączać go i przekazać administratorowi lub ochronie.
+B: Podłączyć, by sprawdzić zawartość.
+C: Włożyć go do swojego komputera z ciekawości.
+CORRECT: A
+---
+Q: Co oznacza, że kopia danych jest „offline”?
+A: Że jest przechowywana na nośniku odłączonym od sieci i systemu.
+B: Że nie działa, dopóki się jej nie włączy.
+C: Że jest przechowywana w folderze offline na dysku.
+CORRECT: A
+---
+Q: Dlaczego nie warto ufać programom, które obiecują szybkie „odzyskanie zaszyfrowanych plików”?
+A: Bo często są fałszywe i mogą pogorszyć sytuację.
+B: Bo są zbyt drogie.
+C: Bo działają tylko w weekendy.
+CORRECT: A
+---
+Q: Co zrobić, gdy pojawi się komunikat „Kliknij OK, aby przywrócić system”?
+A: Nie klikać, tylko uruchomić komputer w trybie awaryjnym i przeskanować go.
+B: Kliknąć, żeby sprawdzić, co się stanie.
+C: Zrestartować komputer kilka razy.
+CORRECT: A
+---
+Q: Po co szyfrować własne kopie danych?
+A: Aby nikt niepowołany nie mógł ich odczytać.
+B: Żeby zajmowały mniej miejsca.
+C: Żeby wyglądały bardziej profesjonalnie.
+CORRECT: A
+---
+Q: Co oznacza pojęcie „wersjonowanie plików” w kontekście backupu?
+A: Przechowywanie starszych wersji plików, by móc cofnąć zmiany lub zaszyfrowanie.
+B: Nadawanie nazw plikom z numerem wersji.
+C: Szybsze kopiowanie dużych folderów.
+CORRECT: A
+---
+Q: Dlaczego nie warto przechowywać wszystkich kopii danych tylko w jednym miejscu?
+A: Bo w razie awarii lub ataku można stracić wszystko naraz.
+B: Bo wtedy trudniej je odnaleźć.
+C: Bo tworzy to bałagan.
+CORRECT: A
+---
+Q: Co jest najlepszym momentem na instalację aktualizacji bezpieczeństwa?
+A: Jak najszybciej po ich wydaniu.
+B: Gdy system zaczyna działać wolniej.
+C: Tylko wtedy, gdy coś przestanie działać.
+CORRECT: A
+---
+Q: Co zrobić, jeśli reklama obiecuje darmowy program zabezpieczający lub VPN?
+A: Nie klikać i pobierać tylko z oficjalnych źródeł.
+B: Kliknąć, bo może faktycznie działa.
+C: Wysłać link znajomym, by sprawdzili.
+CORRECT: A
+---
+Q: Po co trzymać więcej niż jedną kopię zapasową danych?
+A: By mieć pewność, że przetrwa nawet jeśli jedna kopia zostanie uszkodzona lub skasowana.
+B: Bo tak robią profesjonaliści.
+C: Żeby mieć więcej miejsca zajętego na dyskach.
+CORRECT: A
+---
+Q: Jak rozpoznać próbę oszustwa ransomware?
+A: Gdy ktoś żąda zapłaty w zamian za przywrócenie dostępu do plików.
+B: Gdy komputer się aktualizuje.
+C: Gdy pojawia się powiadomienie o backupie.
+CORRECT: A
+---
+Q: Jaki jest najważniejszy wniosek z nauki w Twierdzy Kopii?
+A: Backup to nie plik – to system ochrony przed utratą danych.
+B: Backup jest potrzebny tylko dużym firmom.
+C: Kopia wystarczy raz w roku.
+CORRECT: A
+---

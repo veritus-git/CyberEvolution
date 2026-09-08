@@ -1,0 +1,122 @@
+BOSSNAME: Key Reaper
+INTRO: Jestem Key Reaper, łowca twoich kluczy. \nGubiłeś je każdego dnia, nawet o tym nie wiedząc. \nHasła, dostępy, sekrety — zbieram je, zanim zorientujesz się, że już nie należą do ciebie. \nTeraz przekonamy się, czy potrafisz je odzyskać, zanim zamknę twoją kryptę na zawsze.
+Q: Co powinieneś zrobić, gdy ktoś podający się za administratora prosi Cię o hasło?
+A: Nigdy nie podawać hasła i zweryfikować przez oficjalny kanał.
+B: Podzielić się hasłem, by szybciej rozwiązać problem.
+C: Zresetować hasło i wysłać je w wiadomości.
+CORRECT: A
+---
+Q: Jak rozpoznać fałszywego „admina z pomocy technicznej”?
+A: Prosi o hasło lub dane logowania.
+B: Zawsze dzwoni z numeru służbowego.
+C: Używa profesjonalnego języka i logo firmy.
+CORRECT: A
+---
+Q: Co robić, gdy dostajesz wiadomość o błędzie logowania na swoje konto?
+A: Sprawdzić konto przez oficjalną stronę lub aplikację.
+B: Kliknąć link w wiadomości, by go naprawić.
+C: Podać dane osobie z czatu pomocy.
+CORRECT: A
+---
+Q: Dlaczego darmowy VPN może być niebezpieczny?
+A: Bo często zbiera dane użytkownika zamiast chronić.
+B: Bo spowalnia internet.
+C: Bo wymaga zbyt wielu kliknięć przy instalacji.
+CORRECT: A
+---
+Q: Co należy zrobić, gdy widzisz reklamę „darmowej ochrony online”?
+A: Zignorować i pobierać tylko z oficjalnych źródeł.
+B: Kliknąć, jeśli ma dużo komentarzy.
+C: Zaufać, jeśli wygląda profesjonalnie.
+CORRECT: A
+---
+Q: Jak rozpoznać złośliwy program podszywający się pod aplikację bezpieczeństwa?
+A: Nie pochodzi z oficjalnego sklepu i wymaga dziwnych uprawnień.
+B: Ma zielone logo i certyfikat SSL.
+C: Jest polecany przez znajomych na Facebooku.
+CORRECT: A
+---
+Q: Dlaczego nie warto ufać aplikacjom o nazwach typu „Security+” lub „SafeLogin” z nieznanych źródeł?
+A: Bo często kradną dane logowania użytkowników.
+B: Bo działają tylko na starych systemach.
+C: Bo nie mają ładnej ikony.
+CORRECT: A
+---
+Q: Co jest najbezpieczniejszym sposobem przechowywania haseł?
+A: Używanie oficjalnego menedżera haseł.
+B: Zapisywanie ich w notatniku na komputerze.
+C: Zapamiętywanie wszystkich w głowie.
+CORRECT: A
+---
+Q: Jakie jest ryzyko kliknięcia w reklamę „Darmowy VPN”?
+A: Możesz zainstalować malware, które kradnie dane.
+B: VPN przestanie działać po tygodniu.
+C: Zwiększy się prędkość internetu.
+CORRECT: A
+---
+Q: Jak zachować się wobec „pomocy technicznej”, która prosi o dane logowania?
+A: Nigdy nie udostępniać — zweryfikować autentyczność samodzielnie.
+B: Przekazać dane, jeśli brzmią wiarygodnie.
+C: Odpisać, że hasło zostanie wysłane później.
+CORRECT: A
+---
+Q: Skąd najlepiej pobierać programy zabezpieczające?
+A: Z oficjalnych stron producentów lub zaufanych sklepów aplikacji.
+B: Z forów internetowych i linków w komentarzach.
+C: Z reklam w mediach społecznościowych.
+CORRECT: A
+---
+Q: Czemu kliknięcie w błyszczący baner „Zabezpiecz konto teraz!” to zły pomysł?
+A: Bo może przekierować do fałszywej strony lub pobrać wirusa.
+B: Bo reklamy spowalniają komputer.
+C: Bo VPN może nie być darmowy.
+CORRECT: A
+---
+Q: Jak można sprawdzić wiarygodność aplikacji bezpieczeństwa?
+A: Czytając opinie, sprawdzając wydawcę i źródło pobrania.
+B: Instalując i sprawdzając, jak działa.
+C: Patrząc na ilość pobrań.
+CORRECT: A
+---
+Q: Co zrobić, jeśli już podałeś hasło fałszywemu adminowi?
+A: Natychmiast zmienić hasło i włączyć 2FA.
+B: Poczekać, aż nic się nie stanie.
+C: Zgłosić problem później.
+CORRECT: A
+---
+Q: Jak reagować na obietnice „pełnej ochrony za darmo”?
+A: Być podejrzliwym — nikt nie daje pełnej ochrony bez kosztu.
+B: Kliknąć i sprawdzić, co się stanie.
+C: Pobrać, ale nie instalować od razu.
+CORRECT: A
+---
+Q: Jakie uprawnienia są podejrzane przy instalacji aplikacji?
+A: Dostęp do SMS-ów, haseł i historii przeglądania.
+B: Dostęp do internetu.
+C: Dostęp do powiadomień systemowych.
+CORRECT: A
+---
+Q: Dlaczego warto korzystać z certyfikowanych menedżerów haseł?
+A: Bo szyfrują dane i są regularnie aktualizowane.
+B: Bo mają kolorowe ikony i łatwe logowanie.
+C: Bo pozwalają dzielić się hasłami ze znajomymi.
+CORRECT: A
+---
+Q: Co oznacza skrót VPN?
+A: Virtual Private Network — narzędzie do bezpiecznego połączenia z siecią.
+B: Very Protected Node — program do szybkiego internetu.
+C: Verified Personal Name — system logowania.
+CORRECT: A
+---
+Q: Jak reagować, gdy ktoś z reklamy oferuje „pełny dostęp” po zalogowaniu przez link?
+A: Zignorować — to może być próba phishingu.
+B: Kliknąć i zalogować się testowo.
+C: Podać fałszywe dane, by sprawdzić reakcję.
+CORRECT: A
+---
+Q: Dlaczego warto zachować czujność wobec zbyt dobrych ofert bezpieczeństwa?
+A: Bo oszuści używają ich, by wzbudzić zaufanie i pośpiech.
+B: Bo profesjonalne firmy nie reklamują się w internecie.
+C: Bo darmowe programy zawsze zawierają reklamy.
+CORRECT: A
+---

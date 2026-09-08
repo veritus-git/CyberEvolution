@@ -1,0 +1,12 @@
+MEDRZEC: Witaj Użytkowniku!
+PLAYER: Co... Co się stało?
+PLAYER: Gdzie... ja jestem?
+MEDRZEC: Nieostrożne kliknięcie ściągnęło cię tutaj\nZnalazłeś się w CyberOtchłani, gdzie błędy mają twarze,\na niewiedza... zabija
+PLAYER: CO?! Ale co to znaczy?
+MEDRZEC: Przed tobą czas próby, musisz przejść przez światy pełne niebezpieczeństw\nDopóki nie uda Ci sie ich pokonać, będziesz tkwił tutaj ze mną wieczność!
+PLAYER: Wieczność to trochę długo...
+PLAYER: A co jeśli nie dam rady? 
+MEDRZEC: Będę łaskawy i pomogę Ci nauczyć się wykrywać zagrożenia\nJednakże moja pomoc nie będzie wieczna\nDlatego uważaj i ucz się na swych doświadczeniach
+PLAYER: Ale...
+MEDRZEC: KONIEC PYTAŃ! Wejdź do pierwszego świata przez ten portal.
+MEDRZEC: Sterowanie:\nA/D lub </> - poruszanie się\nSpacja/W/▲ - skok\nE - interakcja z obiektami\nESC - Menu Pauzy\nAby odblokować dalszą cześć mapy, upewnij się że zaliczyłeś interakcję

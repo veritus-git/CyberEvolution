@@ -1,0 +1,5 @@
+WORLDNAME: Twierdza Kopii
+INTROTEXT: To Twierdza Kopii — królestwo pozornie bezpiecznych danych.
+Tu każdy plik ma swój cień, a każda kopia może stać się więzieniem.
+Encryptor strzeże wspomnień, które dawno powinieneś chronić sam.
+Nie licz na litość, jeśli twoje zabezpieczenia są tylko złudzeniem.
