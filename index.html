@@ -16,11 +16,13 @@
     <div id="app">
       <canvas id="game-canvas"></canvas>
       <div id="ui-container">
-        <!-- Floating mobile top buttons -->
-        <div class="mobile-top-bar">
+        <!-- Floating mobile / debug top buttons -->
+        <div id="mobile-top-bar" class="mobile-top-bar hidden">
+          <button id="btn-fullscreen" class="mobile-btn">⛶ Pełny ekran</button>
           <button id="btn-toggle-debug" class="mobile-btn">F2: Hitboxy</button>
           <button id="btn-cycle-skin" class="mobile-btn">Skin: 1</button>
         </div>
+        <div id="error-banner" class="error-banner hidden"></div>
       </div>
     </div>
     <script type="module" src="/src/main.ts"></script>

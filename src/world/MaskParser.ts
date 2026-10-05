@@ -23,9 +23,17 @@ export class MaskParser {
   public static async loadImage(url: string): Promise<HTMLImageElement> {
     return new Promise((resolve, reject) => {
       const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => resolve(img);
-      img.onerror = (err) => reject(new Error(`Failed to load image from: ${url} (${err})`));
+      const timer = setTimeout(() => {
+        reject(new Error(`Timeout loading image: ${url}`));
+      }, 5000);
+      img.onload = () => {
+        clearTimeout(timer);
+        resolve(img);
+      };
+      img.onerror = () => {
+        clearTimeout(timer);
+        reject(new Error(`Failed to load image from: ${url}`));
+      };
       img.src = url;
     });
   }

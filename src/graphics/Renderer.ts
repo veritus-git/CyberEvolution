@@ -57,18 +57,13 @@ export class Renderer {
     ctx.translate(this.offsetX, this.offsetY);
     ctx.scale(this.scale, this.scale);
 
-    // Clip to logical frame 1920x1080
-    ctx.beginPath();
-    ctx.rect(0, 0, CONFIG.LOGICAL_WIDTH, CONFIG.LOGICAL_HEIGHT);
-    ctx.clip();
-
-    // 1. Render Play Area Background & Offset (bars at top and bottom)
+    // 1. Render Play Area Background & Offset
     const playAreaY = CONFIG.BAR_HEIGHT;
     ctx.save();
     ctx.translate(0, playAreaY);
 
     // Background image if available
-    if (level.backgroundImage && level.backgroundImage.complete) {
+    if (level.backgroundImage && level.backgroundImage.complete && level.backgroundImage.naturalWidth > 0) {
       // Draw background with camera offset
       ctx.drawImage(
         level.backgroundImage,
@@ -78,28 +73,40 @@ export class Renderer {
         CONFIG.PLAY_HEIGHT
       );
     } else {
-      // Procedural cyberpunk grid background if image not loaded yet
+      // Procedural background if image not loaded yet
       this.drawProceduralBackground(ctx, level.width, camera.snapX);
     }
 
-    // 2. Render Ladders
+    // 2. Render Ladders (view culled)
     for (const ladder of level.ladders) {
-      this.drawLadder(ctx, ladder.bounds, camera.snapX);
+      const rx = ladder.bounds.x - camera.snapX;
+      if (rx + ladder.bounds.width >= 0 && rx <= CONFIG.LOGICAL_WIDTH) {
+        this.drawLadder(ctx, ladder.bounds, camera.snapX);
+      }
     }
 
-    // 3. Render Portals
+    // 3. Render Portals (view culled)
     for (const portal of level.portals) {
-      this.drawPortal(ctx, portal.bounds, camera.snapX, portal.label || 'PORTAL');
+      const rx = portal.bounds.x - camera.snapX;
+      if (rx + portal.bounds.width >= 0 && rx <= CONFIG.LOGICAL_WIDTH) {
+        this.drawPortal(ctx, portal.bounds, camera.snapX, portal.label || 'PORTAL');
+      }
     }
 
-    // 4. Render Gates
+    // 4. Render Gates (view culled)
     for (const gate of level.gates) {
-      this.drawGate(ctx, gate.bounds, gate.locked, camera.snapX);
+      const rx = gate.bounds.x - camera.snapX;
+      if (rx + gate.bounds.width >= 0 && rx <= CONFIG.LOGICAL_WIDTH) {
+        this.drawGate(ctx, gate.bounds, gate.locked, camera.snapX);
+      }
     }
 
-    // 5. Render Triggers
+    // 5. Render Triggers (view culled)
     for (const trig of level.triggers) {
-      this.drawTrigger(ctx, trig.bounds, camera.snapX, trig.activated);
+      const rx = trig.bounds.x - camera.snapX;
+      if (rx + trig.bounds.width >= 0 && rx <= CONFIG.LOGICAL_WIDTH) {
+        this.drawTrigger(ctx, trig.bounds, camera.snapX, trig.activated);
+      }
     }
 
     // 6. Render Player
@@ -107,33 +114,15 @@ export class Renderer {
 
     // 7. Render Debug Overlays (Hitboxes, colliders, coords)
     if (this.showDebug) {
-      this.renderDebug(ctx, level, player, camera);
+      this.renderDebug(ctx, level, player, camera, fps);
     }
 
     ctx.restore(); // Restore playAreaY
 
-    // 8. Top and Bottom Cinematic Bars
+    // 8. Top and Bottom Cinematic Bars (Clean, zero text clutter)
     ctx.fillStyle = '#05070c';
     ctx.fillRect(0, 0, CONFIG.LOGICAL_WIDTH, CONFIG.BAR_HEIGHT);
     ctx.fillRect(0, CONFIG.LOGICAL_HEIGHT - CONFIG.BAR_HEIGHT, CONFIG.LOGICAL_WIDTH, CONFIG.BAR_HEIGHT);
-
-    // Top Bar HUD: World Title & Evo Stage
-    ctx.fillStyle = '#00e5ff';
-    ctx.font = 'bold 24px "Pixel Emulator", monospace, sans-serif';
-    ctx.textAlign = 'left';
-    ctx.textBaseline = 'middle';
-    ctx.fillText(`CYBER EVOLUTION — ${level.name.toUpperCase()}`, 40, CONFIG.BAR_HEIGHT / 2);
-
-    ctx.fillStyle = '#a0aec0';
-    ctx.font = '18px monospace, sans-serif';
-    ctx.textAlign = 'right';
-    ctx.fillText(`ETAP ROZWOJU: ${player.skinId}/5  |  FPS: ${Math.round(fps)}`, CONFIG.LOGICAL_WIDTH - 40, CONFIG.BAR_HEIGHT / 2);
-
-    // Bottom Bar HUD: Instructions
-    ctx.fillStyle = '#718096';
-    ctx.font = '16px monospace, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('A/D lub Joystick: Ruch  |  SPACJA/SKOK: Skok  |  E/AKCJA: Drabina/Portal  |  1..5: Skiny  |  F2: Hitboxy', CONFIG.LOGICAL_WIDTH / 2, CONFIG.LOGICAL_HEIGHT - CONFIG.BAR_HEIGHT / 2);
 
     ctx.restore(); // Restore logical scale
   }
@@ -259,18 +248,16 @@ export class Renderer {
     }
   }
 
-  private renderDebug(ctx: CanvasRenderingContext2D, level: Level, player: Player, camera: Camera): void {
+  private renderDebug(ctx: CanvasRenderingContext2D, level: Level, player: Player, camera: Camera, fps: number): void {
     ctx.save();
     // 1. Draw all solid collider bounds
     ctx.strokeStyle = '#22c55e'; // Green
     ctx.lineWidth = 2;
     for (const solid of level.getActiveSolids()) {
-      ctx.strokeRect(
-        Math.round(solid.x - camera.snapX),
-        Math.round(solid.y),
-        solid.width,
-        solid.height
-      );
+      const rx = Math.round(solid.x - camera.snapX);
+      if (rx + solid.width >= 0 && rx <= CONFIG.LOGICAL_WIDTH) {
+        ctx.strokeRect(rx, Math.round(solid.y), solid.width, solid.height);
+      }
     }
 
     // 2. Draw Player Hitbox
@@ -284,20 +271,25 @@ export class Renderer {
     );
 
     // 3. Coordinate & State Overlay
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
-    ctx.fillRect(20, 20, 360, 160);
+    ctx.fillStyle = 'rgba(7, 9, 14, 0.88)';
+    ctx.fillRect(20, 20, 420, 180);
     ctx.strokeStyle = '#00e5ff';
-    ctx.lineWidth = 1;
-    ctx.strokeRect(20, 20, 360, 160);
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(20, 20, 420, 180);
+
+    ctx.fillStyle = '#00e5ff';
+    ctx.font = 'bold 16px monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText(`DEBUG OVERLAY [F2]  |  FPS: ${Math.round(fps)}`, 35, 45);
 
     ctx.fillStyle = '#ffffff';
-    ctx.font = '14px monospace';
-    ctx.textAlign = 'left';
-    ctx.fillText(`PLAYER POS: (${Math.round(player.physics.x)}, ${Math.round(player.physics.y)})`, 35, 45);
-    ctx.fillText(`VELOCITY:   VX=${Math.round(player.physics.vx)} VY=${Math.round(player.physics.vy)}`, 35, 70);
-    ctx.fillText(`STATE:      GROUNDED=${player.physics.onGround} CLIMB=${player.physics.isClimbing}`, 35, 95);
-    ctx.fillText(`COLLIDERS:  ${level.getActiveSolids().length} AABB merged rects`, 35, 120);
-    ctx.fillText(`CAMERA X:   ${camera.snapX}px`, 35, 145);
+    ctx.font = '13px monospace';
+    ctx.fillText(`PLAYER:   X=${Math.round(player.physics.x)} Y=${Math.round(player.physics.y)}  |  FACING: ${player.physics.facing.toUpperCase()}`, 35, 70);
+    ctx.fillText(`VELOCITY: VX=${Math.round(player.physics.vx)} VY=${Math.round(player.physics.vy)}`, 35, 95);
+    ctx.fillText(`STATE:    GROUNDED=${player.physics.onGround}  CLIMB=${player.physics.isClimbing}`, 35, 120);
+    ctx.fillText(`SKIN:     EVO ${player.skinId}/5  |  COLLIDERS: ${level.getActiveSolids().length} AABBs`, 35, 145);
+    ctx.fillStyle = '#94a3b8';
+    ctx.fillText(`STEROWANIE: A/D:Ruch | SPACJA:Skok | E:Akcja | 1..5:Skin | F11:Pełny ekran`, 35, 172);
 
     ctx.restore();
   }

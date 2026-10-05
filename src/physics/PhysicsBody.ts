@@ -22,7 +22,6 @@ export class PhysicsBody {
 
   // Game feel timers
   private coyoteTimer: number = 0;
-  private jumpBufferTimer: number = 0;
 
   constructor(x: number, y: number, width: number = CONFIG.PLAYER_WIDTH, height: number = CONFIG.PLAYER_HEIGHT) {
     this.bounds = new AABB(x, y, width, height);
@@ -76,7 +75,7 @@ export class PhysicsBody {
       return;
     }
 
-    // 3. Normal Platformer Physics
+    // 3. Normal Platformer Physics (1:1 with Python original: instant response, zero slipping)
     // Ground and coyote tracking
     if (this.onGround) {
       this.coyoteTimer = CONFIG.COYOTE_TIME;
@@ -84,55 +83,35 @@ export class PhysicsBody {
       this.coyoteTimer = Math.max(0, this.coyoteTimer - dt);
     }
 
-    // Jump buffering
-    if (input.jumpPressed) {
-      this.jumpBufferTimer = CONFIG.JUMP_BUFFER;
-    } else {
-      this.jumpBufferTimer = Math.max(0, this.jumpBufferTimer - dt);
-    }
-
-    // Horizontal acceleration & friction
-    const targetVx = input.moveX * CONFIG.MOVE_SPEED;
+    // Direct 1:1 velocity (no acceleration lag or ice-sliding)
     if (Math.abs(input.moveX) > 0.05) {
-      // Accelerating
-      const accel = CONFIG.ACCELERATION * dt;
-      if (this.vx < targetVx) {
-        this.vx = Math.min(targetVx, this.vx + accel);
-      } else if (this.vx > targetVx) {
-        this.vx = Math.max(targetVx, this.vx - accel);
-      }
+      this.vx = (input.moveX > 0 ? 1 : -1) * CONFIG.MOVE_SPEED;
       this.facing = input.moveX > 0 ? 'right' : 'left';
     } else {
-      // Decelerating / friction
-      const friction = CONFIG.FRICTION * dt;
-      if (this.vx > 0) {
-        this.vx = Math.max(0, this.vx - friction);
-      } else if (this.vx < 0) {
-        this.vx = Math.min(0, this.vx + friction);
-      }
+      this.vx = 0;
     }
 
-    // Jump execution (coyote + buffer)
-    if (this.jumpBufferTimer > 0 && this.coyoteTimer > 0) {
+    // Jump execution (1:1 with Python original)
+    if (input.jumpPressed && (this.onGround || this.coyoteTimer > 0)) {
       this.vy = -CONFIG.JUMP_SPEED;
       this.onGround = false;
       this.coyoteTimer = 0;
-      this.jumpBufferTimer = 0;
-    }
-
-    // Variable jump height: release early to jump lower
-    if (!input.jumpHeld && this.vy < -CONFIG.MIN_JUMP_SPEED) {
-      this.vy = -CONFIG.MIN_JUMP_SPEED;
     }
 
     // Apply gravity
     this.vy += CONFIG.GRAVITY * dt;
 
+    // Filter nearby solids for ultra-high FPS
+    const playerCenterX = this.bounds.centerX;
+    const nearbySolids = solids.filter(
+      (s) => Math.abs(s.centerX - playerCenterX) < 700
+    );
+
     // 4. Resolve Horizontal Movement with Stair-stepping
-    this.moveHorizontal(this.vx * dt, solids);
+    this.moveHorizontal(this.vx * dt, nearbySolids);
 
     // 5. Resolve Vertical Movement
-    this.moveVertical(this.vy * dt, solids);
+    this.moveVertical(this.vy * dt, nearbySolids);
 
     // Clamp inside world borders
     this.clampToWorld(worldWidth);

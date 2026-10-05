@@ -70,6 +70,32 @@ html, body {
   gap: 10px;
   pointer-events: auto;
   z-index: 10;
+  transition: opacity 0.2s ease;
+}
+
+.mobile-top-bar.hidden {
+  display: none !important;
+}
+
+.error-banner {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(239, 68, 68, 0.95);
+  color: #ffffff;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  z-index: 100;
+  pointer-events: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  max-width: 90%;
+  word-break: break-all;
+}
+
+.error-banner.hidden {
+  display: none;
 }
 
 .mobile-btn {

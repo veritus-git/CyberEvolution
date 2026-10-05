@@ -119,13 +119,23 @@ export class Player {
     ctx.save();
 
     if (frameToDraw && frameToDraw.complete && frameToDraw.naturalWidth > 0) {
-      // Draw pixel-art sprite with flip
+      // Scale by height to match hitbox height (250px), preserve natural aspect ratio for width
+      const targetH = h;
+      const naturalW = frameToDraw.naturalWidth;
+      const naturalH = frameToDraw.naturalHeight;
+      const targetW = Math.round(naturalW * (targetH / naturalH));
+
+      // Horizontally centered on the player hitbox
+      const playerCenterX = screenX + w / 2;
+      const drawX = Math.round(playerCenterX - targetW / 2);
+      const drawY = screenY;
+
       if (this.physics.facing === 'left') {
-        ctx.translate(screenX + w, screenY);
+        ctx.translate(playerCenterX, 0);
         ctx.scale(-1, 1);
-        ctx.drawImage(frameToDraw, 0, 0, w, h);
+        ctx.drawImage(frameToDraw, Math.round(-targetW / 2), drawY, targetW, targetH);
       } else {
-        ctx.drawImage(frameToDraw, screenX, screenY, w, h);
+        ctx.drawImage(frameToDraw, drawX, drawY, targetW, targetH);
       }
     } else {
       // Fallback procedural cyberpunk avatar if sprite is still loading

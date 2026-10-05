@@ -37,12 +37,17 @@ export class VirtualJoystick {
   private interactBtnY = 0;
   private interactBtnRadius = 40;
 
-  // Enable/disable
-  public enabled = true;
-  public visible = true;
+  // Device detection & debug mode
+  public isTouchDevice: boolean = false;
+  public forceDebugVisible: boolean = false;
 
   constructor(private container: HTMLElement) {
+    this.isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     this.setupListeners();
+  }
+
+  get isInteractive(): boolean {
+    return this.isTouchDevice || this.forceDebugVisible;
   }
 
   public updateLayout(screenWidth: number, screenHeight: number): void {
@@ -72,7 +77,7 @@ export class VirtualJoystick {
   }
 
   private onPointerDown(e: PointerEvent): void {
-    if (!this.enabled) return;
+    if (!this.isInteractive) return;
     const rect = this.container.getBoundingClientRect();
     const px = e.clientX - rect.left;
     const py = e.clientY - rect.top;
@@ -190,7 +195,7 @@ export class VirtualJoystick {
    * Render modern semi-transparent glowing controls overlay on canvas.
    */
   public render(ctx: CanvasRenderingContext2D): void {
-    if (!this.visible) return;
+    if (!this.isInteractive) return;
 
     ctx.save();
 

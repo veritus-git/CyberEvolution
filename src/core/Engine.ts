@@ -149,8 +149,8 @@ export class Engine {
       this.fpsTimer = 0;
     }
 
-    // Fixed timestep accumulator
-    this.accumulator += frameTime;
+    // Fixed timestep accumulator (capped to avoid spiral of lag)
+    this.accumulator = Math.min(this.accumulator + frameTime, 0.1);
     while (this.accumulator >= this.fixedDt) {
       this.fixedUpdate(this.fixedDt);
       this.accumulator -= this.fixedDt;
@@ -166,7 +166,7 @@ export class Engine {
 
     this.renderer.render(this.level, this.player, this.camera, frameTime, this.fps);
 
-    // Render virtual joystick on canvas
+    // Render virtual joystick on canvas (only on touch devices or under F2 debug)
     this.joystick.render(this.renderer.ctx);
 
     requestAnimationFrame((t) => this.loop(t));
@@ -176,6 +176,7 @@ export class Engine {
     // Check hotkeys
     if (this.input.debugToggleTriggered) {
       this.renderer.showDebug = !this.renderer.showDebug;
+      this.joystick.forceDebugVisible = this.renderer.showDebug;
       this.input.debugToggleTriggered = false;
     }
 

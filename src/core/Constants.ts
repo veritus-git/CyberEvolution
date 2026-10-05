@@ -12,19 +12,15 @@ export const CONFIG = {
   PLAYER_WIDTH: 105,
   PLAYER_HEIGHT: 250,
 
-  // Physics constants
+  // Physics constants (1:1 matching Python original)
   MOVE_SPEED: 750.0,
-  ACCELERATION: 4000.0,
-  FRICTION: 3500.0,
   GRAVITY: 2700.0,
   JUMP_SPEED: 875.0,
-  MIN_JUMP_SPEED: 350.0, // For variable jump height
-  CLIMB_SPEED: 650.0,
+  CLIMB_SPEED: 700.0,
 
-  // Game feel / polish
-  COYOTE_TIME: 0.12, // seconds
-  JUMP_BUFFER: 0.15, // seconds
-  MAX_STEP_UP: 32, // Stair-step tolerance (1 tile)
+  // Game feel / timers (matching original)
+  COYOTE_TIME: 0.10, // seconds
+  MAX_STEP_UP: 32, // Stair-step tolerance (1 tile = 32px)
   GROUND_LOSS_RATIO: 0.25,
 
   // Colors for collision masks (RGB hex or tuple)
