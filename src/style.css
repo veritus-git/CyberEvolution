@@ -1,0 +1,210 @@
+@font-face {
+  font-family: 'Pixel Emulator';
+  src: url('/assets/fonts/pixel.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --neon-cyan: #00e5ff;
+  --neon-blue: #2563eb;
+  --neon-purple: #a855f7;
+  --neon-green: #22c55e;
+  --neon-red: #ef4444;
+  --bg-dark: #07090e;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--bg-dark);
+  font-family: 'Pixel Emulator', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace, sans-serif;
+  color: #ffffff;
+  touch-action: none; /* Prevent pinch-to-zoom and rubber-banding on iOS/Android */
+}
+
+#app {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+}
+
+#game-canvas {
+  display: block;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+#ui-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Allow clicks to pass to canvas unless over UI elements */
+}
+
+/* On-screen quick controls bar for mobile */
+.mobile-top-bar {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  display: flex;
+  gap: 10px;
+  pointer-events: auto;
+  z-index: 10;
+}
+
+.mobile-btn {
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(0, 229, 255, 0.5);
+  color: var(--neon-cyan);
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all 0.15s ease;
+}
+
+.mobile-btn:active, .mobile-btn:hover {
+  background: rgba(0, 229, 255, 0.25);
+  border-color: #ffffff;
+  transform: scale(0.96);
+}
+
+/* Security Quiz & Interaction Dialog Modal */
+.dialog-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(2, 6, 23, 0.75);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  z-index: 50;
+  transition: opacity 0.2s ease;
+}
+
+.dialog-overlay.hidden {
+  display: none;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.dialog-card {
+  width: 90%;
+  max-width: 620px;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.92));
+  border: 2px solid var(--neon-cyan);
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 0 30px rgba(0, 229, 255, 0.25), 0 20px 40px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: modalPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalPop {
+  from {
+    transform: scale(0.85);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.dialog-title {
+  color: var(--neon-cyan);
+  font-size: 20px;
+  letter-spacing: 1px;
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+  border-bottom: 1px solid rgba(0, 229, 255, 0.2);
+  padding-bottom: 12px;
+}
+
+.dialog-text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #e2e8f0;
+  white-space: pre-line;
+}
+
+.dialog-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.dialog-btn {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  padding: 14px 18px;
+  border-radius: 10px;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  line-height: 1.4;
+}
+
+.dialog-btn:hover {
+  background: rgba(0, 229, 255, 0.2);
+  border-color: var(--neon-cyan);
+  transform: translateX(4px);
+}
+
+.dialog-btn:active {
+  transform: scale(0.98);
+}
+
+.dialog-feedback {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: bold;
+}
+
+.dialog-feedback.hidden {
+  display: none;
+}
+
+.dialog-feedback.success {
+  background: rgba(34, 197, 94, 0.2);
+  border: 1px solid var(--neon-green);
+  color: #4ade80;
+}
+
+.dialog-feedback.error {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid var(--neon-red);
+  color: #f87171;
+}
