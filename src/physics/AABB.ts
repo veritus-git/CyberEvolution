@@ -51,12 +51,12 @@ export class AABB {
     );
   }
 
-  contains(other: AABB): boolean {
+  contains(other: AABB, tolerance: number = 2): boolean {
     return (
-      other.x >= this.x &&
-      other.x + other.width <= this.x + this.width &&
-      other.y >= this.y &&
-      other.y + other.height <= this.y + this.height
+      other.x >= this.x - tolerance &&
+      other.x + other.width <= this.x + this.width + tolerance &&
+      other.y >= this.y - tolerance &&
+      other.y + other.height <= this.y + this.height + tolerance
     );
   }
 

@@ -2,295 +2,358 @@ import { CONFIG } from '../core/Constants';
 import { Level } from '../world/Level';
 import { Player } from '../entities/Player';
 import { Camera } from '../core/Camera';
+import { Bossfight } from '../world/Bossfight';
 
 export class Renderer {
   public canvas: HTMLCanvasElement;
   public ctx: CanvasRenderingContext2D;
 
-  public scale: number = 1;
-  public offsetX: number = 0;
-  public offsetY: number = 0;
-
   public showDebug: boolean = false;
-  private pulseTimer: number = 0;
+  public suppressLetterbox: boolean = false;
+  private animTimer: number = 0;
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
+
+    this.canvas.width = CONFIG.LOGICAL_WIDTH;
+    this.canvas.height = CONFIG.LOGICAL_HEIGHT;
+
     const context = canvas.getContext('2d', { alpha: false });
-    if (!context) throw new Error('Could not create 2D context for game renderer');
+    if (!context) throw new Error('Could not create 2D context');
     this.ctx = context;
-  }
-
-  /**
-   * Resize canvas to fit screen while maintaining aspect ratio and sharp High-DPI pixels
-   */
-  public resize(windowWidth: number, windowHeight: number): void {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2); // Cap at 2 for performance on high-density screens
-    this.canvas.width = Math.round(windowWidth * dpr);
-    this.canvas.height = Math.round(windowHeight * dpr);
-
-    this.canvas.style.width = `${windowWidth}px`;
-    this.canvas.style.height = `${windowHeight}px`;
-
-    // Compute uniform scale to fit logical 1920x1080 inside window
-    const scaleX = (windowWidth * dpr) / CONFIG.LOGICAL_WIDTH;
-    const scaleY = (windowHeight * dpr) / CONFIG.LOGICAL_HEIGHT;
-    this.scale = Math.min(scaleX, scaleY);
-
-    this.offsetX = Math.round(((windowWidth * dpr) - CONFIG.LOGICAL_WIDTH * this.scale) / 2);
-    this.offsetY = Math.round(((windowHeight * dpr) - CONFIG.LOGICAL_HEIGHT * this.scale) / 2);
-
-    // Disable image smoothing for crisp pixel-art
     this.ctx.imageSmoothingEnabled = false;
   }
 
-  public render(level: Level, player: Player, camera: Camera, dt: number, fps: number): void {
-    this.pulseTimer += dt * 3;
+  public render(
+    level: Level,
+    player: Player,
+    camera: Camera,
+    dt: number,
+    fps: number,
+    activeHint: string | null = null,
+    bossfight?: Bossfight | null,
+    worldIntroTitle: string | null = null,
+    worldIntroAlpha: number = 1.0,
+    transitionState: 'wipe_out' | 'wipe_in' | 'none' = 'none',
+    transitionProgress: number = 0
+  ): void {
+    this.animTimer += dt;
+    level.updateAnimations(dt);
+
     const ctx = this.ctx;
 
-    // Clear whole screen with dark cyberpunk background
-    ctx.fillStyle = '#0a0e17';
-    ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    // Clear frame
+    ctx.fillStyle = '#080a0e';
+    ctx.fillRect(0, 0, CONFIG.LOGICAL_WIDTH, CONFIG.LOGICAL_HEIGHT);
 
-    ctx.save();
-    // Apply logical scaling and centering
-    ctx.translate(this.offsetX, this.offsetY);
-    ctx.scale(this.scale, this.scale);
-
-    // 1. Render Play Area Background & Offset
+    // Play area
     const playAreaY = CONFIG.BAR_HEIGHT;
     ctx.save();
     ctx.translate(0, playAreaY);
 
-    // Background image if available
+    // Screen shake when taking damage in bossfight
+    if (bossfight && bossfight.screenShakeTimer > 0) {
+      const amp = 6;
+      const ox = (Math.random() - 0.5) * amp * 2;
+      const oy = (Math.random() - 0.5) * amp * 2;
+      ctx.translate(ox, oy);
+    }
+
+    // Clip to play bounds
+    ctx.beginPath();
+    ctx.rect(0, 0, CONFIG.LOGICAL_WIDTH, CONFIG.PLAY_HEIGHT);
+    ctx.clip();
+
+    const camX = camera.snapX;
+    const camLeft = camX;
+    const camRight = camLeft + CONFIG.LOGICAL_WIDTH;
+
+    // 1. Draw World Background (scaled to height, preserving natural aspect ratio)
     if (level.backgroundImage && level.backgroundImage.complete && level.backgroundImage.naturalWidth > 0) {
-      // Draw background with camera offset
-      ctx.drawImage(
-        level.backgroundImage,
-        -camera.snapX,
-        0,
-        level.width,
-        CONFIG.PLAY_HEIGHT
-      );
+      const bg = level.backgroundImage;
+      const naturalH = bg.naturalHeight || bg.height;
+      const naturalW = bg.naturalWidth || bg.width;
+      const scale = CONFIG.PLAY_HEIGHT / naturalH;
+      const drawW = Math.round(naturalW * scale);
+
+      ctx.drawImage(bg, -camX, 0, drawW, CONFIG.PLAY_HEIGHT);
     } else {
-      // Procedural background if image not loaded yet
-      this.drawProceduralBackground(ctx, level.width, camera.snapX);
+      this.drawProceduralBackground(ctx, camX);
     }
 
-    // 2. Render Ladders (view culled)
-    for (const ladder of level.ladders) {
-      const rx = ladder.bounds.x - camera.snapX;
-      if (rx + ladder.bounds.width >= 0 && rx <= CONFIG.LOGICAL_WIDTH) {
-        this.drawLadder(ctx, ladder.bounds, camera.snapX);
+    // 2. Draw NPCs (Single sprite per spawn, scaled by height, aspect ratio preserved, centered)
+    for (const npc of level.npcs) {
+      if (npc.bounds.right >= camLeft && npc.bounds.left <= camRight) {
+        this.drawNPC(ctx, npc, camX);
       }
     }
 
-    // 3. Render Portals (view culled)
+    // 3. Draw Portals (Scaled by height, aspect ratio preserved, centered)
     for (const portal of level.portals) {
-      const rx = portal.bounds.x - camera.snapX;
-      if (rx + portal.bounds.width >= 0 && rx <= CONFIG.LOGICAL_WIDTH) {
-        this.drawPortal(ctx, portal.bounds, camera.snapX, portal.label || 'PORTAL');
+      if (portal.bounds.right >= camLeft && portal.bounds.left <= camRight) {
+        this.drawPortal(ctx, portal, camX);
       }
     }
 
-    // 4. Render Gates (view culled)
-    for (const gate of level.gates) {
-      const rx = gate.bounds.x - camera.snapX;
-      if (rx + gate.bounds.width >= 0 && rx <= CONFIG.LOGICAL_WIDTH) {
-        this.drawGate(ctx, gate.bounds, gate.locked, camera.snapX);
-      }
+    // 4. Draw Scroll (if active in arena)
+    if (level.scrollActive && level.scrollRect) {
+      this.drawScroll(ctx, level, camX);
     }
 
-    // 5. Render Triggers (view culled)
-    for (const trig of level.triggers) {
-      const rx = trig.bounds.x - camera.snapX;
-      if (rx + trig.bounds.width >= 0 && rx <= CONFIG.LOGICAL_WIDTH) {
-        this.drawTrigger(ctx, trig.bounds, camera.snapX, trig.activated);
-      }
+    // 5. Draw Player
+    player.draw(ctx, camX, 0);
+
+    // 6. Draw Bossfight entities (Boss, HP bars, Arena scroll)
+    if (bossfight && bossfight.active) {
+      bossfight.render(ctx, camX, player);
     }
 
-    // 6. Render Player
-    player.draw(ctx, camera.snapX, 0);
+    // 7. Draw Interaction Hint Bubble over player's head (e.g. "E: wspinaj się", "E: wejdź", "E: porozmawiaj")
+    if (activeHint && player.physics.isVisible) {
+      this.drawPlayerHint(ctx, player, camX, activeHint);
+    }
 
-    // 7. Render Debug Overlays (Hitboxes, colliders, coords)
+    // 8. Debug overlays (Hitboxes, Triggers, Ladders, Gates) - F2 ONLY!
     if (this.showDebug) {
       this.renderDebug(ctx, level, player, camera, fps);
     }
 
-    ctx.restore(); // Restore playAreaY
+    ctx.restore();
 
-    // 8. Top and Bottom Cinematic Bars (Clean, zero text clutter)
-    ctx.fillStyle = '#05070c';
-    ctx.fillRect(0, 0, CONFIG.LOGICAL_WIDTH, CONFIG.BAR_HEIGHT);
-    ctx.fillRect(0, CONFIG.LOGICAL_HEIGHT - CONFIG.BAR_HEIGHT, CONFIG.LOGICAL_WIDTH, CONFIG.BAR_HEIGHT);
-
-    ctx.restore(); // Restore logical scale
-  }
-
-  private drawLadder(ctx: CanvasRenderingContext2D, bounds: { x: number; y: number; width: number; height: number }, camX: number): void {
-    const rx = Math.round(bounds.x - camX);
-    const ry = Math.round(bounds.y);
-    const rw = bounds.width;
-    const rh = bounds.height;
-
-    ctx.save();
-    // Rails
-    ctx.fillStyle = '#ffd600';
-    ctx.fillRect(rx + 4, ry, 6, rh);
-    ctx.fillRect(rx + rw - 10, ry, 6, rh);
-
-    // Rungs every 24px
-    ctx.fillStyle = '#ffe082';
-    for (let y = ry + 8; y < ry + rh; y += 24) {
-      ctx.fillRect(rx + 6, y, rw - 12, 4);
+    // 9. Letterboxing bars
+    if (!this.suppressLetterbox) {
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, CONFIG.LOGICAL_WIDTH, CONFIG.BAR_HEIGHT);
+      ctx.fillRect(0, CONFIG.LOGICAL_HEIGHT - CONFIG.BAR_HEIGHT, CONFIG.LOGICAL_WIDTH, CONFIG.BAR_HEIGHT);
     }
-    ctx.restore();
-  }
 
-  private drawPortal(ctx: CanvasRenderingContext2D, bounds: { x: number; y: number; width: number; height: number }, camX: number, label: string): void {
-    const rx = Math.round(bounds.x - camX);
-    const ry = Math.round(bounds.y);
-    const rw = bounds.width;
-    const rh = bounds.height;
+    // 10. World Intro Title Card (1.5s steady + 0.6s smooth fade out, 1:1 with Python)
+    if (worldIntroTitle && worldIntroAlpha > 0) {
+      ctx.save();
+      ctx.fillStyle = `rgba(7, 9, 14, ${0.85 * worldIntroAlpha})`;
+      ctx.fillRect(0, 0, CONFIG.LOGICAL_WIDTH, CONFIG.LOGICAL_HEIGHT);
 
-    ctx.save();
-    const glow = Math.sin(this.pulseTimer) * 0.25 + 0.75;
-    ctx.fillStyle = `rgba(0, 229, 255, ${0.25 * glow})`;
-    ctx.fillRect(rx, ry, rw, rh);
+      ctx.globalAlpha = Math.max(0, Math.min(1, worldIntroAlpha));
 
-    ctx.lineWidth = 3;
-    ctx.strokeStyle = `rgba(0, 229, 255, ${glow})`;
-    ctx.strokeRect(rx, ry, rw, rh);
-
-    // Pulse core
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 16px monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText(label, rx + rw / 2, ry - 14);
-    ctx.restore();
-  }
-
-  private drawGate(ctx: CanvasRenderingContext2D, bounds: { x: number; y: number; width: number; height: number }, locked: boolean, camX: number): void {
-    const rx = Math.round(bounds.x - camX);
-    const ry = Math.round(bounds.y);
-    const rw = bounds.width;
-    const rh = bounds.height;
-
-    ctx.save();
-    if (locked) {
-      ctx.fillStyle = 'rgba(239, 68, 68, 0.4)';
-      ctx.fillRect(rx, ry, rw, rh);
-      ctx.strokeStyle = '#ef4444';
-      ctx.lineWidth = 3;
-      ctx.strokeRect(rx, ry, rw, rh);
-      // Hazard diagonal lines
-      ctx.strokeStyle = 'rgba(239, 68, 68, 0.6)';
-      ctx.beginPath();
-      for (let y = ry; y < ry + rh; y += 20) {
-        ctx.moveTo(rx, y);
-        ctx.lineTo(rx + rw, y + rw);
+      // Massive cinematic title spanning across screen (1:1 with user requirement)
+      let titleFontSize = 130;
+      ctx.font = `${titleFontSize}px 'Jersey 10', 'VT323', monospace`;
+      const measuredW = ctx.measureText(worldIntroTitle).width;
+      const maxW = CONFIG.LOGICAL_WIDTH * 0.90;
+      if (measuredW > maxW) {
+        titleFontSize = Math.floor(titleFontSize * (maxW / measuredW));
+        ctx.font = `${titleFontSize}px 'Jersey 10', 'VT323', monospace`;
       }
-      ctx.stroke();
-    } else {
-      ctx.fillStyle = 'rgba(34, 197, 94, 0.2)';
-      ctx.fillRect(rx, ry, rw, rh);
-      ctx.strokeStyle = '#22c55e';
-      ctx.strokeRect(rx, ry, rw, rh);
+
+      ctx.fillStyle = '#fff0a0';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(worldIntroTitle, CONFIG.LOGICAL_WIDTH / 2, CONFIG.LOGICAL_HEIGHT / 2);
+      ctx.restore();
     }
-    ctx.restore();
+
+    // 11. Screen Wipe Transition (0.55s, 1:1 with Python wipe_out_down / wipe_in_down)
+    if (transitionState !== 'none' && transitionProgress > 0) {
+      const p = Math.max(0, Math.min(1, transitionProgress));
+      const head = Math.round(p * CONFIG.LOGICAL_HEIGHT);
+      ctx.save();
+      if (transitionState === 'wipe_out') {
+        // Curtain wipes DOWN from 0 to head
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, CONFIG.LOGICAL_WIDTH, head);
+        if (head < CONFIG.LOGICAL_HEIGHT) {
+          const grad = ctx.createLinearGradient(0, head, 0, Math.min(CONFIG.LOGICAL_HEIGHT, head + 50));
+          grad.addColorStop(0, 'rgba(0, 0, 0, 1)');
+          grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, head, CONFIG.LOGICAL_WIDTH, 50);
+        }
+      } else if (transitionState === 'wipe_in') {
+        // Curtain reveals from top down: remaining black from head to bottom
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, head, CONFIG.LOGICAL_WIDTH, Math.max(0, CONFIG.LOGICAL_HEIGHT - head));
+        if (head > 0) {
+          const grad = ctx.createLinearGradient(0, Math.max(0, head - 50), 0, head);
+          grad.addColorStop(0, 'rgba(0, 0, 0, 0)');
+          grad.addColorStop(1, 'rgba(0, 0, 0, 1)');
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, Math.max(0, head - 50), CONFIG.LOGICAL_WIDTH, 50);
+        }
+      }
+      ctx.restore();
+    }
   }
 
-  private drawTrigger(ctx: CanvasRenderingContext2D, bounds: { x: number; y: number; width: number; height: number }, camX: number, activated: boolean): void {
-    const rx = Math.round(bounds.x - camX);
-    const ry = Math.round(bounds.y);
-    const rw = bounds.width;
-    const rh = bounds.height;
+  private drawNPC(ctx: CanvasRenderingContext2D, npc: any, camX: number): void {
+    const rx = npc.bounds.x - camX;
+    const ry = npc.bounds.y;
+    const rw = npc.bounds.width;
+    const rh = npc.bounds.height;
+
+    if (npc.frames && npc.frames.length > 0) {
+      const frame = npc.frames[npc.frameIndex || 0];
+      if (frame && frame.complete && frame.naturalWidth > 0) {
+        // Height equals hitbox height, width maintains natural aspect ratio!
+        const targetH = rh;
+        const scale = targetH / frame.naturalHeight;
+        const targetW = Math.round(frame.naturalWidth * scale);
+        const drawX = Math.round(rx + rw / 2 - targetW / 2);
+        const drawY = Math.round(ry + rh - targetH);
+        ctx.drawImage(frame, drawX, drawY, targetW, targetH);
+        return;
+      }
+    }
+  }
+
+  private drawPortal(ctx: CanvasRenderingContext2D, portal: any, camX: number): void {
+    const rx = portal.bounds.x - camX;
+    const ry = portal.bounds.y;
+    const rw = portal.bounds.width;
+    const rh = portal.bounds.height;
+
+    if (portal.frames && portal.frames.length > 0) {
+      const frame = portal.frames[portal.frameIndex || 0];
+      if (frame && frame.complete && frame.naturalWidth > 0) {
+        // Portals stand tall (at least 350px tall, upright and towering, never squashed or lying flat!)
+        const targetH = Math.max(rh, 350);
+        const scale = targetH / frame.naturalHeight;
+        const targetW = Math.round(frame.naturalWidth * scale);
+        const drawX = Math.round(rx + rw / 2 - targetW / 2);
+        const drawY = Math.round(ry + rh - targetH);
+        ctx.drawImage(frame, drawX, drawY, targetW, targetH);
+        return;
+      }
+    }
+  }
+
+  private drawPlayerHint(ctx: CanvasRenderingContext2D, player: Player, camX: number, text: string): void {
+    const px = Math.round(player.physics.x - camX + player.physics.width / 2);
+    const py = Math.round(player.physics.y - 14);
 
     ctx.save();
-    const glow = Math.sin(this.pulseTimer * 1.5) * 0.2 + 0.4;
-    ctx.fillStyle = activated ? 'rgba(168, 85, 247, 0.1)' : `rgba(168, 85, 247, ${glow})`;
-    ctx.fillRect(rx, ry, rw, rh);
-
-    ctx.strokeStyle = activated ? 'rgba(168, 85, 247, 0.4)' : '#c084fc';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(rx, ry, rw, rh);
-
-    // Glowing question mark beacon
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 22px monospace';
+    ctx.font = "24px 'Jersey 10', 'VT323', monospace";
     ctx.textAlign = 'center';
-    ctx.fillText('?', rx + rw / 2, ry + rh / 2 + 8);
+    ctx.textBaseline = 'bottom';
+
+    // Thin 1.5px outline for crisp retro legibility (NO fake bold, NO thick chunky stroke)
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1.5;
+    ctx.lineJoin = 'miter';
+    ctx.miterLimit = 2;
+    ctx.strokeText(text, px, py);
+
+    // Pure white text, NO background (1:1 with Python prototype line 3171/3174)
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(text, px, py);
     ctx.restore();
   }
 
-  private drawProceduralBackground(ctx: CanvasRenderingContext2D, worldWidth: number, camX: number): void {
-    // Deep neon gradient
-    const grad = ctx.createLinearGradient(0, 0, 0, CONFIG.PLAY_HEIGHT);
-    grad.addColorStop(0, '#0f172a');
-    grad.addColorStop(1, '#020617');
-    ctx.fillStyle = grad;
-    ctx.fillRect(-camX, 0, worldWidth, CONFIG.PLAY_HEIGHT);
+  private drawScroll(ctx: CanvasRenderingContext2D, level: Level, camX: number): void {
+    if (!level.scrollRect) return;
+    const bob = Math.sin(this.animTimer * 1.2) * 5;
+    const rx = level.scrollRect.x - camX;
+    const ry = level.scrollRect.y + bob;
+    const rw = level.scrollRect.width;
+    const rh = level.scrollRect.height;
 
-    // Grid lines
+    if (level.scrollImage && level.scrollImage.complete && level.scrollImage.naturalWidth > 0) {
+      ctx.drawImage(level.scrollImage, rx, ry, rw, rh);
+    } else {
+      ctx.fillStyle = '#fde047';
+      ctx.fillRect(rx, ry, rw, rh);
+      ctx.strokeStyle = '#ca8a04';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(rx, ry, rw, rh);
+    }
+  }
+
+  private drawProceduralBackground(ctx: CanvasRenderingContext2D, camX: number): void {
+    ctx.fillStyle = '#0f172a';
+    ctx.fillRect(0, 0, CONFIG.LOGICAL_WIDTH, CONFIG.PLAY_HEIGHT);
     ctx.strokeStyle = 'rgba(30, 41, 59, 0.5)';
     ctx.lineWidth = 1;
-    for (let x = -camX % 64; x < CONFIG.LOGICAL_WIDTH; x += 64) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, CONFIG.PLAY_HEIGHT);
-      ctx.stroke();
+    const ox = -(camX % 64);
+    for (let x = ox; x < CONFIG.LOGICAL_WIDTH; x += 64) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, CONFIG.PLAY_HEIGHT); ctx.stroke();
     }
     for (let y = 0; y < CONFIG.PLAY_HEIGHT; y += 64) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(CONFIG.LOGICAL_WIDTH, y);
-      ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(CONFIG.LOGICAL_WIDTH, y); ctx.stroke();
     }
   }
 
   private renderDebug(ctx: CanvasRenderingContext2D, level: Level, player: Player, camera: Camera, fps: number): void {
-    ctx.save();
-    // 1. Draw all solid collider bounds
-    ctx.strokeStyle = '#22c55e'; // Green
+    const camLeft = camera.snapX;
+    const camRight = camLeft + CONFIG.LOGICAL_WIDTH;
+
+    // Solid colliders (Green)
+    ctx.strokeStyle = '#22c55e';
     ctx.lineWidth = 2;
     for (const solid of level.getActiveSolids()) {
-      const rx = Math.round(solid.x - camera.snapX);
-      if (rx + solid.width >= 0 && rx <= CONFIG.LOGICAL_WIDTH) {
-        ctx.strokeRect(rx, Math.round(solid.y), solid.width, solid.height);
+      if (solid.right >= camLeft && solid.left <= camRight) {
+        ctx.strokeRect((solid.x - camLeft) | 0, solid.y | 0, solid.width, solid.height);
       }
     }
 
-    // 2. Draw Player Hitbox
-    ctx.strokeStyle = '#ef4444'; // Red
+    // Ladders (Yellow)
+    ctx.strokeStyle = '#ffd600';
+    ctx.lineWidth = 2;
+    for (const lad of level.ladders) {
+      if (lad.bounds.right >= camLeft && lad.bounds.left <= camRight) {
+        ctx.strokeRect((lad.bounds.x - camLeft) | 0, lad.bounds.y | 0, lad.bounds.width, lad.bounds.height);
+      }
+    }
+
+    // Gates (F2 Debug ONLY!)
+    for (const gate of level.gates) {
+      if (gate.bounds.right >= camLeft && gate.bounds.left <= camRight) {
+        ctx.strokeStyle = gate.locked ? '#ef4444' : '#22c55e';
+        ctx.lineWidth = 2;
+        ctx.strokeRect((gate.bounds.x - camLeft) | 0, gate.bounds.y | 0, gate.bounds.width, gate.bounds.height);
+      }
+    }
+
+    // Triggers (Magenta)
+    ctx.strokeStyle = '#d946ef';
+    ctx.lineWidth = 2;
+    for (const trig of level.triggers) {
+      if (trig.bounds.right >= camLeft && trig.bounds.left <= camRight) {
+        ctx.strokeRect((trig.bounds.x - camLeft) | 0, trig.bounds.y | 0, trig.bounds.width, trig.bounds.height);
+      }
+    }
+
+    // Player Hitbox (Red)
+    ctx.strokeStyle = '#ef4444';
     ctx.lineWidth = 3;
     ctx.strokeRect(
-      Math.round(player.physics.x - camera.snapX),
-      Math.round(player.physics.y),
+      (player.physics.x - camLeft) | 0,
+      player.physics.y | 0,
       player.physics.width,
       player.physics.height
     );
 
-    // 3. Coordinate & State Overlay
-    ctx.fillStyle = 'rgba(7, 9, 14, 0.88)';
-    ctx.fillRect(20, 20, 420, 180);
+    // Debug Info Panel
+    ctx.fillStyle = 'rgba(7, 9, 14, 0.9)';
+    ctx.fillRect(20, 20, 480, 220);
     ctx.strokeStyle = '#00e5ff';
     ctx.lineWidth = 1.5;
-    ctx.strokeRect(20, 20, 420, 180);
+    ctx.strokeRect(20, 20, 480, 220);
 
     ctx.fillStyle = '#00e5ff';
-    ctx.font = 'bold 16px monospace';
+    ctx.font = "18px 'Jersey 10', 'VT323', monospace";
     ctx.textAlign = 'left';
-    ctx.fillText(`DEBUG OVERLAY [F2]  |  FPS: ${Math.round(fps)}`, 35, 45);
+    ctx.fillText(`DEBUG [F2]  |  FPS: ${Math.round(fps)}`, 35, 45);
 
     ctx.fillStyle = '#ffffff';
-    ctx.font = '13px monospace';
-    ctx.fillText(`PLAYER:   X=${Math.round(player.physics.x)} Y=${Math.round(player.physics.y)}  |  FACING: ${player.physics.facing.toUpperCase()}`, 35, 70);
-    ctx.fillText(`VELOCITY: VX=${Math.round(player.physics.vx)} VY=${Math.round(player.physics.vy)}`, 35, 95);
-    ctx.fillText(`STATE:    GROUNDED=${player.physics.onGround}  CLIMB=${player.physics.isClimbing}`, 35, 120);
-    ctx.fillText(`SKIN:     EVO ${player.skinId}/5  |  COLLIDERS: ${level.getActiveSolids().length} AABBs`, 35, 145);
-    ctx.fillStyle = '#94a3b8';
-    ctx.fillText(`STEROWANIE: A/D:Ruch | SPACJA:Skok | E:Akcja | 1..5:Skin | F11:Pełny ekran`, 35, 172);
+    ctx.font = "16px 'Jersey 10', 'VT323', monospace";
+    ctx.fillText(`POZYCJA:   X=${Math.round(player.physics.x)} Y=${Math.round(player.physics.y)}  |  KIERUNEK: ${player.physics.facing.toUpperCase()}`, 35, 72);
+    ctx.fillText(`PRĘDKOŚĆ:  VX=${Math.round(player.physics.vx)} VY=${Math.round(player.physics.vy)}`, 35, 96);
+    ctx.fillText(`STAN:      ZIEMIA=${player.physics.onGround}  DRABINA=${player.physics.isClimbing}`, 35, 120);
+    ctx.fillText(`SKÓRKA:    EWOLUCJA ${player.skinId}/5  |  ŚCIANY: ${level.getActiveSolids().length}`, 35, 144);
+    ctx.fillText(`ŚWIAT:     ${level.key} (${level.width}x${level.height})`, 35, 168);
 
-    ctx.restore();
+    ctx.fillStyle = '#94a3b8';
+    ctx.font = "15px 'Jersey 10', 'VT323', monospace";
+    ctx.fillText(`A/D:Ruch  SPACJA:Skok  E:Interakcja/Drabina  1..5:Skin  F11:Pełny ekran`, 35, 196);
+    ctx.fillText(`Bramy i hitboxy widoczne tylko w trybie debug F2`, 35, 218);
   }
 }

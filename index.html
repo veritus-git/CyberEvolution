@@ -11,6 +11,22 @@
     <meta name="theme-color" content="#07090e" />
     <title>CyberEvolution — Nowy Silnik Gry</title>
     <link rel="stylesheet" href="/src/style.css" />
+    <script>
+      window.addEventListener('error', function(e) {
+        var b = document.getElementById('error-banner');
+        if (b) {
+          b.textContent = 'Błąd: ' + (e.message || e);
+          b.classList.remove('hidden');
+        }
+      });
+      window.addEventListener('unhandledrejection', function(e) {
+        var b = document.getElementById('error-banner');
+        if (b) {
+          b.textContent = 'Błąd Promise: ' + (e.reason?.message || e.reason);
+          b.classList.remove('hidden');
+        }
+      });
+    </script>
   </head>
   <body>
     <div id="app">
@@ -19,6 +35,7 @@
         <!-- Floating mobile / debug top buttons -->
         <div id="mobile-top-bar" class="mobile-top-bar hidden">
           <button id="btn-fullscreen" class="mobile-btn">⛶ Pełny ekran</button>
+          <button id="btn-switch-world" class="mobile-btn">Świat: Lobby</button>
           <button id="btn-toggle-debug" class="mobile-btn">F2: Hitboxy</button>
           <button id="btn-cycle-skin" class="mobile-btn">Skin: 1</button>
         </div>

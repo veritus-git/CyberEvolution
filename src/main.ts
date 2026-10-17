@@ -5,27 +5,24 @@ function showError(msg: string) {
   if (banner) {
     banner.textContent = msg;
     banner.classList.remove('hidden');
+    setTimeout(() => banner.classList.add('hidden'), 8000);
   }
   console.error(msg);
 }
 
 window.addEventListener('error', (e) => {
-  showError(`Błąd runtime: ${e.message} (${e.filename}:${e.lineno})`);
+  showError(`Runtime error: ${e.message}`);
 });
-
 window.addEventListener('unhandledrejection', (e) => {
-  showError(`Błąd asynchroniczny: ${e.reason}`);
+  showError(`Async error: ${e.reason}`);
 });
 
 function toggleFullscreen() {
+  const el = document.documentElement;
   if (!document.fullscreenElement) {
-    if (document.documentElement.requestFullscreen) {
-      document.documentElement.requestFullscreen().catch(() => {});
-    }
+    el.requestFullscreen?.().catch(() => {});
   } else {
-    if (document.exitFullscreen) {
-      document.exitFullscreen().catch(() => {});
-    }
+    document.exitFullscreen?.().catch(() => {});
   }
 }
 
@@ -38,38 +35,46 @@ async function bootstrap() {
   const skinBtn = document.getElementById('btn-cycle-skin') as HTMLButtonElement;
 
   if (!canvas || !uiContainer) {
-    throw new Error('Canvas or UI container element not found in DOM.');
+    throw new Error('Canvas or UI container not found.');
   }
 
-  // Detect touch device
-  const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+  // Show top bar on touch devices, hidden on PC until F2
+  const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
   if (isTouch) {
     mobileTopBar?.classList.remove('hidden');
-  } else {
-    mobileTopBar?.classList.add('hidden'); // Clean PC experience
   }
 
-  // Pre-load font with safety timeout so mobile never hangs
-  const fontPromise = document.fonts ? document.fonts.load('16px "Pixel Emulator"') : Promise.resolve();
-  const timeoutPromise = new Promise((resolve) => setTimeout(resolve, 800));
-  await Promise.race([fontPromise, timeoutPromise]);
+  // Font loading with short timeout — never block on this
+  try {
+    await Promise.race([
+      document.fonts?.load?.('16px "Jersey 10"') ?? Promise.resolve(),
+      document.fonts?.ready ?? Promise.resolve(),
+      new Promise(r => setTimeout(r, 600)),
+    ]);
+  } catch { /* ignore font failures */ }
+
+  const params = new URLSearchParams(window.location.search);
+  const initialWorld = params.get('world') || 'lobby';
 
   const engine = new Engine(canvas, uiContainer);
-  await engine.init();
+  await engine.init(initialWorld);
 
-  // Fullscreen controls
-  fullscreenBtn?.addEventListener('click', () => {
-    toggleFullscreen();
-  });
-
+  // Fullscreen
+  fullscreenBtn?.addEventListener('click', toggleFullscreen);
   window.addEventListener('keydown', (e) => {
-    if (e.code === 'F11' || (e.code === 'KeyF' && !engine.dialog.isOpen)) {
-      e.preventDefault();
-      toggleFullscreen();
-    }
+    if (e.code === 'F11') { e.preventDefault(); toggleFullscreen(); }
+    if (e.code === 'KeyF' && !engine.dialog.isOpen) { toggleFullscreen(); }
   });
 
-  // Cycle skin button
+  // World switching
+  const worldBtn = document.getElementById('btn-switch-world') as HTMLButtonElement;
+  worldBtn?.addEventListener('click', () => {
+    const nextKey = engine.level.key === 'lobby' ? 'world1' : 'lobby';
+    engine.loadWorld(nextKey);
+    if (worldBtn) worldBtn.textContent = nextKey === 'lobby' ? 'Świat: Lobby' : 'Świat: 1';
+  });
+
+  // Skin cycling
   let currentSkin = 1;
   skinBtn?.addEventListener('click', () => {
     currentSkin = (currentSkin % 5) + 1;
@@ -77,39 +82,57 @@ async function bootstrap() {
     skinBtn.textContent = `Skin: ${currentSkin}`;
   });
 
-  // Toggle debug button
-  const updateDebugUI = () => {
+  // Debug toggle (sync UI with F2 keyboard shortcut)
+  const syncDebugUI = () => {
     const isDbg = engine.renderer.showDebug;
     engine.joystick.forceDebugVisible = isDbg;
-    if (debugBtn) {
-      debugBtn.style.color = isDbg ? '#22c55e' : '#00e5ff';
-    }
+    if (debugBtn) debugBtn.style.color = isDbg ? '#22c55e' : '#00e5ff';
     if (!isTouch && mobileTopBar) {
-      // On PC: show top bar and virtual joystick only when F2 debug is enabled!
-      if (isDbg) {
-        mobileTopBar.classList.remove('hidden');
-      } else {
-        mobileTopBar.classList.add('hidden');
-      }
+      mobileTopBar.classList.toggle('hidden', !isDbg);
     }
   };
 
   debugBtn?.addEventListener('click', () => {
     engine.renderer.showDebug = !engine.renderer.showDebug;
-    updateDebugUI();
+    syncDebugUI();
   });
 
-  // Keyboard F2 sync
   window.addEventListener('keydown', (e) => {
-    if (e.code === 'F2') {
-      setTimeout(() => updateDebugUI(), 10);
-    }
+    if (e.code === 'F2') setTimeout(syncDebugUI, 20);
   });
+
+  (window as any).engine = engine;
+
+  // Sync world button label with initial world
+  if (worldBtn) worldBtn.textContent = initialWorld === 'lobby' ? 'Świat: Lobby' : `Świat: ${initialWorld}`;
+
+  if (params.has('skin')) {
+    const s = parseInt(params.get('skin')!, 10);
+    if (s >= 1 && s <= 5) {
+      currentSkin = s;
+      engine.player.setSkin(s);
+      if (skinBtn) skinBtn.textContent = `Skin: ${s}`;
+    }
+  }
+  if (params.get('debug') === '1') {
+    engine.renderer.showDebug = true;
+    syncDebugUI();
+  }
+  if (params.has('x')) {
+    const targetX = parseFloat(params.get('x')!);
+    engine.player.physics.x = targetX;
+  }
+  if (params.has('quiz')) {
+    const qId = parseInt(params.get('quiz')!, 10);
+    setTimeout(() => {
+      engine.openSecurityQuiz(qId);
+    }, 150);
+  }
 
   engine.start();
   console.log('🚀 CyberEvolution engine running!');
 }
 
 bootstrap().catch((err) => {
-  showError(`Błąd inicjalizacji: ${err.message || err}`);
+  showError(`Init error: ${err?.message || err}`);
 });

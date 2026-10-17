@@ -1,18 +1,56 @@
 @font-face {
-  font-family: 'Pixel Emulator';
-  src: url('/assets/fonts/pixel.ttf') format('truetype');
+  font-family: 'Jersey 10';
+  src: url('/assets/fonts/jersey10.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
-  font-display: swap;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'VT323';
+  src: url('/assets/fonts/vt323.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'Tiny5';
+  src: url('/assets/fonts/jersey10.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'PixelConsolas';
+  src: url('/assets/fonts/jersey10.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'Pixel Emulator';
+  src: url('/assets/fonts/jersey10.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'Jersey 15';
+  src: url('/assets/fonts/jersey10.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
 }
 
 :root {
   --neon-cyan: #00e5ff;
-  --neon-blue: #2563eb;
-  --neon-purple: #a855f7;
-  --neon-green: #22c55e;
-  --neon-red: #ef4444;
   --bg-dark: #07090e;
+  --retro-panel-bg: rgba(16, 18, 24, 0.94);
+  --retro-border: #b9b9dc;
 }
 
 * {
@@ -29,27 +67,37 @@ html, body {
   height: 100%;
   overflow: hidden;
   background-color: var(--bg-dark);
-  font-family: 'Pixel Emulator', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, monospace, sans-serif;
+  font-family: 'Jersey 10', 'VT323', monospace;
+  font-size: 18px;
   color: #ffffff;
-  touch-action: none; /* Prevent pinch-to-zoom and rubber-banding on iOS/Android */
+  touch-action: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 #app {
   position: relative;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at center, #0f172a 0%, #020617 100%);
+  background: #020617;
 }
 
+/* Game canvas: fixed logical resolution, CSS-only scaling to fit screen */
 #game-canvas {
   display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
   image-rendering: -moz-crisp-edges;
   image-rendering: -webkit-crisp-edges;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
+  background: #0a0e17;
 }
 
 #ui-container {
@@ -58,179 +106,439 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none; /* Allow clicks to pass to canvas unless over UI elements */
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 10;
 }
 
-/* On-screen quick controls bar for mobile */
+/* Mobile top bar */
 .mobile-top-bar {
   position: absolute;
-  top: 14px;
-  right: 18px;
+  top: 10px;
+  right: 14px;
   display: flex;
-  gap: 10px;
+  gap: 8px;
+  z-index: 20;
   pointer-events: auto;
-  z-index: 10;
-  transition: opacity 0.2s ease;
 }
 
 .mobile-top-bar.hidden {
   display: none !important;
 }
 
+.mobile-btn {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(0, 229, 255, 0.4);
+  color: #00e5ff;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  touch-action: manipulation;
+  transition: all 0.15s ease;
+}
+
+.mobile-btn:active {
+  transform: scale(0.95);
+  background: rgba(0, 229, 255, 0.2);
+}
+
+/* Error / Toast banner */
 .error-banner {
   position: absolute;
-  bottom: 20px;
+  bottom: 24px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(239, 68, 68, 0.95);
-  color: #ffffff;
-  padding: 12px 20px;
+  background: rgba(220, 38, 38, 0.95);
+  color: #fff;
+  padding: 10px 20px;
   border-radius: 8px;
   font-size: 14px;
   z-index: 100;
-  pointer-events: auto;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
   max-width: 90%;
-  word-break: break-all;
+  word-break: break-word;
+  pointer-events: auto;
 }
 
 .error-banner.hidden {
   display: none;
 }
 
-.mobile-btn {
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px solid rgba(0, 229, 255, 0.5);
-  color: var(--neon-cyan);
-  padding: 8px 14px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: bold;
-  cursor: pointer;
-  backdrop-filter: blur(8px);
-  transition: all 0.15s ease;
-}
-
-.mobile-btn:active, .mobile-btn:hover {
-  background: rgba(0, 229, 255, 0.25);
-  border-color: #ffffff;
-  transform: scale(0.96);
-}
-
-/* Security Quiz & Interaction Dialog Modal */
-.dialog-overlay {
+/* ==========================================================================
+   START MENU (1:1 with Python original style)
+   ========================================================================== */
+.start-menu-overlay {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(2, 6, 23, 0.75);
-  backdrop-filter: blur(10px);
+  background: #080a0e url('/assets/start_menu.png') no-repeat center center;
+  background-size: cover;
   display: flex;
   align-items: center;
   justify-content: center;
   pointer-events: auto;
   z-index: 50;
-  transition: opacity 0.2s ease;
 }
 
-.dialog-overlay.hidden {
+.start-menu-overlay.hidden {
   display: none;
-  opacity: 0;
-  pointer-events: none;
 }
 
-.dialog-card {
-  width: 90%;
-  max-width: 620px;
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 41, 59, 0.92));
-  border: 2px solid var(--neon-cyan);
-  border-radius: 16px;
-  padding: 28px;
-  box-shadow: 0 0 30px rgba(0, 229, 255, 0.25), 0 20px 40px rgba(0, 0, 0, 0.6);
+.start-menu-card {
   display: flex;
   flex-direction: column;
-  gap: 20px;
-  animation: modalPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  align-items: center;
+  gap: 30px;
+  padding: 40px;
+  background: rgba(8, 10, 14, 0.7);
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
 }
 
-@keyframes modalPop {
-  from {
-    transform: scale(0.85);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+.start-menu-title {
+  font-family: 'Jersey 10', 'VT323', monospace;
+  font-weight: normal;
+  font-size: clamp(32px, 4.5vw, 50px);
+  color: #dcdeff;
+  text-shadow: 0 0 10px rgba(185, 185, 220, 0.4);
+  letter-spacing: 2px;
 }
 
-.dialog-title {
-  color: var(--neon-cyan);
+.start-menu-options {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 440px;
+}
+
+.start-menu-btn {
+  background: transparent;
+  border: none;
+  color: #c8c8c8;
+  font-family: inherit;
+  font-size: clamp(16px, 2.5vw, 22px);
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.start-menu-btn.selected,
+.start-menu-btn:hover {
+  background: #46465a;
+  color: #ffffff;
+  transform: scale(1.02);
+}
+
+/* ==========================================================================
+   PREINTRO & ENDING OVERLAYS
+   ========================================================================== */
+.intro-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #000000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  z-index: 60;
+  padding: 40px;
+}
+
+.intro-overlay.hidden {
+  display: none;
+}
+
+.intro-content-box {
+  max-width: 1000px;
+  width: 90%;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.intro-text {
+  font-size: clamp(16px, 2vw, 24px);
+  line-height: 1.8;
+  color: #e6e6e6;
+  white-space: pre-wrap;
+}
+
+.intro-hint {
+  font-size: clamp(12px, 1.5vw, 16px);
+  color: #969696;
+  text-align: right;
+}
+
+/* ==========================================================================
+   RETRO DIALOG BOX (1:1 with Python prototype: Avatar Box + Content Panel)
+   ========================================================================== */
+.retro-dialog-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent; /* No full-screen darkening! Background stays crisp & alive */
+  pointer-events: none;
+  z-index: 40;
+}
+
+.retro-dialog-overlay.hidden {
+  display: none;
+}
+
+.retro-dialog-container {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 16px;
+  width: min(1560px, 94vw); /* Wide 1:1 like Python (avatar 270px + gap 16px + panel 1270px = 1556px) */
+  height: 270px; /* Reduced height, matching Python 1:1 proportions */
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: auto;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7);
+  box-sizing: border-box;
+}
+
+.retro-dialog-container.position-top {
+  top: 108px;
+  bottom: auto;
+}
+
+.retro-dialog-container.position-bottom {
+  bottom: 108px;
+  top: auto;
+}
+
+/* Left Avatar Box */
+.retro-avatar-box {
+  width: 270px; /* EXACT SAME 270px height and width as panel! */
+  height: 270px;
+  flex-shrink: 0;
+  background: var(--retro-panel-bg);
+  border: 2px solid var(--retro-border);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.retro-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* Right Content Panel */
+.retro-panel-box {
+  flex: 1;
+  height: 270px; /* EXACT SAME height as avatar box! */
+  background: var(--retro-panel-bg);
+  border: 2px solid var(--retro-border);
+  border-radius: 10px;
+  padding: 14px 22px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* STRICT TOP ALIGNMENT (1:1 with Python, no jumping or middle centering!) */
+  align-items: stretch;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.retro-dialog-title {
+  font-family: 'Jersey 10', 'VT323', monospace;
+  color: #ffff00;
+  font-size: 24px;
+  margin: 0 0 2px 0;
+  font-weight: normal;
+  letter-spacing: 0.5px;
+  line-height: 1.1;
+  text-align: left;
+}
+
+.retro-dialog-speaker {
+  font-family: 'Jersey 10', 'VT323', monospace;
   font-size: 20px;
-  letter-spacing: 1px;
-  text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
-  border-bottom: 1px solid rgba(0, 229, 255, 0.2);
-  padding-bottom: 12px;
+  color: #b4d2ff;
+  margin: 0 0 4px 0;
+  line-height: 1.1;
+  text-align: left;
 }
 
-.dialog-text {
+.retro-dialog-body {
+  font-family: 'Jersey 10', 'VT323', monospace;
+  font-size: 20px;
+  line-height: 1.25;
+  color: #ebebeb;
+  white-space: pre-wrap;
+  flex: 0 0 auto;
+  margin: 0 0 8px 0;
+  text-align: left;
+}
+
+.retro-dialog-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 0 6px 0;
+  text-align: left;
+}
+
+.retro-dialog-choices.hidden {
+  display: none;
+}
+
+.retro-choice-btn {
+  font-family: 'Jersey 10', 'VT323', monospace;
+  background: rgba(30, 40, 55, 0.6);
+  border: 1px solid rgba(185, 185, 220, 0.3);
+  color: #d2d2d2;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 19px;
+  cursor: pointer;
+  transition: all 0.1s ease;
+  line-height: 1.2;
+  text-align: left;
+}
+
+.retro-choice-btn.selected,
+.retro-choice-btn:hover {
+  background: rgba(60, 90, 140, 0.55);
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
+.retro-dialog-hint {
+  font-family: 'Jersey 10', 'VT323', monospace;
   font-size: 15px;
-  line-height: 1.6;
-  color: #e2e8f0;
-  white-space: pre-line;
+  color: #c8c8c8;
+  text-align: right;
+  margin-top: auto; /* Stays anchored at bottom right without shifting body */
+  padding-top: 4px;
 }
 
-.dialog-buttons {
+/* Mobile responsive adjustments */
+@media (max-width: 680px) {
+  .retro-dialog-container {
+    flex-direction: column;
+    max-height: 80vh;
+  }
+  .retro-avatar-box {
+    width: 140px;
+    height: 140px;
+    align-self: center;
+  }
+}
+
+/* ==========================================================================
+   BOSS QUIZ RETRO PANEL
+   ========================================================================== */
+.boss-quiz-overlay {
+  position: absolute;
+  top: 30px;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 45;
+}
+
+.boss-quiz-overlay.hidden {
+  display: none;
+}
+
+.boss-quiz-panel {
+  width: 90%;
+  max-width: 1100px;
+  background: rgba(16, 18, 24, 0.94);
+  border: 2px solid #b9b9dc;
+  border-radius: 12px;
+  padding: 18px 24px;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  margin-top: 8px;
+  pointer-events: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
 }
 
-.dialog-btn {
-  background: rgba(30, 41, 59, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #ffffff;
-  padding: 14px 18px;
-  border-radius: 10px;
-  font-size: 14px;
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.15s ease;
+.boss-quiz-question {
+  color: #ffff00;
+  font-size: clamp(14px, 1.6vw, 19px);
+  font-weight: normal;
   line-height: 1.4;
 }
 
-.dialog-btn:hover {
-  background: rgba(0, 229, 255, 0.2);
-  border-color: var(--neon-cyan);
-  transform: translateX(4px);
+.boss-quiz-choices {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.dialog-btn:active {
-  transform: scale(0.98);
+.boss-choice-btn {
+  background: rgba(30, 40, 55, 0.7);
+  border: 1px solid rgba(185, 185, 220, 0.3);
+  color: #d2d2d2;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-size: clamp(12px, 1.3vw, 15px);
+  cursor: pointer;
+  transition: all 0.1s ease;
+  line-height: 1.4;
 }
 
-.dialog-feedback {
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-size: 14px;
-  line-height: 1.5;
-  font-weight: bold;
+.boss-choice-btn.selected,
+.boss-choice-btn:hover {
+  background: rgba(60, 90, 140, 0.6);
+  border-color: #ffffff;
+  color: #ffffff;
 }
 
-.dialog-feedback.hidden {
-  display: none;
+.boss-choice-btn.correct {
+  background: rgba(34, 197, 94, 0.4) !important;
+  border-color: #22c55e !important;
+  color: #ffffff !important;
 }
 
-.dialog-feedback.success {
-  background: rgba(34, 197, 94, 0.2);
-  border: 1px solid var(--neon-green);
-  color: #4ade80;
+.boss-choice-btn.wrong {
+  background: rgba(239, 68, 68, 0.4) !important;
+  border-color: #ef4444 !important;
+  color: #ffffff !important;
 }
 
-.dialog-feedback.error {
-  background: rgba(239, 68, 68, 0.2);
-  border: 1px solid var(--neon-red);
-  color: #f87171;
+.boss-choice-btn.reveal-correct {
+  background: rgba(234, 179, 8, 0.4) !important;
+  border-color: #eab308 !important;
+  color: #ffffff !important;
 }
+
+.boss-quiz-hint {
+  font-size: 12px;
+  color: #94a3b8;
+  text-align: right;
+}
+

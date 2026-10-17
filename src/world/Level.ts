@@ -6,6 +6,9 @@ export interface Portal {
   bounds: AABB;
   targetWorld: string;
   label?: string;
+  frames?: [HTMLImageElement, HTMLImageElement] | null;
+  frameIndex?: number;
+  animTimer?: number;
 }
 
 export interface Ladder {
@@ -26,6 +29,14 @@ export interface Gate {
   locked: boolean;
 }
 
+export interface NPCSpawn {
+  id: number; // 1, 2, or 3
+  bounds: AABB;
+  frames: [HTMLImageElement, HTMLImageElement] | null;
+  frameIndex: number;
+  animTimer: number;
+}
+
 export class Level {
   public key: string;
   public name: string;
@@ -39,8 +50,15 @@ export class Level {
   public portals: Portal[] = [];
   public triggers: TriggerZone[] = [];
   public gates: Gate[] = [];
+  public npcs: NPCSpawn[] = [];
+  public arenaZones: AABB[] = [];
+  public bossSpawns: AABB[] = [];
+
   public backgroundUrl: string | null = null;
   public backgroundImage: HTMLImageElement | null = null;
+  public scrollImage: HTMLImageElement | null = null;
+  public scrollActive: boolean = false;
+  public scrollRect: AABB | null = null;
 
   constructor(
     key: string = 'lobby',
@@ -69,16 +87,52 @@ export class Level {
   }
 
   public openGate(id: number): void {
-    const gate = this.gates.find((g) => g.id === id);
-    if (gate) {
-      gate.locked = false;
+    for (const gate of this.gates) {
+      if (gate.id === id) {
+        gate.locked = false;
+      }
     }
   }
 
   public lockGate(id: number): void {
-    const gate = this.gates.find((g) => g.id === id);
-    if (gate) {
-      gate.locked = true;
+    for (const gate of this.gates) {
+      if (gate.id === id) {
+        gate.locked = true;
+      }
+    }
+  }
+
+  /**
+   * Effective world boundary (1:1 with Python recompute_world_clip).
+   * Clamps the player and camera so the camera never reveals past locked gates.
+   */
+  public getEffectiveWidth(): number {
+    let effective = this.width;
+    for (const gate of this.gates) {
+      if (gate.locked && gate.bounds.left < effective) {
+        effective = gate.bounds.left;
+      }
+    }
+    return effective;
+  }
+
+  public updateAnimations(dt: number): void {
+    // Portals 2-frame animation tick (0.80s rhythm, 1:1 with Python prototype)
+    for (const p of this.portals) {
+      p.animTimer = (p.animTimer || 0) + dt;
+      if (p.animTimer >= 0.80) {
+        p.animTimer = 0;
+        p.frameIndex = p.frameIndex === 1 ? 0 : 1;
+      }
+    }
+
+    // NPC 2-frame animation tick (0.80s rhythm, 1:1 with Python prototype)
+    for (const npc of this.npcs) {
+      npc.animTimer = (npc.animTimer || 0) + dt;
+      if (npc.animTimer >= 0.80) {
+        npc.animTimer = 0;
+        npc.frameIndex = npc.frameIndex === 1 ? 0 : 1;
+      }
     }
   }
 }

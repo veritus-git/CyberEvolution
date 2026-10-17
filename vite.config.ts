@@ -11,6 +11,12 @@ export default defineConfig({
       allow: ['.'],
     },
   },
+  preview: {
+    host: '0.0.0.0',
+    port: 4173,
+    cors: true,
+    allowedHosts: true,
+  },
   resolve: {
     alias: {
       '@': resolve(import.meta.dirname, './src'),

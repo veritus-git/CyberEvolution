@@ -10,7 +10,7 @@ export class VirtualJoystick {
   private baseRadius = 60;
   private knobRadius = 28;
 
-  // Joystick position (screen pixels)
+  // Joystick position (screen pixels, CSS coordinates)
   private centerX = 0;
   private centerY = 0;
   private knobX = 0;
@@ -28,7 +28,7 @@ export class VirtualJoystick {
   private interactPointerId: number | null = null;
   private interactJustPressed = false;
 
-  // Button positions & sizes
+  // Button positions & sizes (CSS coordinates)
   private jumpBtnX = 0;
   private jumpBtnY = 0;
   private jumpBtnRadius = 45;
@@ -41,7 +41,7 @@ export class VirtualJoystick {
   public isTouchDevice: boolean = false;
   public forceDebugVisible: boolean = false;
 
-  constructor(private container: HTMLElement) {
+  constructor(_listenTarget?: HTMLElement) {
     this.isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
     this.setupListeners();
   }
@@ -51,26 +51,21 @@ export class VirtualJoystick {
   }
 
   public updateLayout(screenWidth: number, screenHeight: number): void {
-    // Position joystick in bottom-left
     this.centerX = Math.max(90, screenWidth * 0.12);
     this.centerY = screenHeight - Math.max(90, screenHeight * 0.22);
     if (!this.joystickActive) {
       this.knobX = this.centerX;
       this.knobY = this.centerY;
     }
-
-    // Position buttons in bottom-right
     this.jumpBtnX = screenWidth - Math.max(80, screenWidth * 0.1);
     this.jumpBtnY = screenHeight - Math.max(100, screenHeight * 0.22);
-
     this.interactBtnX = this.jumpBtnX - 95;
     this.interactBtnY = this.jumpBtnY - 35;
   }
 
   private setupListeners(): void {
-    const el = this.container;
-
-    el.addEventListener('pointerdown', (e) => this.onPointerDown(e), { passive: false });
+    // Listen on window for all pointer events so touch and mouse clicks work anywhere on screen
+    window.addEventListener('pointerdown', (e) => this.onPointerDown(e), { passive: false });
     window.addEventListener('pointermove', (e) => this.onPointerMove(e), { passive: false });
     window.addEventListener('pointerup', (e) => this.onPointerUp(e), { passive: false });
     window.addEventListener('pointercancel', (e) => this.onPointerUp(e), { passive: false });
@@ -78,9 +73,16 @@ export class VirtualJoystick {
 
   private onPointerDown(e: PointerEvent): void {
     if (!this.isInteractive) return;
-    const rect = this.container.getBoundingClientRect();
-    const px = e.clientX - rect.left;
-    const py = e.clientY - rect.top;
+
+    // Do not intercept clicks on buttons or inside dialogs
+    const target = e.target as HTMLElement | null;
+    if (target && (target.tagName === 'BUTTON' || target.closest('button') || target.closest('.dialog-card'))) {
+      return;
+    }
+
+    // Use CSS-pixel coordinates relative to viewport
+    const px = e.clientX;
+    const py = e.clientY;
 
     // Check Jump button
     const distJump = Math.hypot(px - this.jumpBtnX, py - this.jumpBtnY);
@@ -102,13 +104,12 @@ export class VirtualJoystick {
       return;
     }
 
-    // Left half of screen: start joystick (floating if outside base radius)
-    if (px < rect.width * 0.55 && !this.joystickActive) {
+    // Left half of screen: start joystick
+    if (px < window.innerWidth * 0.55 && !this.joystickActive) {
       this.joystickActive = true;
       this.joystickPointerId = e.pointerId;
-
-      // Dynamic repositioning if tapped near joystick zone
-      if (py > rect.height * 0.4) {
+      // Dynamic reposition if tapped in lower half
+      if (py > window.innerHeight * 0.4) {
         this.centerX = px;
         this.centerY = py;
       }
@@ -119,10 +120,7 @@ export class VirtualJoystick {
 
   private onPointerMove(e: PointerEvent): void {
     if (!this.joystickActive || e.pointerId !== this.joystickPointerId) return;
-    const rect = this.container.getBoundingClientRect();
-    const px = e.clientX - rect.left;
-    const py = e.clientY - rect.top;
-    this.updateKnobPosition(px, py);
+    this.updateKnobPosition(e.clientX, e.clientY);
     e.preventDefault();
   }
 
@@ -147,7 +145,6 @@ export class VirtualJoystick {
     const dx = px - this.centerX;
     const dy = py - this.centerY;
     const dist = Math.hypot(dx, dy);
-
     if (dist <= this.baseRadius) {
       this.knobX = px;
       this.knobY = py;
@@ -166,9 +163,7 @@ export class VirtualJoystick {
       const dx = this.knobX - this.centerX;
       const dy = this.knobY - this.centerY;
       const dist = Math.hypot(dx, dy);
-
       if (dist > 10) {
-        // Deadzone 10px
         const norm = Math.min(1.0, dist / this.baseRadius);
         const angle = Math.atan2(dy, dx);
         moveX = Math.cos(angle) * norm;
@@ -184,73 +179,61 @@ export class VirtualJoystick {
       interactPressed: this.interactJustPressed,
     };
 
-    // Reset single-frame presses
     this.jumpJustPressed = false;
     this.interactJustPressed = false;
-
     return state;
   }
 
   /**
-   * Render modern semi-transparent glowing controls overlay on canvas.
+   * Render on a SCREEN-SPACE overlay canvas (not the game canvas).
+   * This avoids coordinate system confusion between game-logical and CSS pixels.
    */
-  public render(ctx: CanvasRenderingContext2D): void {
+  public renderOverlay(overlayCtx: CanvasRenderingContext2D): void {
     if (!this.isInteractive) return;
 
+    const ctx = overlayCtx;
     ctx.save();
 
-    // 1. Draw Joystick Base
+    // Joystick base
     ctx.beginPath();
     ctx.arc(this.centerX, this.centerY, this.baseRadius, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(15, 23, 42, 0.45)';
+    ctx.fillStyle = 'rgba(15,23,42,0.45)';
     ctx.fill();
     ctx.lineWidth = 2;
-    ctx.strokeStyle = this.joystickActive ? 'rgba(0, 229, 255, 0.7)' : 'rgba(255, 255, 255, 0.2)';
+    ctx.strokeStyle = this.joystickActive ? 'rgba(0,229,255,0.7)' : 'rgba(255,255,255,0.2)';
     ctx.stroke();
 
-    // Joystick Knob
+    // Knob
     ctx.beginPath();
     ctx.arc(this.knobX, this.knobY, this.knobRadius, 0, Math.PI * 2);
-    const knobGrad = ctx.createRadialGradient(
-      this.knobX - 5,
-      this.knobY - 5,
-      2,
-      this.knobX,
-      this.knobY,
-      this.knobRadius
-    );
-    knobGrad.addColorStop(0, 'rgba(0, 242, 254, 0.9)');
-    knobGrad.addColorStop(1, 'rgba(79, 172, 254, 0.6)');
-    ctx.fillStyle = knobGrad;
+    ctx.fillStyle = this.joystickActive ? 'rgba(0,229,255,0.7)' : 'rgba(0,242,254,0.5)';
     ctx.fill();
-    ctx.strokeStyle = '#ffffff';
+    ctx.strokeStyle = 'rgba(255,255,255,0.6)';
     ctx.lineWidth = 1.5;
     ctx.stroke();
 
-    // 2. Draw Jump Button
+    // Jump button
     ctx.beginPath();
     ctx.arc(this.jumpBtnX, this.jumpBtnY, this.jumpBtnRadius, 0, Math.PI * 2);
-    ctx.fillStyle = this.jumpActive ? 'rgba(0, 229, 255, 0.7)' : 'rgba(15, 23, 42, 0.5)';
+    ctx.fillStyle = this.jumpActive ? 'rgba(0,229,255,0.7)' : 'rgba(15,23,42,0.5)';
     ctx.fill();
     ctx.lineWidth = 2;
-    ctx.strokeStyle = 'rgba(0, 229, 255, 0.8)';
+    ctx.strokeStyle = 'rgba(0,229,255,0.8)';
     ctx.stroke();
-
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 18px sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillText('SKOK', this.jumpBtnX, this.jumpBtnY);
 
-    // 3. Draw Interact Button
+    // Interact button
     ctx.beginPath();
     ctx.arc(this.interactBtnX, this.interactBtnY, this.interactBtnRadius, 0, Math.PI * 2);
-    ctx.fillStyle = this.interactActive ? 'rgba(255, 171, 0, 0.7)' : 'rgba(15, 23, 42, 0.5)';
+    ctx.fillStyle = this.interactActive ? 'rgba(255,171,0,0.7)' : 'rgba(15,23,42,0.5)';
     ctx.fill();
     ctx.lineWidth = 2;
-    ctx.strokeStyle = 'rgba(255, 171, 0, 0.8)';
+    ctx.strokeStyle = 'rgba(255,171,0,0.8)';
     ctx.stroke();
-
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 15px sans-serif';
     ctx.textAlign = 'center';

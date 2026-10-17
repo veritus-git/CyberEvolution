@@ -3,33 +3,49 @@ export class Camera {
   public y: number = 0;
   public viewportWidth: number;
   public viewportHeight: number;
-  public lerpSpeed: number = 6.0;
+  // Responsive smoothing speed (frame-rate independent)
+  public smoothSpeed: number = 10.0;
 
   constructor(viewportWidth: number, viewportHeight: number) {
     this.viewportWidth = viewportWidth;
     this.viewportHeight = viewportHeight;
   }
 
-  public update(targetCenterX: number, _targetCenterY: number, worldWidth: number, dt: number): void {
-    // Target camera position to keep target in center horizontally
+  public reset(targetCenterX: number, worldWidth: number): void {
     const targetX = targetCenterX - this.viewportWidth / 2;
-    
-    // Smooth horizontal lerp
-    this.x += (targetX - this.x) * Math.min(1.0, this.lerpSpeed * dt);
-
-    // Clamp camera within world bounds
     const maxX = Math.max(0, worldWidth - this.viewportWidth);
-    this.x = Math.max(0, Math.min(maxX, this.x));
-
-    // Vertical camera: can be fixed to 0 if height matches PLAY_HEIGHT
+    this.x = Math.max(0, Math.min(maxX, targetX));
     this.y = 0;
   }
 
+  public update(targetCenterX: number, _targetCenterY: number, worldWidth: number, dt: number): void {
+    const maxX = Math.max(0, worldWidth - this.viewportWidth);
+    if (maxX <= 0) {
+      // World fits on screen (e.g. 1920px lobby) — camera locked at 0
+      this.x = 0;
+      this.y = 0;
+      return;
+    }
+
+    const targetX = targetCenterX - this.viewportWidth / 2;
+    const clampedTargetX = Math.max(0, Math.min(maxX, targetX));
+
+    // Frame-rate independent exponential smoothing
+    // 1 - exp(-speed * dt) guarantees identical behavior at 60Hz, 144Hz, 180Hz, 240Hz!
+    const alpha = 1.0 - Math.exp(-this.smoothSpeed * dt);
+    this.x += (clampedTargetX - this.x) * alpha;
+
+    // Strict clamp
+    this.x = Math.max(0, Math.min(maxX, this.x));
+    this.y = 0;
+  }
+
+  // Use floating-point camera X for subpixel-smooth scrolling without rounding jitter
   get snapX(): number {
-    return Math.round(this.x);
+    return this.x;
   }
 
   get snapY(): number {
-    return Math.round(this.y);
+    return this.y;
   }
 }
