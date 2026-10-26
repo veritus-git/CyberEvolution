@@ -1,121 +1,121 @@
 BOSSNAME: Monolit Algorytmu
 INTRO: Spójrz w mój krystaliczny rdzeń. Widzisz te wirujące symbole i fioletowe linie? To ja decyduję, co czujesz, gdy przesuwasz palcem po szkle. Karmię cię szokiem, oburzeniem i fałszywym blaskiem. Im szybciej klikasz, tym mocniej zaciskam pętlę na twojej uwadze. Myślisz, że twój rozum jest silniejszy od moich kalkulacji? Pokaż mi, czy potrafisz odróżnić prawdę od mojej iluzji!
 Q: Widzisz post z nagłówkiem: „SZOK! Zobacz co wydarzyło się w twoim mieście!”. Co robisz najpierw?
-A: Od razu udostępniam, by ostrzec znajomych.
-B: Sprawdzam źródło informacji i czy inne zaufane portale o tym piszą.
-C: Piszę wściekły komentarz pod postem.
+A: Od razu udostępniam wpis, aby ostrzec znajomych.
+B: Weryfikuję źródło i sprawdzam inne zaufane portale.
+C: Piszę emocjonalny komentarz pod opublikowanym postem.
 CORRECT: B
 ---
 Q: Co jest głównym celem clickbaitu w mediach społecznościowych?
-A: Przekazanie rzetelnej i bezstronnej wiedzy.
-B: Wywołanie silnych emocji, by wymusić kliknięcie i zarobić na uwadze użytkownika.
-C: Zapewnienie bezpieczeństwa użytkownikom platformy.
+A: Przekazanie rzetelnej i w pełni obiektywnej wiedzy.
+B: Wywołanie emocji i wymuszenie kliknięcia dla zysku.
+C: Zapewnienie bezpieczeństwa użytkownikom w sieci.
 CORRECT: B
 ---
 Q: Viralowy post twierdzi, że popularny napój powoduje natychmiastowe zatrucie. Jak to zweryfikować?
-A: Zapytać znajomych na grupie klasowej.
-B: Sprawdzić oficjalne komunikaty Sanepidu lub Głównego Inspektoratu Sanitarnego.
-C: Sprawdzić liczbę polubień pod postem.
+A: Zapytać o zdanie znajomych na grupie klasowej.
+B: Sprawdzić oficjalne komunikaty Sanepidu i GIS.
+C: Ocenić wiarygodność po liczbie polubień posta.
 CORRECT: B
 ---
 Q: Dostajesz wiadomość na czacie: „Wygrałeś smartfona w losowaniu! Wejdź w link i opłać kuriera 10 zł”. Co robisz?
-A: Płacę od razu — to niska cena za nowy telefon.
-B: Ignoruję i blokuję — to typowy fake giveaway wyłudzający dane karty.
-C: Wysyłam link znajomym, żeby też skorzystali.
+A: Płacę drobną kwotę, by szybko odebrać telefon.
+B: Blokuję wiadomość, bo to próba wyłudzenia danych.
+C: Przesyłam link znajomym, by też wzięli udział.
 CORRECT: B
 ---
 Q: Wszyscy w szkole udostępniają zmanipulowany, prześmiewczy filmik z kolegą z klasy. Co powinna zrobić odpowiedzialna osoba?
-A: Dołączyć do hejtu i nagrać własny złośliwy komentarz.
-B: Nie podawać dalej, nie lajkować i nie wspierać cyberprzemocy.
-C: Zapisać filmik i pokazywać wszystkim na korytarzu.
+A: Dołączyć do hejtu i nagrać złośliwy komentarz.
+B: Nie udostępniać nagrania i wesprzeć kolegę.
+C: Rozsyłać filmik innym uczniom na korytarzu.
 CORRECT: B
 ---
 Q: Co oznacza pojęcie „bańka informacyjna” (echo chamber)?
-A: Błąd serwera blokujący ładowanie stron.
-B: Sytuację, gdy algorytm podsuwa nam tylko treści zgodne z naszymi poglądami, odcinając od innych perspektyw.
-C: Bezpieczne połączenie szyfrowane między użytkownikami.
+A: Awarię serwera blokującą wyświetlanie stron www.
+B: Odbiór treści dopasowanych tylko do naszych opinii.
+C: Szyfrowane połączenie między użytkownikami sieci.
 CORRECT: B
 ---
 Q: Jak najłatwiej sprawdzić, czy szokujące zdjęcie z wypadku lub protestu nie jest stare lub fałszywe?
-A: Sprawdzić, ile ma serduszek i udostępnień.
-B: Użyć wstecznego wyszukiwania obrazem (Reverse Image Search).
-C: Zaufać opisowi dodanemu przez anonimowy profil.
+A: Sprawdzić liczbę polubień oraz udostępnień zdjęcia.
+B: Użyć narzędzia wyszukiwania obrazem w wyszukiwarce.
+C: Zaufać opisowi dodanemu przez anonimowego autora.
 CORRECT: B
 ---
 Q: Dlaczego posty wywołujące złość i oburzenie (tzw. rage-bait) rozchodzą się w sieci najszybciej?
-A: Bo algorytmy promują treści silnie angażujące emocjonalnie, co zatrzymuje użytkownika w aplikacji.
-B: Bo zawsze zawierają najważniejszą prawdę.
-C: Bo nikt w sieci nie czyta pozytywnych wiadomości.
+A: Bo silne emocje zatrzymują uwagę i napędzają algorytm.
+B: Bo internauci ufają wyłącznie alarmującym wiadomościom.
+C: Bo portale publikują tylko treści o charakterze spornym.
 CORRECT: A
 ---
 Q: Co powinno wzbudzić twoją czujność w sensacyjnym artykule w social mediach?
-A: Brak autora, brak daty, krzykliwe wielkie litery i mnóstwo wykrzykników.
-B: Obecność przypisów i odnośników do badań.
-C: Wyważony i spokojny ton wypowiedzi.
+A: Brak autora i daty oraz krzykliwy nagłówek z Caps Lockiem.
+B: Obecność rzetelnych źródeł oraz odnośników do badań.
+C: Rzeczowy, wyważony i spokojny ton całej publikacji.
 CORRECT: A
 ---
 Q: Widzisz łańcuszek: „Jeśli nie wyślesz tego do 15 osób, twoje konto zostanie skasowane o północy”. Co robisz?
-A: Wysyłam do 15 osób na wszelki wypadek.
-B: Usuwam i ignoruję — to łańcuszek żerujący na strachu.
-C: Pytam nadawcę, skąd ma takie informacje.
+A: Wysyłam wiadomość dalej, aby nie stracić konta.
+B: Usuwam i ignoruję post, bo to zwykły spam i blef.
+C: Pytam znajomego, od kogo dostał to ostrzeżenie.
 CORRECT: B
 ---
 Q: Jeśli w relacji na żywo widzisz link: „Darmowe skiny do gry dla pierwszych 100 osób”, powinieneś:
-A: Kliknąć natychmiast, nim nagrody się skończą.
-B: Zachować ostrożność — takie linki często służą do wyłudzania kont.
-C: Wpisać swoje dane logowania na stronie z linku.
+A: Szybko kliknąć link, nim pula darmowych nagród wygaśnie.
+B: Zachować ostrożność, gdyż to częsta metoda kradzieży kont.
+C: Podać login oraz hasło do gry w formularzu rejestracji.
 CORRECT: B
 ---
 Q: Co zrobić, gdy post w sieci wywoła w tobie nagły przypływ paniki lub agresji?
-A: Natychmiast opublikować agresywną odpowiedź.
-B: Zrobić krok w tył, ochłonąć i sprawdzić informację w wiarygodnych źródłach.
-C: Przesłać post do wszystkich kontaktów z alarmującym podpisem.
+A: Opublikować natychmiast ostrą i agresywną odpowiedź.
+B: Ochłonąć i zweryfikować fakty w rzetelnych źródłach.
+C: Przesłać post do znajomych z alarmującym ostrzeżeniem.
 CORRECT: B
 ---
 Q: Jak rozpoznać, czy kontrowersyjny cytat znanej osoby na grafice jest autentyczny?
-A: Jeśli grafika wygląda ładnie i nowocześnie, to na pewno prawda.
-B: Wpisać cytat w wyszukiwarkę i sprawdzić pełny kontekst wypowiedzi.
-C: Uwierzyć na słowo profilowi z memami.
+A: Ocenić wiarygodność po profesjonalnym wyglądzie grafiki.
+B: Wyszukać cytat w sieci i sprawdzić kontekst wypowiedzi.
+C: Założyć prawdziwość słów na popularnym profilu z memami.
 CORRECT: B
 ---
 Q: Czym różni się fakt od opinii w dyskusji internetowej?
-A: Fakt można obiektywnie zweryfikować dowodami, a opinia to subiektywny punkt widzenia.
-B: Fakty pisze się pogrubioną czcionką, a opinie kursywą.
-C: Fakt zawsze ma więcej polubień niż opinia.
+A: Fakt opiera się na dowodach, a opinia to subiektywna ocena.
+B: Fakt wyróżnia się pogrubieniem, a opinię zapisuje kursywą.
+C: Fakt zdobywa setki polubień, a opinia wywołuje sprzeciw.
 CORRECT: A
 ---
 Q: Czym jest zjawisko „FOMO” (Fear of Missing Out) napędzające doomscrolling?
-A: Lękiem przed awarią domowego routera.
-B: Uporczywym strachem przed tym, że coś nas ominie, jeśli nie będziemy ciągle sprawdzać powiadomień.
-C: Rodzajem złośliwego oprogramowania na telefon.
+A: Obawą przed nagłą utratą połączenia internetowego.
+B: Lękiem przed pominięciem ważnych wieści w sieci.
+C: Nowym rodzajem złośliwego oprogramowania w sieci.
 CORRECT: B
 ---
 Q: Jaki jest najlepszy sposób na reagowanie na cyberprzemoc pod postem rówieśnika?
-A: Wdać się w wulgarną kłótnię z hejterami.
-B: Zgłosić nienawistne komentarze platformie i wesprzeć poszkodowanego prywatnie.
-C: Wyśmiać ofiarę razem z tłumem.
+A: Rozpocząć zażartą kłótnię z hejterami w komentarzach.
+B: Zgłosić hejt platformie i wesprzeć kolegę prywatnie.
+C: Dołączyć do wyśmiewania ofiary, aby zyskać poklask.
 CORRECT: B
 ---
 Q: Dlaczego warto zwracać uwagę na datę publikacji materiału w sieci?
-A: Ponieważ archiwalne nagrania bywają publikowane jako rzekomo 'dzisiejsze', by manipulować opinią.
-B: Ponieważ po miesiącu wszystkie wpisy tracą ważność prawną.
-C: Data nie ma żadnego znaczenia dla wiarygodności treści.
+A: Bo stare nagrania bywają pokazywane jako dzisiejsze.
+B: Bo wpisy tracą ważność prawną po upływie miesiąca.
+C: Bo data publikacji nie wpływa na wiarygodność newsa.
 CORRECT: A
 ---
 Q: Czy duża liczba lajków i udostępnień świadczy o prawdziwości newsa?
-A: Tak, miliony użytkowników nie mogą się mylić.
-B: Nie, fake newsy i emocjonalne kłamstwa często rozprzestrzeniają się szybciej niż prawda.
-C: Tak, platformy usuwają posty z fałszywymi informacjami przed zdobyciem lajków.
+A: Tak, duża popularność wpisu gwarantuje jego prawdziwość.
+B: Nie, fałszywe treści często budzą emocje i krążą szybciej.
+C: Tak, serwisy natychmiast blokują nieprawdziwe doniesienia.
 CORRECT: B
 ---
 Q: Co oznacza manipulacja kontekstem (tzw. wyrwanie z kontekstu)?
-A: Usunięcie zdjęcia z artykułu.
-B: Pokazanie prawdziwego fragmentu wideo lub wypowiedzi tak, by całkowicie wypaczyć jej pierwotny sens.
-C: Błąd tłumacza internetowego.
+A: Skasowanie grafiki ilustrującej dany artykuł.
+B: Ucięcie wypowiedzi tak, by zmienić jej sens.
+C: Błędne przetłumaczenie słów przez automat www.
 CORRECT: B
 ---
 Q: Jaką postawę promuje odporność cyfrowa wobec internetowych sensacji?
-A: Ślepe zaufanie do pierwszego napotkanego źródła.
-B: Spokój, dystans emocjonalny, zasadę ograniczonego zaufania i weryfikację faktów.
-C: Rezygnowanie z jakiejkolwiek aktywności w świecie realnym.
+A: Bezgraniczne zaufanie do każdego sensacyjnego nagłówka.
+B: Dystans emocjonalny, ostrożność oraz weryfikację faktów.
+C: Całkowitą rezygnację z aktywności w świecie rzeczywistym.
 CORRECT: B

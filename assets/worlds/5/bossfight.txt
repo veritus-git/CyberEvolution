@@ -2,121 +2,121 @@ BOSSNAME: Mędrzec Rozumu
 INTRO: Stoisz wreszcie przed moim obliczem. Przeszedłeś przez dymiące zgliszcza clickbaitu, oparłeś się pożeraczom tożsamości, odrzuciłeś maski pozorów i wygasiłeś pożar nienawiści. Dziś nie walczysz ze złem z krwi i kości — walczysz z własnymi słabościami z tamtej nocy. Odpowiedz mi nie z pamięci, lecz z dojrzałości, którą w sobie wykułeś. Pokaż, że jesteś gotów powrócić do swojego świata jako świadomy i wolny człowiek!
 OUTRO: Udało ci się! Zbudowałeś w sobie prawdziwą cyfrową odporność. Zrozumiałeś, że najgroźniejszą bronią w sieci nie są kody ani wirusy, lecz manipulacja naszymi emocjami: wstydem, strachem i pośpiechem. Teraz to ty jesteś strażnikiem swojego rozumu. Otwieram portal powrotny. Obudź się i broń się w necie!
 Q: Jeśli w nocy trafisz na zmanipulowane wideo ze swoją twarzą i groźbą kompromitacji, co robisz najpierw?
-A: Wpadam w panikę i klikam w pierwszy link obiecujący usunięcie pliku.
-B: Zachowuję spokój, robię zrzuty ekranu jako dowód, zgłaszam naruszenie platformie i rozmawiam z zaufanym dorosłym.
-C: Płacę szantażyście pieniądze, by usunął film.
+A: W panice klikam link obiecujący usunięcie wideo.
+B: Zabezpieczam dowody, zgłaszam i mówię dorosłym.
+C: Płacę okup szantażyście z nadzieją na usunięcie.
 CORRECT: B
 ---
 Q: Co jest najczęstszym narzędziem manipulacji wykorzystywanym przeciwko młodzieży w internecie?
-A: Nasze własne silne emocje: strach, wstyd, chciwość i pragnienie natychmiastowej akceptacji.
-B: Przestarzała wersja karty graficznej w komputerze.
-C: Brak zainstalowanej gry na telefonie.
+A: Silne emocje: strach, wstyd oraz pośpiech ofiary.
+B: Przestarzała wersja karty graficznej w laptopie.
+C: Brak zainstalowanych najnowszych gier na telefonie.
 CORRECT: A
 ---
 Q: Jak postąpić z sensacyjnym postem wywołującym w tobie nagłe oburzenie lub wściekłość?
-A: Od razu udostępnić go z gniewnym komentarzem na grupie klasowej.
-B: Zatrzymać się, ochłonąć i zweryfikować informację w co najmniej dwóch niezależnych źródłach.
-C: Wysłać go do wszystkich kontaktów z prośbą o polubienie.
+A: Od razu udostępnić go z gniewnym wpisem na czacie grupy.
+B: Ochłonąć i zweryfikować newsa w dwóch niezależnych źródłach.
+C: Rozesłać post do wszystkich kontaktów z prośbą o reakcję.
 CORRECT: B
 ---
 Q: Dlaczego bezrefleksyjny nocny doomscrolling jest tak groźny dla naszej odporności cyfrowej?
-A: Bo zużywa prąd w domowym gniazdku.
-B: Ponieważ zmęczony mózg traci czujność i bezbronnie ulega emocjonalnym manipulacjom algorytmów.
-C: Ponieważ smartfon przegrzewa się w nocy.
+A: Ponieważ generuje duże straty prądu w sieci domowej.
+B: Bo zmęczony mózg traci czujność i ulega manipulacjom.
+C: Bo ekran telefonu przegrzewa się podczas nocnej pracy.
 CORRECT: B
 ---
 Q: Co to jest „fact-checking” i dlaczego jest kluczem do prawdy w sieci?
-A: Pisanie anonimowych komentarzy pod postami.
-B: Rzetelna, obiektywna weryfikacja prawdziwości faktów w oparciu o wiarygodne dowody i źródła.
-C: Kasowanie starych zdjęć z dysku.
+A: Publikowanie anonimowych opinii pod postami w sieci.
+B: Weryfikacja faktów na podstawie wiarygodnych dowodów.
+C: Usuwanie nieaktualnych fotografii z dysku urządzenia.
 CORRECT: B
 ---
 Q: Kiedy influencer ma prawny obowiązek oznaczyć post jako materiał reklamowy (#reklama)?
-A: Zawsze, gdy otrzymuje korzyść majątkową (pieniądze, darmowy produkt, zniżki) za promowanie marki.
-B: Tylko wtedy, gdy sam uzna to za stosowne.
-C: Nigdy, jeśli nagranie trwa krócej niż minutę.
+A: Zawsze, gdy czerpie korzyści majątkowe z promocji marki.
+B: Wyłącznie wtedy, gdy sam uzna takie oznaczenie za słuszne.
+C: Nigdy, jeśli materiał wideo trwa poniżej jednej minuty.
 CORRECT: A
 ---
 Q: Jak najskuteczniej zabezpieczyć swoje profile społecznościowe przed przejęciem?
-A: Mieć wszędzie takie samo, proste hasło.
-B: Używać długich, unikalnych haseł, menedżera haseł oraz uwierzytelniania dwuskładnikowego (2FA).
-C: Nie wylogowywać się na komputerach publicznych.
+A: Stosować wszędzie to samo, łatwe do wpisania hasło.
+B: Używać unikalnych haseł oraz logowania dwuskładnikowego.
+C: Pozostawiać aktywne logowanie na szkolnych komputerach.
 CORRECT: B
 ---
 Q: Co zrobić, gdy znajomi ze szkoły nakłaniają cię do udziału w zmasowanym hejcie na inną osobę?
-A: Dołączyć do tłumu, by nie odstawać od grupy.
-B: Stanowczo odmówić i uświadomić im, że cyberprzemoc jest karalna i może zniszczyć komuś życie.
-C: Założyć anonimowe konto i pisać obelgi po kryjomu.
+A: Dołączyć do hejtu, aby nie odstawać od reszty klasy.
+B: Odmówić i przypomnieć, że cyberprzemoc jest karalna.
+C: Założyć anonimowe konto i pisać przykre uwagi z ukrycia.
 CORRECT: B
 ---
 Q: Czym charakteryzuje się materiał typu Deepfake?
-A: Wyraźnym czarno-białym filtrem retro.
-B: Fotorealistycznym podmienieniem twarzy i głosu przy użyciu AI w celu sfałszowania czyjejś wypowiedzi lub czynu.
-C: Zwiększoną liczbą klatek na sekundę.
+A: Wyraźnym filtrem retro stylizującym nagranie na dawne lata.
+B: Podmienieniem twarzy lub głosu przez AI dla fałszerstwa.
+C: Zwiększoną płynnością obrazu dzięki podwojeniu liczby klatek.
 CORRECT: B
 ---
 Q: Czym jest bańka filtrująca w mediach społecznościowych?
-A: Środowiskiem informacyjnym tworzonym przez algorytmy, w którym widzimy wyłącznie treści zgodne z naszymi przekonaniami.
-B: Funkcją w smartfonie chroniącą przed kurzem.
-C: Specjalnym filtrem fotograficznym wygładzającym cerę.
+A: Podsuwaniem przez algorytm treści zgodnych z naszymi opiniami.
+B: Zabezpieczeniem obudowy telefonu przed wnikaniem kurzu i wody.
+C: Efektem graficznym wygładzającym cerę na zdjęciach portretowych.
 CORRECT: A
 ---
 Q: Jeśli w relacji widzisz „Konkurs na darmowy telefon — podaj kod SMS, który właśnie otrzymałeś”, to:
-A: Prawdziwa szansa na darmowy sprzęt.
-B: Pułapka mająca na celu przejęcie twojego konta lub wyłudzenie drogiej subskrypcji SMS.
-C: Oficjalna akcja dobroczynna platformy.
+A: Bezpieczna okazja do wygrania drogiego smartfona.
+B: Podstęp służący kradzieży konta lub subskrypcji SMS.
+C: Oficjalny konkurs dobroczynny wspierany przez portal.
 CORRECT: B
 ---
 Q: Jak najskuteczniej reagować na internetowych trolli i prowokatorów?
-A: Ignorować zaczepki, zgłaszać naruszenia regulaminu i blokować profile zamiast wdawać się w pyskówki.
-B: Wypisywać agresywne odpowiedzi przez całą noc.
-C: Przesyłać im swoje prywatne zdjęcia.
+A: Ignorować zaczepki, zgłaszać hejt i blokować konta.
+B: Wdawać się w niekończącą się kłótnię pod komentarzem.
+C: Przesyłać prywatne dane z prośbą o zakończenie ataku.
 CORRECT: A
 ---
 Q: Czym różni się merytoryczna dyskusja od mowy nienawiści?
-A: Merytoryczna debata szanuje godność człowieka i opiera się na argumentach, mowa nienawiści dąży do upokorzenia i zniszczenia drugiej osoby.
-B: Merytoryczna dyskusja odbywa się wyłącznie w językach obcych.
-C: Nie ma między nimi żadnej różnicy.
+A: Dyskusja szanuje rozmówcę, mowa nienawiści dąży do upokorzenia.
+B: Dyskusja prowadzona jest wyłącznie w obcych językach urzędowych.
+C: Nie ma żadnych różnic, oba zjawiska oznaczają ostrą wymianę zdań.
 CORRECT: A
 ---
 Q: Dlaczego nie należy instalować nieznanych aplikacji oferujących „darmowych followersów”?
-A: Ponieważ mogą wykradać tokeny dostępu, instalować złośliwy kod i przejmować kontrolę nad smartfonem.
-B: Ponieważ działają wyłącznie na tabletach graficznych.
-C: Ponieważ zajmują zbyt dużo miejsca na pulpicie.
+A: Bo mogą wykradać tokeny dostępu i infekować smartfon.
+B: Bo są tworzone wyłącznie z myślą o tabletach z rysikiem.
+C: Bo zapełniają pamięć podręczną niepotrzebnymi motywami.
 CORRECT: A
 ---
 Q: Co należy zrobić, gdy nieznana osoba w sieci szantażuje cię intymnymi materiałami?
-A: Natychmiast zapłacić lub wysłać kolejne zdjęcia w nadziei, że odpuści.
-B: Nie ulegać szantażowi, zabezpieczyć dowody, zerwać kontakt i niezwłocznie zgłosić sprawę zaufanym dorosłym oraz na policję.
-C: Skasować aplikację i udawać, że problem nie istnieje.
+A: Zapłacić okup w nadziei, że szantażysta usunie nagranie.
+B: Zachować dowody, zerwać kontakt i powiadomić dorosłych.
+C: Usunąć konto i udawać, że sprawa rozwiąże się samoistnie.
 CORRECT: B
 ---
 Q: Jaki jest główny cel twórców dezinformacji i fake newsów?
-A: Polaryzacja społeczeństwa, wywołanie chaosu, zarobek na kliknięciach lub realizacja wrogich celów politycznych.
-B: Poprawa samopoczucia internautów.
-C: Promocja zdrowego stylu życia.
+A: Wywołanie chaosu, skłócenie ludzi oraz zysk z kliknięć.
+B: Poprawa nastroju użytkowników i walka ze stresem online.
+C: Promowanie zdrowego stylu życia i aktywności sportowej.
 CORRECT: A
 ---
 Q: Jak odpowiedzialnie dbać o własną prywatność w mediach społecznościowych?
-A: Ustawiać profile jako prywatne, weryfikować listę znajomych i unikać publikowania wrażliwych szczegółów z życia.
-B: Wstawiać zdjęcia dokumentów i biletów do sieci.
-C: Akceptować zaproszenia od każdego nieznajomego profilu.
+A: Mieć profil prywatny i nie wrzucać wrażliwych danych.
+B: Publikować zdjęcia biletów ze wszystkimi kodami kreskowymi.
+C: Akceptować zaproszenia od każdego anonimowego konta w sieci.
 CORRECT: A
 ---
 Q: Co zrobić, gdy zauważysz, że doomscrolling pogarsza twoje samopoczucie i wywołuje ciągły niepokój?
-A: Kupić większy ekran, by szybciej scrollować.
-B: Wprowadzić higienę cyfrową: ustalić limity czasu na telefon, wyłączyć zbędne powiadomienia i spędzać czas offline.
-C: Oglądać rolki z podwójną prędkością odtwarzania.
+A: Zmienić telefon na większy model, by wygodniej scrollować.
+B: Ograniczyć czas przed ekranem i wyciszyć powiadomienia w nocy.
+C: Oglądać materiały wideo z dwukrotną prędkością odtwarzania.
 CORRECT: B
 ---
 Q: Czym jest „krytyczne myślenie” w cyfrowym świecie?
-A: Negowaniem każdego faktu i ślepą wiarą we wszystkie teorie spiskowe.
-B: Umiejętnością logicznej analizy treści, sprawdzania źródeł i intencji autora oraz oddzielania faktów od manipulacji.
-C: Pisaniem złośliwych komentarzy pod każdym postem.
+A: Podważaniem wszystkich faktów i wiarą w teorie spiskowe.
+B: Analizą źródeł, intencji autora i weryfikacją informacji.
+C: Regularnym pisaniem krytycznych komentarzy pod wpisami.
 CORRECT: B
 ---
 Q: Co w praktyce oznacza hasło „Broń się w necie”?
-A: Bycie świadomym, odpowiedzialnym i odpornym użytkownikiem internetu, który chroni swój umysł i szanuje innych.
-B: Zbieranie wirtualnego ekwipunku w grach wideo.
-C: Całkowity zakaz włączania komputera.
+A: Świadome korzystanie z sieci, ochronę danych i empatię.
+B: Zbieranie wirtualnego uzbrojenia w grach wieloosobowych.
+C: Całkowity zakaz włączania komputera oraz urządzeń mobilnych.
 CORRECT: A

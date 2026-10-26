@@ -1,121 +1,121 @@
 BOSSNAME: Key Reaper
 INTRO: Spójrz na moje ostrze. Widzisz tę cyfrową czaszkę wykutą w moich zębach? Jestem Key Reaper — zwiastun twojej cyfrowej pustki. Zbieram każde lekkomyślnie zatwierdzone uprawnienie, każdy przejęty token i każdą tożsamość, którą oddałeś za darmowego lajka czy quiz. Gdy przekręcę ten klucz, twój profil przestanie istnieć dla ciebie, a zacznie pracować dla mnie. Myślisz, że potrafisz strzec swoich bram? Udowodnij to!
 Q: Dostajesz wiadomość na Instagramie: „Naruszyłeś prawa autorskie! Zaloguj się pod tym adresem w 24h”. Co robisz?
-A: Loguję się od razu, by anulować ostrzeżenie.
-B: Sprawdzam powiadomienia w oficjalnym Centrum Pomocy aplikacji — to próba wyłudzenia danych.
-C: Wysyłam swoje hasło w odpowiedzi na wiadomość.
+A: Loguję się pod podanym linkiem, aby cofnąć zgłoszenie.
+B: Weryfikuję alert w Centrum Pomocy — to próba phishingu.
+C: Przesyłam swoje dane logowania w wiadomości zwrotnej.
 CORRECT: B
 ---
 Q: Czym jest uwierzytelnianie dwuskładnikowe (2FA) i dlaczego jest kluczowe w social mediach?
-A: Wymaga podania hasła i dodatkowego potwierdzenia (np. z aplikacji), chroniąc konto nawet po wycieku hasła.
-B: To po prostu dwa takie same hasła wpisywane jedno po drugim.
-C: To funkcja, która automatycznie kasuje konto po 30 dniach nieaktywności.
+A: Wymaga hasła i drugiego składnika, chroniąc konto przy wycieku.
+B: Polega na dwukrotnym wpisaniu tego samego hasła z rzędu w oknie.
+C: Zabezpiecza profil przez automatyczne wylogowanie co kwadrans.
 CORRECT: A
 ---
 Q: Strona z quizem „Do jakiej postaci z anime pasujesz” żąda uprawnień do twoich czatów i zdjęć. Co robisz?
-A: Akceptuję wszystko — chcę tylko zobaczyć wynik testu.
-B: Rezygnuję. Żaden quiz psychologiczny nie potrzebuje dostępu do prywatnych rozmów.
-C: Zezwalam, ale zmieniam opis na profilu.
+A: Akceptuję uprawnienia, by szybko zobaczyć swój wynik.
+B: Odrzucam dostęp, bo quiz nie potrzebuje moich czatów.
+C: Zezwalam na wgląd, lecz zmieniam publiczny opis konta.
 CORRECT: B
 ---
 Q: Dlaczego używanie tego samego hasła na wszystkich portalach i w grach jest skrajnie niebezpieczne?
-A: Ponieważ algorytmy blokują identyczne hasła.
-B: Ponieważ wyciek danych z jednej słabej strony daje przestępcom klucz do wszystkich twoich kont.
-C: Ponieważ trudniej je zapamiętać.
+A: Ponieważ portale internetowe automatycznie blokują duplikaty haseł.
+B: Ponieważ wyciek z jednej witryny otwiera drogę do reszty kont gracza.
+C: Ponieważ pojedyncze hasło łatwiej pomylić podczas częstego logowania.
 CORRECT: B
 ---
 Q: Czym jest socjotechnika (social engineering) w atakach na konta młodzieży?
-A: Tworzeniem baz danych dla platform społecznościowych.
-B: Manipulowaniem emocjami (strachem, ciekawością, pośpiechem), by ofiara sama oddała dostęp do konta.
-C: Instalowaniem światłowodów w szkołach.
+A: Tworzeniem baz danych dla serwisów społecznościowych.
+B: Graniem na emocjach, by ofiara sama oddała dane logowania.
+C: Budową bezpiecznych połączeń sieciowych w pracowniach.
 CORRECT: B
 ---
 Q: Reklama obiecuje „+50 000 darmowych followersów po zainstalowaniu specjalnego profilu konfiguracji”. Co to oznacza?
-A: Świetną okazję na szybki rozwój profilu.
-B: Poważne zagrożenie — obcy profil może przekierować cały ruch sieciowy i przejąć twoje hasła.
-C: Oficjalne narzędzie partnerskie platformy.
+A: Znakomitą okazję na bezpłatną promocję własnego profilu.
+B: Ryzyko infekcji telefonu i kradzieży haseł przez obcy profil.
+C: Certyfikowane narzędzie reklamowe udostępnione przez portal.
 CORRECT: B
 ---
 Q: Gdzie najbezpieczniej przechowywać skomplikowane i unikalne hasła?
-A: W zaufanym menedżerze haseł zabezpieczonym silnym hasłem głównym.
-B: Na karteczce przyklejonej pod klawiaturą.
-C: W notatce w telefonie bez żadnego hasła.
+A: W menedżerze haseł chronionym silnym hasłem głównym.
+B: Na samoprzylepnej karteczce umieszczonej pod monitorem.
+C: W zwykłym pliku tekstowym zapisanym w pamięci telefonu.
 CORRECT: A
 ---
 Q: Ktoś założył profil z twoim zdjęciem oraz nazwiskiem i pisze do twoich znajomych. Jak reagujesz?
-A: Ignoruję to całkowicie.
-B: Zgłaszam podszywanie się administracji platformy i ostrzegam znajomych na prawdziwym profilu.
-C: Tworzę fałszywe konto w odwecie.
+A: Ignoruję fałszywe konto, licząc że z czasem samo zniknie.
+B: Zgłaszam podszywanie serwisowi i ostrzegam moich znajomych.
+C: Tworzę kolejne konto w odwecie, by pisać niemiłe wiadomości.
 CORRECT: B
 ---
 Q: Co warto zrobić ze starymi kontami na portalach, z których już dawno nie korzystasz?
-A: Pozostawić je bez nadzoru.
-B: Usunąć je, by nie stały się celem wycieków danych w przyszłości.
-C: Zmienić hasło na '1234'.
+A: Zostawić profile bez zmian, bo stare dane tracą znaczenie.
+B: Całkowicie je skasować, by nie padły ofiarą wycieku danych.
+C: Zmienić hasła na proste kombinacje cyfr, by ich nie zapomnieć.
 CORRECT: B
 ---
 Q: Przy logowaniu zewnętrznym („Zaloguj przez Google/TikTok”) na nieznanej stronie powinieneś:
-A: Klikać 'Zezwól' jak najszybciej.
-B: Sprawdzić listę żądanych uprawnień oraz czy okno logowania pochodzi z prawdziwej domeny dostawcy.
-C: Wpisać numer karty płatniczej rodziców.
+A: Bezzwłocznie zatwierdzić zgodę, by przejść do zawartości.
+B: Sprawdzić domenę okna oraz listę przyznawanych uprawnień.
+C: Wpisać dane karty płatniczej w formularzu weryfikacyjnym.
 CORRECT: B
 ---
 Q: Otrzymujesz SMS z kodem logowania do konta, o który sam nie prosiłeś. Co to oznacza?
-A: Że operator sieci komórkowej testuje system.
-B: Że ktoś próbuje zalogować się na twoje konto — należy natychmiast zmienić hasło główne!
-C: Że wygrałeś nagrodę w loterii platformy.
+A: Że operator sieci prowadzi rutynowe testy infrastruktury.
+B: Że ktoś usiłuje przejąć konto — zmień natychmiast hasło!
+C: Że zostałeś wylosowany do nagrody w oficjalnej loterii.
 CORRECT: B
 ---
 Q: Jakie cechy powinno mieć silne i bezpieczne hasło do profilu?
-A: Imię zwierzaka i rok urodzenia.
-B: Co najmniej 12-16 znaków: małe i wielkie litery, cyfry oraz symbole, unikalne dla danej usługi.
-C: Słowo 'qwerty12345'.
+A: Imię ulubionego zwierzaka połączone z rokiem urodzenia.
+B: Ponad 12 znaków z literami, cyframi i symbolami specjalnymi.
+C: Popularny i łatwy do wpisania ciąg klawiszy na klawiaturze.
 CORRECT: B
 ---
 Q: Logujesz się na swoje konto społecznościowe na komputerze szkolnym. O czym musisz pamiętać?
-A: Zaznaczyć pole 'Nie wylogowuj mnie'.
-B: Skorzystać z trybu prywatnego, wylogować się po zakończeniu i nie zapamiętywać haseł.
-C: Zostawić przeglądarkę otwartą dla kolejnej osoby.
+A: Zaznaczyć opcję zapamiętania sesji na urządzeniu.
+B: Użyć trybu incognito i wylogować się po lekcji.
+C: Pozostawić otwartą przeglądarkę dla innych osób.
 CORRECT: B
 ---
 Q: Dlaczego data urodzenia czy imię zwierzaka nie powinny być odpowiedziami na pytania pomocnicze?
-A: Bo systemy ich nie akceptują.
-B: Ponieważ każdy może bez trudu znaleźć te informacje na twoich publicznych profilach.
-C: Bo są zbyt trudne do zapamiętania.
+A: Ponieważ formularze zabezpieczeń odrzucają krótkie wyrazy.
+B: Ponieważ każdy może znaleźć te informacje na twoim profilu.
+C: Ponieważ skomplikowane imiona zbyt łatwo wypadają z pamięci.
 CORRECT: B
 ---
 Q: Czym jest fałszywa strona logowania (phishingowa)?
-A: Witryną łudząco podobną do prawdziwej platformy, stworzoną wyłącznie po to, by przechwycić wpisany login i hasło.
-B: Stroną, która za wolno się ładuje.
-C: Oficjalną wersją testową portalu.
+A: Podrobioną stroną służącą do wyłudzenia danych logowania.
+B: Oficjalnym serwisem testowym przeciążonym przez ruch www.
+C: Błędnie załadowaną witryną z powodu awarii serwerów DNS.
 CORRECT: A
 ---
 Q: Czy prawdziwy administrator platformy kiedykolwiek poprosi cię o podanie hasła w wiadomości prywatnej?
-A: Tak, gdy naprawia usterkę na serwerze.
-B: Nigdy — pracownicy serwisów posiadają narzędzia administracyjne i nie potrzebują twojego hasła.
-C: Tylko wtedy, gdy wyśle certyfikat w załączniku.
+A: Tak, w trakcie usuwania poważnej usterki na serwerze.
+B: Nigdy — pracownicy serwisu nie potrzebują twoich haseł.
+C: Tylko po przesłaniu cyfrowego certyfikatu w załączniku.
 CORRECT: B
 ---
 Q: Co zrobić w pierwszej kolejności, gdy ktoś przejmie twoje konto i rozsyła wiadomości?
-A: Czekać, aż sprawca sam zrezygnuje.
-B: Użyć procedury odzyskiwania konta, zresetować hasło, wylogować wszystkie urządzenia i włączyć 2FA.
-C: Wyłączyć internet w całym domu.
+A: Czekać bezczynnie na reakcję sprawcy włamania na profil.
+B: Zresetować hasło, wylogować urządzenia i uruchomić 2FA.
+C: Odłączyć domowy router Wi-Fi i zablokować kartę sieciową.
 CORRECT: B
 ---
 Q: Dlaczego aplikacja uwierzytelniająca (2FA) jest bezpieczniejsza niż kody przesyłane SMS-em?
-A: Bo jest całkowicie odporna na przechwycenie karty SIM (SIM-swapping) i nie zależy od sieci komórkowej.
-B: Bo SMS-y są zawsze płatne.
-C: Bo aplikacja działa tylko na komputerze.
+A: Bo chroni przed przejęciem numeru SIM u operatora.
+B: Bo wiadomości tekstowe są zawsze dodatkowo płatne.
+C: Bo kody w aplikacji działają wyłącznie na komputerze.
 CORRECT: A
 ---
 Q: Czy obecność szyfrowania (kłódka i https://) oznacza, że stronie można bezgranicznie ufać?
-A: Tak, kłódka gwarantuje, że strona jest w 100% uczciwa.
-B: Nie, kłódka oznacza jedynie szyfrowanie transmisji — oszuści również mogą założyć bezpieczny certyfikat na fałszywej domenie.
-C: Kłódka pojawia się tylko na stronach rządowych.
+A: Tak, symbol kłódki potwierdza pełną uczciwość właściciela.
+B: Nie, szyfrowanie chroni przesył, ale strona może być scamem.
+C: Tak, certyfikaty SSL przysługują jedynie instytucjom rządu.
 CORRECT: B
 ---
 Q: Co jest najczęstszą przyczyną utraty konta przez młodzież w sieci?
-A: Kosmiczne promieniowanie uszkadzające serwery.
-B: Nieuwaga, brak 2FA i samodzielne podanie danych na fałszywej stronie lub w podejrzanym quizie.
-C: Posiadanie zbyt wielu zdjęć na profilu.
+A: Błędy sprzętowe wynikające z przegrzewania się serwerów.
+B: Podanie hasła na fałszywej stronie i brak aktywnego 2FA.
+C: Publikacja zbyt dużej liczby fotografii na osi czasu.
 CORRECT: B

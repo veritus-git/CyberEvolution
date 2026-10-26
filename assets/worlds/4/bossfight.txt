@@ -1,121 +1,121 @@
 BOSSNAME: Chronos Paniki
 INTRO: Spójrz w moją bezlitosną tarczę! Widzisz, jak moje wskazówki tną sekundy, a czerwone obwody buzują alarmem? Jestem Chronos Paniki — zegar, który wyłącza wasze mózgi! 'Zostało tylko 5 minut!', 'Reaguj natychmiast!', 'Zobacz, zanim usuną!'. Gdy włączam odliczanie, gubicie rozsądek, a zaczynacie krzyczeć i nienawidzić. Czy potrafisz zatrzymać mój bieg i zachować spokój w samym oku cyfrowego cyklonu? Spróbuj, nim wybije twoja ostatnia godzina!
 Q: Do czego służy manipulatorom sztuczna presja czasu („Masz tylko 3 minuty, działaj!”)?
-A: Do ułatwienia spokojnego i logicznego namysłu.
-B: Do wywołania stresu i paniki, które blokują krytyczne myślenie i skłaniają do pochopnych decyzji.
-C: Do optymalizacji zużycia baterii w smartfonie.
+A: Do umożliwienia spokojnej i wnikliwej analizy faktów.
+B: Do wywołania paniki, która blokuje krytyczne myślenie.
+C: Do zmniejszenia zużycia baterii w telefonie odbiorcy.
 CORRECT: B
 ---
 Q: Czym jest zjawisko „doxingu” (doxxingu) w sieci?
-A: Nowym filtrem graficznym w mediach społecznościowych.
-B: Złośliwym ujawnianiem prywatnych danych osoby (adresu, telefonu, szkoły), by ściągnąć na nią falę nękania.
-C: Sposobem na przyspieszenie łącza internetowego.
+A: Nowym filtrem graficznym w aplikacji społecznościowej.
+B: Ujawnieniem prywatnych danych ofiary, by wywołać hejt.
+C: Sposobem na optymalizację szybkości łącza domowego.
 CORRECT: B
 ---
 Q: Jak działa mechanizm „króliczej nory” (rabbit hole) w algorytmach polecających?
-A: Poleca wyłącznie filmy przyrodnicze.
-B: Po obejrzeniu kontrowersyjnego filmu algorytm podsuwa coraz bardziej skrajne i spiskowe materiały, by utrzymać uwagę.
-C: Blokuje dostęp do konta w godzinach nocnych.
+A: Ogranicza polecane filmy wyłącznie do treści edukacyjnych.
+B: Podsuwa coraz bardziej skrajne treści, by przykuć uwagę.
+C: Wyłącza działanie aplikacji podczas godzin nocnego spoczynku.
 CORRECT: B
 ---
 Q: Znajomi planują zmasowany najazd (rajd hejterski) na profil rówieśnika. Jakie konsekwencje im grożą?
-A: Żadne, w internecie panuje całkowita anonimowość.
-B: Odpowiedzialność prawna za uporczywe nękanie (stalking), zniesławienie oraz wyrządzenie krzywdy psychicznej.
-C: Jedynie pochwała od administratora za wysoką aktywność.
+A: Żadne, bo w sieci panuje pełna anonimowość użytkowników.
+B: Kary prawne za nękanie, zniesławienie i cyberprzemoc.
+C: Otrzymanie odznaki aktywności od moderatorów platformy.
 CORRECT: B
 ---
 Q: Co charakteryzuje syndrom „oblężonej twierdzy” w radykalizujących grupach online?
-A: Przekonanie, że całe otoczenie spiskuje przeciwko nim, a jedyną prawdę posiada ich anonimowy lider.
-B: Zabezpieczenie domowego Wi-Fi hasłem.
-C: Budowanie fortyfikacji w grach sieciowych.
+A: Wiara, że wszyscy wokół spiskują, a rację ma tylko ich lider.
+B: Standardowe zabezpieczenie sieci domowej skomplikowanym hasłem.
+C: Wznoszenie baz obronnych w wieloosobowych grach strategicznych.
 CORRECT: A
 ---
 Q: Czy mowa nienawiści (hate speech) jest usprawiedliwiona wolnością słowa?
-A: Tak, wolność słowa pozwala na bezkarne obrażanie i grożenie każdemu.
-B: Nie, wolność słowa nie obejmuje naruszania godności, bezpieczeństwa i praw drugiego człowieka.
-C: Tak, jeśli wpis zostanie usunięty po 24 godzinach.
+A: Tak, wolność słowa dopuszcza obrażanie i zastraszanie ludzi.
+B: Nie, wolność słowa nie pozwala naruszać godności człowieka.
+C: Tak, o ile autor skasuje swój komentarz przed upływem doby.
 CORRECT: B
 ---
 Q: Dlaczego zradykalizowany internauta często odrzuca twarde dowody naukowe i sprostowania?
-A: Ponieważ wierzy, że każda informacja sprzeczna z jego wizją to opłacony spisek 'układu'.
-B: Ponieważ nie potrafi obsługiwać przeglądarki.
-C: Ponieważ oficjalne artykuły są zbyt tanie.
+A: Uznaje fakty niezgodne z jego wiarą za opłacony spisek.
+B: Ma trudności z poprawną obsługą przeglądarek www.
+C: Uważa publikacje naukowe za zbyt proste w odbiorze.
 CORRECT: A
 ---
 Q: Jak reagować, gdy kolega z klasy zaczyna głosić skrajne, nienawistne poglądy pod wpływem forów?
-A: Wyśmiać go publicznie na forum klasy.
-B: Spokojnie z nim porozmawiać w cztery oczy, zapytać o źródła tych teorii i zachęcić do aktywności w realnym świecie.
-C: Natychmiast zablokować go bez słowa wyjaśnienia.
+A: Ośmieszyć go publicznie na szkolnym forum dyskusyjnym.
+B: Spokojnie porozmawiać w cztery oczy i zbadać źródła teorii.
+C: Zablokować kontakt bez próby wyjaśnienia nieporozumień.
 CORRECT: B
 ---
 Q: Co to jest „polaryzacja społeczna” napędzana przez algorytmy social mediów?
-A: Dzielenie ludzi na wrogie, zwalczające się obozy, niszczące przestrzeń do porozumienia i dialogu.
-B: Oglądanie filmów w trybie portretowym.
-C: Zmiana biegunowości baterii w telefonie.
+A: Dzielenie społeczeństwa na wrogie i zwalczające się grupy.
+B: Oglądanie pionowych materiałów wideo w aplikacjach wideo.
+C: Odwrócenie biegunów akumulatora w urządzeniu mobilnym.
 CORRECT: A
 ---
 Q: Ktoś w komentarzach pisze: „Oni wszyscy są podludźmi, trzeba ich wyeliminować!”. To przykład:
-A: Spokojnej i rzeczowej debaty publicznej.
-B: Dehumanizacji i mowy nienawiści, mającej na celu odebranie grupie ludzi ludzkiej godności.
-C: Błędu ortograficznego w słowniku.
+A: Kulturalnej i rzeczowej dyskusji na forum publicznym.
+B: Dehumanizacji i hejtu odbierającego ludzką godność.
+C: Błędu edytorskiego w automatycznym słowniku pisowni.
 CORRECT: B
 ---
 Q: Gdy post zostaje oznaczony przez niezależnych weryfikatorów jako „fałszywy montaż”:
-A: Oznacza to, że fact-checkerzy wykazali manipulację i warto zapoznać się z dowodami w sprostowaniu.
-B: Świadczy to o tym, że post zawiera niewygodną prawdę, którą ktoś próbuje zatuszować.
-C: Post natychmiast ulega samozniszczeniu na dysku.
+A: Dowodzi to fałszerstwa, które wykazali fact-checkerzy.
+B: Świadczy to o niewygodnej prawdzie ukrywanej przed ludźmi.
+C: Oznacza to natychmiastowe usunięcie pliku z dysków sieci.
 CORRECT: A
 ---
 Q: Dlaczego teorie spiskowe zyskują tak dużą popularność w momentach kryzysu?
-A: Ponieważ zawsze opierają się na twardych dowodach naukowych.
-B: Ponieważ dają proste, czarno-białe odpowiedzi na skomplikowane zjawiska i zaspokajają potrzebę kontroli.
-C: Ponieważ są oficjalnie nauczane w szkołach.
+A: Ponieważ opierają się na twardych dowodach naukowych.
+B: Bo dają proste wyjaśnienia dla trudnych i lękowych spraw.
+C: Ponieważ są oficjalnie wpisane do programów szkolnych.
 CORRECT: B
 ---
 Q: Co zrobić, gdy trafisz w sieci na zamknięty kanał nawołujący do przemocy fizycznej?
-A: Zgłosić kanał administratorom oraz zespołowi Dyżurnet.pl lub organom ścigania.
-B: Kłócić się z członkami grupy przez całą noc.
-C: Zaprosić tam wszystkich swoich znajomych.
+A: Zgłosić grupę na policję lub do zespołu Dyżurnet.pl.
+B: Prowadzić bezcelowe kłótnie z agresywnymi członkami.
+C: Zaprosić do zamkniętego kanału kolegów ze szkoły.
 CORRECT: A
 ---
 Q: Czym różni się merytoryczna dyskusja od internetowego hejtu?
-A: Dyskusja opiera się na argumentach i szacunku dla rozmówcy, a hejt służy wyłącznie upokorzeniu drugiej osoby.
-B: Dyskusja ma mniej niż 5 zdań, a hejt więcej.
-C: Hejt pisze się wyłącznie wielkimi literami.
+A: Dyskusja skupia się na faktach, a hejt na upokorzeniu osoby.
+B: Dyskusja zawiera krótkie zdania, a hejt długie wypowiedzi.
+C: Hejt jest zapisywany wyłącznie z włączonym klawiszem Caps Lock.
 CORRECT: A
 ---
 Q: Czym jest „spirala milczenia” w dyskusjach internetowych?
-A: Wyłączeniem dźwięku w telefonie.
-B: Zjawiskiem, w którym umiarkowani użytkownicy milkną z obawy przed atakiem, przez co skrajne głosy wydają się większością.
-C: Błędem w aplikacji czatu.
+A: Wyciszeniem powiadomień w ustawieniach smartfona.
+B: Milczeniem rozsądnych osób z obawy przed hejtem.
+C: Usterką oprogramowania uniemożliwiającą pisanie.
 CORRECT: B
 ---
 Q: Jaki jest główny cel internetowego trolla publikującego agresywne prowokacje?
-A: Dzielenie się rzetelną wiedzą akademicką.
-B: Wywołanie wściekłości, podziałów, zniszczenie spokoju i czerpanie satysfakcji z reakcji ofiar.
-C: Optymalizacja kodu strony.
+A: Przekazywanie rzetelnej wiedzy i faktów naukowych.
+B: Wywołanie wściekłości i czerpanie zysku z awantury.
+C: Testowanie stabilności silnika witryny dyskusyjnej.
 CORRECT: B
 ---
 Q: Jaka jest najskuteczniejsza zasada w starciu z internetowym trollem?
-A: Odpowiadać na każdą obelgę ze zdwojoną siłą.
-B: „Nie karm trolla” — nie dawać mu atencji, ignorować, zgłaszać i blokować profil.
-C: Podać mu swój adres domowy w wiadomości.
+A: Odpowiadać na każdą obelgę ze zdwojoną agresją.
+B: Nie dawać mu uwagi, ignorować i blokować konto.
+C: Przesłać trollowi swoje dane adresowe w czacie.
 CORRECT: B
 ---
 Q: Dlaczego przebywanie wyłącznie w zamkniętych, hermetycznych bańkach światopoglądowych jest groźne?
-A: Ponieważ z czasem człowiek zatraca krytycyzm i zaczyna usprawiedliwiać agresję wobec 'innych'.
-B: Ponieważ zużywa to więcej pakietu internetowego.
-C: Ponieważ takie grupy działają wyłącznie na komputerach stacjonarnych.
+A: Prowadzi do utraty krytycyzmu i wrogości do innych.
+B: Zużywa znacznie więcej cennego pakietu danych lte.
+C: Wymaga korzystania wyłącznie z komputerów stacjonarnych.
 CORRECT: A
 ---
 Q: Co oznacza zasada „Odetchnij przed kliknięciem” w odporności cyfrowej?
-A: Zrobienie pauzy, opanowanie emocji i weryfikację faktów zanim cokolwiek skomentujesz lub udostępnisz.
-B: Wstrzymanie oddechu na 30 sekund przy włączaniu komputera.
-C: Wyłączenie routera na noc.
+A: Opanowanie emocji i sprawdzenie faktów przed reakcją.
+B: Wstrzymanie oddechu przed uruchomieniem przeglądarki.
+C: Odłączenie domowego routera od zasilania na całą noc.
 CORRECT: A
 ---
 Q: Co stanowi ostateczne zwycięstwo nad Chronosem Paniki w Twierdzy Kopii?
-A: Wyrzucenie telefonu przez okno.
-B: Spokój ducha, odporność na manipulację czasem, odrzucenie nienawiści i szacunek dla prawdy.
-C: Założenie kolejnego anonimowego konta.
+A: Wyrzucenie smartfona przez okno pokoju.
+B: Spokój ducha, odrzucenie hejtu i rozwaga.
+C: Utworzenie kolejnego anonimowego profilu.
 CORRECT: B

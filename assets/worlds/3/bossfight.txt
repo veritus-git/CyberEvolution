@@ -1,121 +1,121 @@
 BOSSNAME: Mirror Queen
 INTRO: Spójrz w moją lśniącą twarz-ekran! Widzisz tę chmarę serduszek, lajków i roześmianych masek krążących wokół moich skrzydeł? To ja jestem Mirror Queen — architektka waszej cyfrowej próżności. Sprawiam, że czujesz się nikim, dopóki tłum nie rzuci ci garści polubień. Uczysz się kłamać, filtrować swoje życie i gonić za sztuczną aprobatą. Kim jesteś, gdy zgasną powiadomienia na twoim ekranie? Zobaczmy, czy potrafisz zbić moje lustro pozorów!
 Q: Twój ulubiony streamer nagle zachwala stronę z „darmowymi skrzynkami z drogimi ubraniami”. O czym musisz pamiętać?
-A: Że twórcy często otrzymują ogromne sumy za promowanie hazardu i naciąganie nieletnich widzów.
-B: Że streamer na pewno osobiście zweryfikował uczciwość każdego losowania.
-C: Że darmowe nagrody są finansowane przez organizacje charytatywne.
+A: Że twórcy biorą pieniądze za promowanie niepewnego hazardu.
+B: Że streamer osobiście sprawdził uczciwość każdego losowania.
+C: Że darmowe nagrody fundują znane fundacje charytatywne.
 CORRECT: A
 ---
 Q: Zgodnie z polskim prawem i wytycznymi UOKiK, post sponsorowany influencera:
-A: Może ukryć informację o zapłacie małym drukiem na samym dole komentarzy.
-B: Musi być jasno, czytelnie i od razu oznaczony jako płatna współpraca (np. #reklama lub #materiałsponsorowany).
-C: Nie wymaga żadnych oznaczeń, jeśli influencer osobiście lubi ten produkt.
+A: Może ukryć współpracę drobnym drukiem na końcu opisu.
+B: Musi być wyraźnie oznaczony (np. tagiem #reklama).
+C: Nie wymaga oznaczeń, jeśli twórca naprawdę lubi markę.
 CORRECT: B
 ---
 Q: Kolega z klasy pisze na czacie: „Podaj mi 6-cyfrowy kod, który zaraz przyjdzie do ciebie SMS-em, bo głosuję w konkursie”. Co robisz?
-A: Podaję kod od razu — kumplowi trzeba pomóc.
-B: Bezwzględnie odmawiam i dzwonię do kolegi — to klasyczny atak wyłudzenia konta lub drogiej subskrypcji SMS.
-C: Wpisuję kod w komentarzu pod jego najnowszym zdjęciem.
+A: Podaję kod z wiadomości, aby pomóc kumplowi w konkursie.
+B: Odmawiam i dzwonię do niego — to próba wyłudzenia konta.
+C: Publikuję nadesłany kod w komentarzu pod jego zdjęciem.
 CORRECT: B
 ---
 Q: Jak codzienne przeglądanie wyidealizowanych, wyretuszowanych zdjęć w social mediach wpływa na nastolatków?
-A: Zawsze buduje pewność siebie i motywuje do działania.
-B: Może prowadzić do zaniżonej samooceny, kompleksów i złudnego poczucia, że życie innych jest idealne.
-C: Nie ma absolutnie żadnego wpływu na psychikę i nastrój.
+A: Trwale buduje pewność siebie i motywuje do samorozwoju.
+B: Może wywołać kompleksy i fałszywe poczucie gorszości.
+C: Nie wywiera żadnego wpływu na emocje oraz samoocenę.
 CORRECT: B
 ---
 Q: Czym jest „astroturfing” w mediach społecznościowych?
-A: Pielęgnacją wirtualnych ogrodów w grach symulacyjnych.
-B: Sztucznym tworzeniem pozorów masowego poparcia dla produktu lub idei za pomocą armii botów i opłaconych profili.
-C: Nowym filtrem fotograficznym na TikToku.
+A: Uprawą wirtualnych ogrodów w popularnych grach online.
+B: Udawaniem oddolnego poparcia za pomocą armii botów.
+C: Nowym filtrem ulepszającym wygląd zdjęć na TikToku.
 CORRECT: B
 ---
 Q: Co to jest „oversharing” i dlaczego bywa niebezpieczny?
-A: Publikowanie zbyt wielu prywatnych i intymnych szczegółów ze swojego życia, co ułatwia śledzenie i kradzież danych.
-B: Przesyłanie zbyt wielu memów do znajomych.
-C: Przeciążenie pamięci smartfona przez zbyt dużą liczbę plików.
+A: Nadmierne dzielenie się prywatnością, ułatwiające stalking.
+B: Masowe przesyłanie zabawnych grafik w wiadomościach do grupy.
+C: Przeciążenie pamięci telefonu nadmierną liczbą pobranych zdjęć.
 CORRECT: A
 ---
 Q: Jak najłatwiej rozpoznać profil bota w komentarzach pod postem?
-A: Posiada oficjalny certyfikat i długą historię autorskich publikacji.
-B: Brak zdjęcia lub twarz z generatora AI, ciąg losowych cyfr w nicku i szablonowe, powtarzające się komentarze.
-C: Komentuje wyłącznie w języku łacińskim.
+A: Publikuje wyłącznie zweryfikowane certyfikatem treści naukowe.
+B: Posiada twarz z AI, losowe cyfry w nazwie i powtarza komentarze.
+C: Pisze komentarze pod każdym postem wyłącznie w języku łacińskim.
 CORRECT: B
 ---
 Q: Co to jest technologia Deepfake?
-A: Nowy rodzaj antywirusa skanującego pamięć telefonu.
-B: Narzędzie AI umożliwiające fotorealistyczną manipulację twarzą i głosem w wideo, tworzące fałszywe wypowiedzi ludzi.
-C: Program do automatycznego montowania rolek.
+A: Nowy skaner antywirusowy chroniący pliki na smartfonie.
+B: Narzędzie AI podmieniające twarz i głos w nagraniu wideo.
+C: Prosty program do automatycznego montażu krótkich rolek.
 CORRECT: B
 ---
 Q: Widzisz nagranie ze znaną postacią reklamującą podejrzaną inwestycję. Na co zwrócisz uwagę, by wykryć fałszywkę?
-A: Na nienaturalne ruchy ust, rozmycia krawędzi twarzy, metaliczny głos i brak potwierdzenia w oficjalnych mediach.
-B: Na to, czy postać ma modne ubrania.
-C: Na liczbę wyświetleń wideo.
+A: Na sztuczną mimikę ust, nienaturalny głos i rozmyte krawędzie.
+B: Na markę ubrań noszonych przez znaną osobę podczas wystąpienia.
+C: Na aktualną liczbę odtworzeń oraz serduszek pod publikacją wideo.
 CORRECT: A
 ---
 Q: Dlaczego algorytmy platform społecznościowych tak chętnie promują dramy i konflikty?
-A: Ponieważ chcą uczyć użytkowników kulturalnej dyskusji.
-B: Ponieważ oburzenie i kłótnie generują najwięcej komentarzy i najdłużej zatrzymują odbiorców przed ekranem.
-C: To przypadek, algorytmy nie biorą pod uwagę zaangażowania.
+A: Ponieważ chcą promować kulturalną wymianę zdań w sieci.
+B: Bo spory generują komentarze i trzymają ludzi na platformie.
+C: To czysty przypadek, bo algorytm ignoruje aktywność widzów.
 CORRECT: B
 ---
 Q: Jeśli twórca internetowy oferuje „poradnik szybkiego bogactwa” za 150 zł, to w rzeczywistości:
-A: Chce bezinteresownie pomóc wszystkim swoim obserwatorom.
-B: Zarabia głównie na sprzedaży bezwartościowych materiałów naiwnym fanom.
-C: Realizuje projekt rządowy.
+A: Pragnie bezinteresownie pomóc fanom w osiągnięciu sukcesu.
+B: Zarabia na sprzedaży bezwartościowych poradników naiwnym.
+C: Wdraża oficjalny program rządowy z zakresu przedsiębiorczości.
 CORRECT: B
 ---
 Q: Co zrobić, gdy nieznany profil na czacie próbuje wyciągać intymne zdjęcia i szantażuje ich ujawnieniem?
-A: Spełnić jego żądania, licząc na to, że da ci spokój.
-B: Nie ulegać szantażowi, zabezpieczyć dowody (zrzuty ekranu), zgłosić sprawę na policję lub zaufanemu dorosłemu.
-C: Skasować całą historię czatu bez robienia zrzutów.
+A: Spełnić żądania szantażysty, licząc na jego dyskrecję.
+B: Odrzucić szantaż, zabezpieczyć dowody i powiadomić dorosłych.
+C: Skasować rozmowę bez robienia zrzutów ekranu na pamiątkę.
 CORRECT: B
 ---
 Q: Czym różni się relacja jednostronna (parasocjalna) z influencerem od prawdziwej relacji?
-A: W relacji parasocjalnej odbiorca czuje silną więź z twórcą, lecz twórca traktuje odbiorcę jedynie jako liczbę w statystykach.
-B: Relacja parasocjalna wymaga codziennych spotkań w świecie realnym.
-C: Obie relacje są dokładnie takie same.
+A: Widz czuje więź, lecz dla twórcy jest tylko cyfrą w statystyce.
+B: Relacja parasocjalna polega na częstych spotkaniach w realu.
+C: Obie relacje opierają się na identycznej, obustronnej przyjaźni.
 CORRECT: A
 ---
 Q: Dlaczego nie powinno się publikować w sieci zdjęć biletów lotniczych czy legitymacji?
-A: Ponieważ kody kreskowe i QR zawierają wrażliwe dane osobowe, które łatwo odczytać i wykorzystać.
-B: Bo zdjęcia mogą mieć za słabą ostrość.
-C: Ponieważ platformy natychmiast blokują profile za zdjęcia dokumentów.
+A: Bo kody QR i kreskowe kryją wrażliwe dane osobowe.
+B: Bo zdjęcia dokumentów mają zazwyczaj zbyt słabą ostrość.
+C: Bo algorytmy automatycznie kasują profile za takie zdjęcia.
 CORRECT: A
 ---
 Q: Jak sprawdzić, czy sklep internetowy promowany przez influencera nie jest fałszywką (scamem)?
-A: Sprawdzić dane rejestrowe firmy (NIP, KRS), opinie na niezależnych forach i zasady zwrotu towaru.
-B: Uwierzyć, jeśli w sklepie widnieje zegar z napisem 'Promocja kończy się za 5 minut'.
-C: Wystarczy, że sklep ma ładne logo.
+A: Sprawdzić NIP, KRS, regulamin zwrotów i opinie klientów.
+B: Zaufać licznikowi odliczającemu ostatnie minuty promocji.
+C: Ocenić uczciwość po nowoczesnym logo oraz estetyce strony.
 CORRECT: A
 ---
 Q: Czym jest zjawisko „sharentingu”?
-A: Wymianą plików w chmurze rodzinnej.
-B: Bezrefleksyjnym publikowaniem przez dorosłych wizerunku i intymnych chwil dzieci w internecie bez ich zgody.
-C: Nowym sposobem na wypożyczanie sprzętu elektronicznego.
+A: Wymianą plików i folderów w chmurze rodzinnej online.
+B: Masowym wrzucaniem zdjęć dzieci do sieci bez ich zgody.
+C: Usługą bezpiecznego wypożyczania sprzętu w internecie.
 CORRECT: B
 ---
 Q: Gdy wirtualny doradca lub chatbot w social mediach zadaje pytania o twoje hasła i problemy rodzinne:
-A: Odpowiadam szczerze — to przecież sztuczna inteligencja.
-B: Zachowuję ostrożność i nie podaję poufnych danych, które mogą zostać przetworzone lub skradzione.
-C: Pytam bota o radę finansową.
+A: Odpowiadam szczerze na pytania — to neutralne AI.
+B: Odmawiam odpowiedzi, bo dane mogą zostać przejęte.
+C: Pytam bota o poradę w sprawach budżetu domowego.
 CORRECT: B
 ---
 Q: Jaka postawa pomaga zachować równowagę psychiczną wobec kultury lajków i filtrów?
-A: Spędzanie każdej wolnej chwili na poprawianiu zdjęć.
-B: Świadomość, że wartość człowieka nie zależy od cyfrowych polubień, a social media pokazują tylko wyreżyserowany teatr.
-C: Kupowanie followersów za kieszonkowe.
+A: Spędzanie wielu godzin na nakładaniu filtrów na twarz.
+B: Pamiętanie, że nasza wartość nie zależy od polubień w sieci.
+C: Kupowanie sztucznych fanów i serduszek za kieszonkowe.
 CORRECT: B
 ---
 Q: Co oznacza pojęcie „UGC” (User-Generated Content) w kontekście ukrytej reklamy?
-A: Błąd serwera bazy danych.
-B: Materiały stylizowane na spontaniczne opinie zwykłych użytkowników, które w rzeczywistości są opłaconymi zleceniami marketingowymi.
-C: Certyfikat jakości grafiki komputerowej.
+A: Błąd konfiguracji bazy danych na serwerze firmy.
+B: Reklamy udające szczere opinie zwykłych klientów.
+C: Certyfikat jakości grafiki dla twórców wideo.
 CORRECT: B
 ---
 Q: Co jest najlepszą tarczą przed manipulacją w Maskaradzie Luster?
-A: Ślepe naśladowanie każdego internetowego trendu.
-B: Krytyczny dystans do internetowych idoli, asertywność i pielęgnowanie prawdziwych pasji poza ekranem.
-C: Całkowite odcięcie się od znajomych ze szkoły.
+A: Bezmyślne naśladowanie każdego nowego trendu z sieci.
+B: Dystans do idoli, asertywność i pasje poza ekranem.
+C: Całkowite zerwanie kontaktów ze znajomymi ze szkoły.
 CORRECT: B
