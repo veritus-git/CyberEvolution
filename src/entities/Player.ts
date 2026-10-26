@@ -91,13 +91,17 @@ export class Player {
     }
   }
 
-  public evolveUp(): void {
+  private onEvoCompleteCallback?: () => void;
+
+  public evolveUp(onComplete?: () => void): void {
     const next = Math.min(5, this.skinId + 1);
     this.evoNextSkin = next;
     this.evoBlinkActive = true;
     this.evoBlinkTimer = 0;
     this.evoSwapped = false;
-    this.evoMsgTimer = 2.0;
+    this.evoMsgTimer = 2.5;
+    this.onEvoCompleteCallback = onComplete;
+    this.physics.vx = 0;
 
     // Initial burst of green energy particles
     this.spawnEvoBurst(35);
@@ -125,7 +129,15 @@ export class Player {
   }
 
   public update(dt: number, input: MovementInput, solids: AABB[], ladders: Ladder[], worldWidth: number): void {
-    this.physics.update(dt, input, solids, ladders, worldWidth);
+    // If evolution is ongoing, completely lock player movement and input
+    const effectiveInput = this.evoBlinkActive
+      ? { moveX: 0, moveY: 0, jumpPressed: false, jumpHeld: false, interactPressed: false }
+      : input;
+    if (this.evoBlinkActive) {
+      this.physics.vx = 0;
+    }
+
+    this.physics.update(dt, effectiveInput, solids, ladders, worldWidth);
 
     // Evolution 4-blink sequence (1:1 with Python prototype: 2 blinks old skin, swap skin + Evolution UP, 2 blinks new skin)
     if (this.evoBlinkActive) {
@@ -163,6 +175,11 @@ export class Player {
       if (phase >= 8) {
         this.evoBlinkActive = false;
         this.physics.isVisible = true;
+        if (this.onEvoCompleteCallback) {
+          const cb = this.onEvoCompleteCallback;
+          this.onEvoCompleteCallback = undefined;
+          cb();
+        }
       }
     }
 

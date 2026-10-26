@@ -18,6 +18,9 @@ export interface QuizInteractionData {
 
 export class InteractionDialog {
   public isOpen: boolean = false;
+  public get isChoicesVisible(): boolean {
+    return this.isOpen && this.mode === 'quiz' && this.quizStage === 'choices';
+  }
 
   private overlayElement: HTMLElement;
   private containerElement: HTMLElement;
@@ -149,11 +152,14 @@ export class InteractionDialog {
     });
   }
 
+  private swapChoices: boolean = false;
+
   public setPlayerEvo(evo: number): void {
     this.playerEvoLevel = Math.max(1, Math.min(5, evo));
   }
 
   public updatePosition(playerY: number): void {
+    this.containerElement.classList.remove('position-center');
     if (playerY < 448) {
       this.containerElement.classList.add('position-bottom');
       this.containerElement.classList.remove('position-top');
@@ -163,9 +169,26 @@ export class InteractionDialog {
     }
   }
 
+  private adjustBodyFontSize(text: string, isCompact: boolean): void {
+    this.bodyElement.classList.remove('font-xlarge', 'font-compact', 'font-dense');
+    if (isCompact) {
+      if (text.length > 200) {
+        this.bodyElement.classList.add('font-dense');
+      } else {
+        this.bodyElement.classList.add('font-compact');
+      }
+    } else {
+      if (text.length < 80) {
+        this.bodyElement.classList.add('font-xlarge');
+      } else if (text.length > 260) {
+        this.bodyElement.classList.add('font-compact');
+      }
+    }
+  }
+
   /**
    * Start conversation sequence (e.g. Sage intro dialog or world summary)
-   * 1:1 with Python prototype: pinned to TOP of the screen, with Sage/Player avatar!
+   * Pinned to TOP or centered depending on style
    */
   public startConversation(
     title: string,
@@ -176,8 +199,9 @@ export class InteractionDialog {
   ): void {
     if (!lines || lines.length === 0) return;
     this.avatarBox.style.display = '';
+    this.containerElement.classList.remove('position-bottom', 'position-center');
     this.containerElement.classList.add('position-top');
-    this.containerElement.classList.remove('position-bottom');
+    this.overlayElement.classList.remove('dark-backdrop');
     this.mode = 'conversation';
 
     this.titleElement.textContent = title;
@@ -193,20 +217,31 @@ export class InteractionDialog {
   }
 
   /**
-   * Start World Intro narrative dialogue (1:1 with Python line 3278: text panel WITHOUT avatar!)
+   * Start World Intro narrative dialogue (1:1 with Python: Centered on screen, dark backdrop, Sage avatar for worlds 1-4)
    */
-  public startWorldIntro(title: string, text: string, onComplete?: () => void): void {
+  public startWorldIntro(title: string, text: string, wn: number = 1, onComplete?: () => void): void {
     this.mode = 'conversation';
     this.titleElement.textContent = `${title} — Wstęp`;
     this.speakerElement.textContent = '';
-    this.avatarBox.style.display = 'none'; // NO avatar box!
-    this.containerElement.classList.add('position-top');
-    this.containerElement.classList.remove('position-bottom');
+    
+    // Worlds 1-4 show Sage avatar; World 5 has no avatar (empty)
+    if (wn === 5) {
+      this.avatarBox.style.display = 'none';
+    } else {
+      this.avatarBox.style.display = '';
+      this.avatarImg.src = '/assets/avatars/medrzec.png';
+    }
+
+    this.containerElement.classList.remove('position-top', 'position-bottom');
+    this.containerElement.classList.add('position-center');
+    this.overlayElement.classList.add('dark-backdrop');
 
     this.conversationItems = [{ speaker: '', text }];
     this.conversationIndex = 0;
     this.onCompleteCallback = () => {
       this.avatarBox.style.display = '';
+      this.containerElement.classList.remove('position-center');
+      this.overlayElement.classList.remove('dark-backdrop');
       if (onComplete) onComplete();
     };
 
@@ -218,7 +253,7 @@ export class InteractionDialog {
   }
 
   /**
-   * Start Boss Intro dialogue (1:1 with Python line 2300 & 3294: Boss avatar + panel with intro text)
+   * Start Boss Intro dialogue (1:1 with Python: Centered on screen, dark backdrop, Boss avatar)
    */
   public startBossIntro(bossName: string, introText: string, wn: number, onComplete?: () => void): void {
     this.mode = 'conversation';
@@ -230,12 +265,16 @@ export class InteractionDialog {
     this.avatarImg.onerror = () => {
       this.avatarImg.src = `/assets/avatars/boss1.png`;
     };
-    this.containerElement.classList.add('position-top');
-    this.containerElement.classList.remove('position-bottom');
+
+    this.containerElement.classList.remove('position-top', 'position-bottom');
+    this.containerElement.classList.add('position-center');
+    this.overlayElement.classList.add('dark-backdrop');
 
     this.conversationItems = [{ speaker: bossName, text: introText }];
     this.conversationIndex = 0;
     this.onCompleteCallback = () => {
+      this.containerElement.classList.remove('position-center');
+      this.overlayElement.classList.remove('dark-backdrop');
       if (onComplete) onComplete();
     };
 
@@ -268,6 +307,7 @@ export class InteractionDialog {
       this.avatarImg.src = '/assets/avatars/medrzec.png';
     }
 
+    this.adjustBodyFontSize(cur.text, false);
     this.startTypewriter(cur.text);
   }
 
@@ -281,9 +321,11 @@ export class InteractionDialog {
     this.quizStage = 'context';
     this.selectedChoice = 'A';
     this.playerEvoLevel = evo;
+    this.swapChoices = Math.random() < 0.5; // True 50/50 randomize choice positions!
     this.isOpen = true;
     this.titleElement.textContent = data.title;
     this.overlayElement.classList.remove('hidden');
+    this.overlayElement.classList.remove('dark-backdrop');
 
     this.showQuizStage('context');
   }
@@ -302,25 +344,30 @@ export class InteractionDialog {
       };
       this.speakerElement.textContent = 'Zdarzenie:';
       this.speakerElement.style.color = '#b4d2ff';
+      this.adjustBodyFontSize(this.quizData.context, false);
       this.startTypewriter(this.quizData.context);
     } else if (stage === 'sage') {
       this.choicesContainer.classList.add('hidden');
       this.avatarImg.src = '/assets/avatars/medrzec.png';
       this.speakerElement.textContent = 'Wskazówka Mędrca:';
       this.speakerElement.style.color = '#ffe6b4';
-      this.startTypewriter(this.quizData.sageMessage || 'Zachowaj czujność.');
+      const sageMsg = this.quizData.sageMessage || 'Zachowaj czujność.';
+      this.adjustBodyFontSize(sageMsg, false);
+      this.startTypewriter(sageMsg);
     } else if (stage === 'choices') {
       this.avatarImg.src = `/assets/avatars/player${this.playerEvoLevel}.png`;
       this.speakerElement.textContent = 'Wybierz reakcję:';
       this.speakerElement.style.color = '#b4d2ff';
       // In Python original: The story context/question remains visible above the choices!
       if (this.quizData) {
+        this.adjustBodyFontSize(this.quizData.context, true);
         this.bodyElement.textContent = this.quizData.context;
       }
       this.choicesContainer.classList.remove('hidden');
       this.renderChoices();
       this.hintElement.textContent = '↑/↓ lub 1/2 — wybór, Enter/Spacja/E — zatwierdź';
       this.isDoneTyping = true;
+      document.body.classList.remove('cursor-hidden');
     } else if (stage === 'feedback') {
       this.choicesContainer.classList.add('hidden');
       const isGood = feedbackText === this.quizData.goodFeedback;
@@ -328,14 +375,19 @@ export class InteractionDialog {
       this.speakerElement.textContent = isGood ? '✓ Poprawny wybór:' : '✗ Błędna decyzja:';
       this.speakerElement.style.color = isGood ? '#4ade80' : '#f87171';
       this.hintElement.textContent = isGood ? 'ENTER aby przejść dalej' : 'ENTER aby spróbować ponownie';
-      this.startTypewriter(feedbackText || '');
+      const fb = feedbackText || '';
+      this.adjustBodyFontSize(fb, false);
+      this.startTypewriter(fb);
     }
   }
 
   private renderChoices(): void {
     if (!this.quizData) return;
-    this.choiceA.textContent = `A. ${this.quizData.optionA}`;
-    this.choiceB.textContent = `B. ${this.quizData.optionB}`;
+    const textA = this.swapChoices ? this.quizData.optionB : this.quizData.optionA;
+    const textB = this.swapChoices ? this.quizData.optionA : this.quizData.optionB;
+
+    this.choiceA.textContent = `A. ${textA}`;
+    this.choiceB.textContent = `B. ${textB}`;
 
     this.choiceA.classList.toggle('selected', this.selectedChoice === 'A');
     this.choiceB.classList.toggle('selected', this.selectedChoice === 'B');
@@ -343,7 +395,11 @@ export class InteractionDialog {
 
   private confirmChoice(): void {
     if (!this.quizData) return;
-    this.lastChoiceCorrect = (this.selectedChoice === this.quizData.correctOption);
+    const chosenText = this.selectedChoice === 'A'
+      ? (this.swapChoices ? this.quizData.optionB : this.quizData.optionA)
+      : (this.swapChoices ? this.quizData.optionA : this.quizData.optionB);
+    const correctText = this.quizData.correctOption === 'A' ? this.quizData.optionA : this.quizData.optionB;
+    this.lastChoiceCorrect = (chosenText === correctText);
     const fb = this.lastChoiceCorrect ? this.quizData.goodFeedback : this.quizData.badFeedback;
 
     if (this.lastChoiceCorrect && this.quizData.onSuccess) {
@@ -446,9 +502,13 @@ export class InteractionDialog {
     this.isOpen = false;
     if (this.animFrameId) cancelAnimationFrame(this.animFrameId);
     this.overlayElement.classList.add('hidden');
+    this.overlayElement.classList.remove('dark-backdrop');
+    this.containerElement.classList.remove('position-center');
     this.choicesContainer.classList.add('hidden');
     this.avatarBox.style.display = '';
     this.bodyElement.textContent = '';
+    this.bodyElement.classList.remove('font-xlarge', 'font-compact', 'font-dense');
     this.hintElement.textContent = '';
+    document.body.classList.add('cursor-hidden');
   }
 }

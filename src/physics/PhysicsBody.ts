@@ -84,11 +84,14 @@ export class PhysicsBody {
     if (this.respawnState === 'blinking') {
       this.respawnTimer += dt;
       this.isVisible = Math.floor(this.respawnTimer / CONFIG.BLINK_INTERVAL_S) % 2 === 0;
+      this.vx = 0;
       if (this.respawnTimer >= CONFIG.BLINKS_TOTAL * CONFIG.BLINK_INTERVAL_S) {
         this.respawnState = 'normal';
         this.respawnTimer = 0;
         this.isVisible = true;
       }
+      // Strictly freeze all movement & jumping during blinking (1:1 with Python prototype)
+      input = { moveX: 0, moveY: 0, jumpPressed: false, jumpHeld: false, interactPressed: false };
     }
 
     // 1. Ladder proximity check

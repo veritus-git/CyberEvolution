@@ -3,6 +3,15 @@ import { MaskParser } from './MaskParser';
 import { Player } from '../entities/Player';
 import { AABB } from '../physics/AABB';
 
+function shuffleArray<T>(arr: T[]): T[] {
+  const result = [...arr];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
 export interface BossQuestion {
   q: string;
   a: string;
@@ -62,6 +71,23 @@ export class Bossfight {
     return this.shakeTimer;
   }
 
+  // Boss reaction & damage effects
+  public bossShakeTimer: number = 0;
+  public bossDeathTimer: number = 0;
+  public deathParticles: {
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    size: number;
+    life: number;
+    maxLife: number;
+    color: string;
+  }[] = [];
+
+  // Input debouncer to strictly prevent enter/skip bleed-through
+  public inputCooldownTimer: number = 0;
+
   // Slide-in animation from above (gentle ease-out glide)
   public animState: 'enter' | 'visible' | 'exit' | 'hidden' = 'enter';
   public animTimer: number = 0;
@@ -82,7 +108,8 @@ export class Bossfight {
   constructor() {
     // Keyboard navigation
     window.addEventListener('keydown', (e) => {
-      if (!this.active || this.bossDefeated) return;
+      if (!this.active || this.bossDefeated || this.isIntroActive) return;
+      if (this.animState !== 'visible' || this.inputCooldownTimer > 0) return;
       if (this.state === 'feedback') return;
 
       if (e.code === 'ArrowUp' || e.code === 'KeyW') {
@@ -121,6 +148,10 @@ export class Bossfight {
     this.active = true;
     this.bossDefeated = false;
     this.bossBlinkActive = false;
+    this.bossShakeTimer = 0;
+    this.bossDeathTimer = 0;
+    this.deathParticles = [];
+    this.inputCooldownTimer = 0.5;
     this.scrollActive = false;
     this.bossSpawnRect = bossSpawn;
 
@@ -174,6 +205,7 @@ export class Bossfight {
 
   public finishIntro(): void {
     this.isIntroActive = false;
+    this.inputCooldownTimer = 0.45; // Strict debounce after closing dialog!
     this.animState = 'enter';
     this.animTimer = 0.0;
     this.pickNext();
@@ -255,19 +287,19 @@ export class Bossfight {
 
     this.bossData = { name, intro, questions };
     this.questionsAll = [...questions];
-    this.questions = [...this.questionsAll].sort(() => Math.random() - 0.5);
+    this.questions = shuffleArray([...this.questionsAll]);
   }
 
   private pickNext(): void {
     if (this.questions.length === 0) {
-      this.questions = [...this.questionsAll].sort(() => Math.random() - 0.5);
+      this.questions = shuffleArray([...this.questionsAll]);
     }
     this.cur = this.questions.pop() || null;
     if (!this.cur) return;
 
-    // Shuffle options (1:1 with Python BossQuizRuntime)
+    // True uniform Fisher-Yates shuffle of options A, B, C!
     const options = [this.cur.a, this.cur.b, this.cur.c];
-    const perm = [0, 1, 2].sort(() => Math.random() - 0.5);
+    const perm = shuffleArray([0, 1, 2]);
     this.optPerm = perm;
     this.optTexts = perm.map((idx) => options[idx]);
     this.correctIdxShuffled = perm.indexOf(this.cur.correct);
@@ -292,6 +324,7 @@ export class Bossfight {
     const dmg = 100; // 1:1 with Python dmg = 100
     if (good) {
       this.bossHp = Math.max(0, this.bossHp - dmg);
+      this.bossShakeTimer = 0.35; // Boss shakes upon taking damage!
       this.bossBlinkActive = true;
       this.bossBlinkTimer = 0.35;
       if (this.bossHp <= 0) {
@@ -299,7 +332,7 @@ export class Bossfight {
       }
     } else {
       this.playerHp = Math.max(0, this.playerHp - dmg);
-      this.shakeTimer = 0.25; // horizontal screen shake on mistake
+      this.shakeTimer = 0.25; // screen shake on error
       if (this.playerHp <= 0) {
         this.triggerPlayerDefeat();
       }
@@ -308,11 +341,31 @@ export class Bossfight {
 
   private triggerBossDefeat(): void {
     this.bossDefeated = true;
-    this.bossBlinkActive = true;
-    // 1:1 with Python: BLINKS_TOTAL * BLINK_INTERVAL_S = 5 * 0.17 = 0.85s
-    this.bossBlinkTimer = 5 * 0.17;
-    // Scroll does NOT spawn yet — it drops only after blinking ends!
+    this.bossBlinkActive = false;
+    // Slower, dramatic death blinking (1.6s total) before bursting into pixel explosion!
+    this.bossDeathTimer = 1.6;
+    this.bossShakeTimer = 1.6;
     this.scrollActive = false;
+  }
+
+  private spawnBossDeathExplosion(): void {
+    const cx = this.bossX + this.bossW / 2;
+    const cy = this.bossY + this.bossH / 2;
+    const colors = ['#00e5ff', '#ff007f', '#ffe600', '#ffffff', '#8a2be2', '#39ff14'];
+    for (let i = 0; i < 95; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 140 + Math.random() * 480;
+      this.deathParticles.push({
+        x: cx + (Math.random() - 0.5) * (this.bossW * 0.7),
+        y: cy + (Math.random() - 0.5) * (this.bossH * 0.7),
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed - 90,
+        size: 4 + Math.random() * 8,
+        life: 0.6 + Math.random() * 0.9,
+        maxLife: 0.6 + Math.random() * 0.9,
+        color: colors[Math.floor(Math.random() * colors.length)],
+      });
+    }
   }
 
   private triggerPlayerDefeat(): void {
@@ -325,6 +378,13 @@ export class Bossfight {
   public update(dt: number, player: Player): void {
     if (!this.active) return;
 
+    if (this.inputCooldownTimer > 0) {
+      this.inputCooldownTimer = Math.max(0, this.inputCooldownTimer - dt);
+    }
+    if (this.bossShakeTimer > 0) {
+      this.bossShakeTimer = Math.max(0, this.bossShakeTimer - dt);
+    }
+
     // Boss frame animation (1.50s rhythm, calm and majestic)
     if (!this.bossDefeated) {
       this.bossAnimTimer += dt;
@@ -334,18 +394,37 @@ export class Bossfight {
       }
     }
 
-    // Boss damage & defeat blink timer
+    // Boss damage blink timer
     if (this.bossBlinkActive) {
       this.bossBlinkTimer -= dt;
       if (this.bossBlinkTimer <= 0) {
         this.bossBlinkActive = false;
-        if (this.bossDefeated && !this.scrollActive) {
-          // Boss completely vanishes and drops the scroll onto the arena floor!
-          this.scrollActive = true;
-          this.scrollX = this.bossX + this.bossW / 2 - this.scrollSize / 2;
-          this.scrollY = this.bossY + this.bossH - this.scrollSize - 20;
-          this.scrollBobTimer = 0;
-        }
+      }
+    }
+
+    // Boss defeat sequence: dramatic blinking + trembling -> pixel explosion -> drop scroll
+    if (this.bossDefeated && this.bossDeathTimer > 0) {
+      this.bossDeathTimer -= dt;
+      this.bossShakeTimer = 0.2; // Continuous trembling
+      if (this.bossDeathTimer <= 0) {
+        this.spawnBossDeathExplosion();
+        this.scrollActive = true;
+        this.scrollX = this.bossX + this.bossW / 2 - this.scrollSize / 2;
+        this.scrollY = this.bossY + this.bossH - this.scrollSize - 20;
+        this.scrollBobTimer = 0;
+      }
+    }
+
+    // Update death explosion particles
+    for (let i = this.deathParticles.length - 1; i >= 0; i--) {
+      const p = this.deathParticles[i];
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.vy += 380 * dt; // gravity
+      p.vx *= 0.97;
+      p.life -= dt;
+      if (p.life <= 0) {
+        this.deathParticles.splice(i, 1);
       }
     }
 
@@ -400,6 +479,7 @@ export class Bossfight {
    * 2. Draw Boss SECOND (so the Boss sprite overlaps/sits NAD the card!)
    * 3. Draw HP bars THIRD
    * 4. Draw Scroll FOURTH
+   * 5. Draw Death Particles
    */
   public render(ctx: CanvasRenderingContext2D, cameraX: number, player: Player): void {
     if (!this.active) return;
@@ -410,17 +490,33 @@ export class Bossfight {
     }
 
     // 2. Draw Boss (drawn AFTER card, overlapping right edge of card!)
-    const isBossVisible = !this.bossDefeated || (this.bossBlinkActive && Math.floor(this.bossBlinkTimer / 0.17) % 2 === 0);
+    let isBossVisible = true;
+    if (this.bossDefeated) {
+      if (this.bossDeathTimer > 0) {
+        // Slow dramatic blinking before death explosion: 0.20s per blink
+        isBossVisible = Math.floor(this.bossDeathTimer / 0.20) % 2 === 0;
+      } else {
+        isBossVisible = false; // Vanished after explosion!
+      }
+    } else if (this.bossBlinkActive) {
+      isBossVisible = Math.floor(this.bossBlinkTimer / 0.12) % 2 === 0;
+    }
+
     if (isBossVisible) {
       this.drawBossSprite(ctx, cameraX);
     }
 
-    // 3. Draw HP Bars above heads (1:1 with Python _draw_hp_bars) - ONLY when not in intro!
+    // 3. Draw Death Explosion Particles
+    if (this.deathParticles.length > 0) {
+      this.drawDeathParticles(ctx, cameraX);
+    }
+
+    // 4. Draw HP Bars above heads (1:1 with Python _draw_hp_bars) - ONLY when not in intro and not defeated!
     if (!this.bossDefeated && !this.isIntroActive) {
       this.drawHpBars(ctx, cameraX, player);
     }
 
-    // 4. Draw Scroll (if dropped)
+    // 5. Draw Scroll (if dropped)
     if (this.scrollActive) {
       this.drawScrollItem(ctx, cameraX);
     }
@@ -549,12 +645,35 @@ export class Bossfight {
     const scale = targetH / frame.naturalHeight;
     const targetW = Math.round(frame.naturalWidth * scale);
 
-    const bx = Math.round(this.bossX - cameraX + this.bossW / 2 - targetW / 2);
-    const by = Math.round(this.bossY + this.bossH - targetH);
+    // Apply shake jitter when damaged or dying
+    let offX = 0;
+    let offY = 0;
+    if (this.bossShakeTimer > 0) {
+      const amp = this.bossDefeated ? 15 : 10;
+      offX = Math.round((Math.random() - 0.5) * 2 * amp);
+      offY = Math.round((Math.random() - 0.5) * amp);
+    }
+
+    const bx = Math.round(this.bossX - cameraX + this.bossW / 2 - targetW / 2 + offX);
+    const by = Math.round(this.bossY + this.bossH - targetH + offY);
 
     ctx.save();
-    // 1:1 with Python: no high-saturation CSS filter, clean sprite draw
+    // Hit flash effect when damaged
+    if (this.bossShakeTimer > 0 && !this.bossDefeated) {
+      ctx.filter = 'brightness(1.5) contrast(1.2)';
+    }
     ctx.drawImage(frame, bx, by, targetW, targetH);
+    ctx.restore();
+  }
+
+  private drawDeathParticles(ctx: CanvasRenderingContext2D, cameraX: number): void {
+    ctx.save();
+    for (const p of this.deathParticles) {
+      const alpha = Math.max(0, Math.min(1, p.life / p.maxLife));
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = p.color;
+      ctx.fillRect(Math.round(p.x - cameraX), Math.round(p.y), p.size, p.size);
+    }
     ctx.restore();
   }
 

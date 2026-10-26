@@ -283,8 +283,16 @@ html, body {
   text-align: right;
 }
 
+/* Cursor visibility control */
+body.cursor-hidden,
+body.cursor-hidden #app,
+body.cursor-hidden #game-canvas,
+body.cursor-hidden #ui-container {
+  cursor: none !important;
+}
+
 /* ==========================================================================
-   RETRO DIALOG BOX (1:1 with Python prototype: Avatar Box + Content Panel)
+   RETRO DIALOG BOX (Avatar Box + Content Panel)
    ========================================================================== */
 .retro-dialog-overlay {
   position: absolute;
@@ -292,13 +300,42 @@ html, body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: transparent; /* No full-screen darkening! Background stays crisp & alive */
+  background: transparent;
   pointer-events: none;
   z-index: 40;
+  transition: background-color 0.25s ease;
+}
+
+.retro-dialog-overlay.dark-backdrop {
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(2px);
+  pointer-events: auto;
 }
 
 .retro-dialog-overlay.hidden {
   display: none;
+}
+
+@keyframes dialogFadeInTop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -14px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes dialogFadeInCenter {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -55%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
 }
 
 .retro-dialog-container {
@@ -306,29 +343,39 @@ html, body {
   flex-direction: row;
   align-items: stretch;
   gap: 16px;
-  width: min(1560px, 94vw); /* Wide 1:1 like Python (avatar 270px + gap 16px + panel 1270px = 1556px) */
-  height: 270px; /* Reduced height, matching Python 1:1 proportions */
+  width: min(1560px, 94vw);
+  height: 270px;
   position: absolute;
   left: 50%;
-  transform: translateX(-50%);
   pointer-events: auto;
-  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.75);
   box-sizing: border-box;
 }
 
 .retro-dialog-container.position-top {
   top: 108px;
   bottom: auto;
+  transform: translateX(-50%);
+  animation: dialogFadeInTop 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .retro-dialog-container.position-bottom {
   bottom: 108px;
   top: auto;
+  transform: translateX(-50%);
+  animation: dialogFadeInTop 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.retro-dialog-container.position-center {
+  top: 50%;
+  bottom: auto;
+  transform: translate(-50%, -50%);
+  animation: dialogFadeInCenter 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 /* Left Avatar Box */
 .retro-avatar-box {
-  width: 270px; /* EXACT SAME 270px height and width as panel! */
+  width: 270px;
   height: 270px;
   flex-shrink: 0;
   background: var(--retro-panel-bg);
@@ -353,14 +400,14 @@ html, body {
 /* Right Content Panel */
 .retro-panel-box {
   flex: 1;
-  height: 270px; /* EXACT SAME height as avatar box! */
+  height: 270px;
   background: var(--retro-panel-bg);
   border: 2px solid var(--retro-border);
   border-radius: 10px;
   padding: 14px 22px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-start; /* STRICT TOP ALIGNMENT (1:1 with Python, no jumping or middle centering!) */
+  justify-content: flex-start;
   align-items: stretch;
   text-align: left;
   position: relative;
@@ -371,32 +418,55 @@ html, body {
 .retro-dialog-title {
   font-family: 'Jersey 10', 'VT323', monospace;
   color: #ffff00;
-  font-size: 24px;
+  font-size: 21px;
   margin: 0 0 2px 0;
   font-weight: normal;
   letter-spacing: 0.5px;
   line-height: 1.1;
   text-align: left;
+  opacity: 0.95;
 }
 
 .retro-dialog-speaker {
   font-family: 'Jersey 10', 'VT323', monospace;
-  font-size: 20px;
+  font-size: 27px;
+  font-weight: normal;
   color: #b4d2ff;
-  margin: 0 0 4px 0;
+  margin: 0 0 6px 0;
   line-height: 1.1;
   text-align: left;
+  letter-spacing: 0.5px;
 }
 
 .retro-dialog-body {
   font-family: 'Jersey 10', 'VT323', monospace;
-  font-size: 20px;
-  line-height: 1.25;
+  font-size: 25px;
+  line-height: 1.3;
   color: #ebebeb;
   white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
   flex: 0 0 auto;
   margin: 0 0 8px 0;
   text-align: left;
+  transition: font-size 0.15s ease;
+}
+
+.retro-dialog-body.font-xlarge {
+  font-size: 28px;
+  line-height: 1.35;
+}
+
+.retro-dialog-body.font-compact {
+  font-size: 21px;
+  line-height: 1.25;
+  margin-bottom: 6px;
+}
+
+.retro-dialog-body.font-dense {
+  font-size: 19px;
+  line-height: 1.2;
+  margin-bottom: 4px;
 }
 
 .retro-dialog-choices {
@@ -418,7 +488,7 @@ html, body {
   color: #d2d2d2;
   padding: 6px 14px;
   border-radius: 6px;
-  font-size: 19px;
+  font-size: 20px;
   cursor: pointer;
   transition: all 0.1s ease;
   line-height: 1.2;

@@ -213,13 +213,13 @@ export class MaskParser {
             });
             break;
           case 'TRIGGER_1':
-            level.triggers.push({ id: 1, bounds: rect, interactionId: 1, label: 'Interakcja #1', activated: false });
+            level.triggers.push({ id: 1, bounds: rect, interactionId: 1, label: 'E: porozmawiaj', activated: false });
             break;
           case 'TRIGGER_2':
-            level.triggers.push({ id: 2, bounds: rect, interactionId: 2, label: 'Interakcja #2', activated: false });
+            level.triggers.push({ id: 2, bounds: rect, interactionId: 2, label: 'E: porozmawiaj', activated: false });
             break;
           case 'TRIGGER_3':
-            level.triggers.push({ id: 3, bounds: rect, interactionId: 3, label: 'Interakcja #3', activated: false });
+            level.triggers.push({ id: 3, bounds: rect, interactionId: 3, label: 'E: porozmawiaj', activated: false });
             break;
           case 'GATE_1':
             level.gates.push({ id: 1, bounds: rect, locked: true });

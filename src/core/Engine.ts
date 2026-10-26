@@ -55,8 +55,14 @@ export class Engine {
   private arenaIntroActive: boolean = false;
   private arenaIntroWn: number | null = null;
   private worldIntroTitle: string | null = null;
+  private worldIntroWn: number = 1;
   private worldIntroTimer: number = 0;
   private pendingWorldIntroText: string = '';
+
+  // Lobby vertical drop-in state (1:1 with Python prototype: falls in from top)
+  private lobbyDropinActive: boolean = false;
+  private lobbyDropinLockTimer: number = 0;
+  private pendingLobbyDialog: 'intro' | number | null = null;
 
   // Screen wipe transition state (1:1 with Python wipe_out_down / wipe_in_down)
   private transitionState: 'wipe_out' | 'wipe_in' | 'none' = 'none';
@@ -93,6 +99,19 @@ export class Engine {
 
     this.setupWindowResize();
     this.setupStartMenu();
+
+    // Mouse cursor hiding during platforming; only show when UI needs selection
+    document.body.classList.add('cursor-hidden');
+    window.addEventListener('mousemove', () => {
+      if (this.startMenu.isOpen || this.dialog.isChoicesVisible) {
+        document.body.classList.remove('cursor-hidden');
+      }
+    });
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'F11' || (!this.startMenu.isOpen && !this.dialog.isChoicesVisible)) {
+        document.body.classList.add('cursor-hidden');
+      }
+    });
   }
 
   private setupWindowResize(): void {
@@ -234,6 +253,11 @@ export class Engine {
         // LOBBY
         this.currentQuizzes.clear();
         this.renderer.suppressLetterbox = true;
+        // After World 4 is cleared, the Sage is gone (testing us in World 5), so Lobby is empty!
+        const isLobbyEmpty = this.completedWorlds.has(4) || this.player.skinId >= 5;
+        bgPath = isLobbyEmpty
+          ? '/assets/worlds/lobby/bg_empty.png'
+          : '/assets/worlds/lobby/bg.png';
       }
 
       console.log(`Loading world "${worldName}" from ${maskPath}...`);
@@ -264,9 +288,11 @@ export class Engine {
 
       // Spawn positioning
       if (isArena && currentWn !== null) {
-        // Arena entrance intro: player starts just off-screen left and walks in smoothly at 260 px/s
+        // Arena entrance intro: compute floor ground level so player's feet are exactly on ground
+        this.placePlayerOnGround(defaultSpawnX);
+        const groundY = this.player.physics.y;
         this.player.physics.x = -150;
-        this.player.physics.y = 560;
+        this.player.physics.y = groundY;
         this.player.physics.vx = 260;
         this.player.physics.vy = 0;
         this.player.physics.facing = 'right';
@@ -276,14 +302,23 @@ export class Engine {
         this.arenaIntroActive = true;
         this.arenaIntroWn = currentWn;
       } else if (worldKey === 'lobby') {
+        // Always drop in from above on every return to lobby (1:1 with Python prototype)
+        this.player.physics.x = CONFIG.LOGICAL_WIDTH / 2 - CONFIG.PLAYER_WIDTH / 2;
+        this.player.physics.y = 80;
+        this.player.physics.vx = 0;
+        this.player.physics.vy = 0;
+        this.player.physics.facing = 'left';
+        this.player.physics.onGround = false;
+        this.lobbyDropinActive = true;
+        this.lobbyDropinLockTimer = 0.85;
+
         if (isNewGameIntro) {
-          this.player.physics.x = CONFIG.LOGICAL_WIDTH / 2 - CONFIG.PLAYER_WIDTH / 2;
-          this.player.physics.y = 120;
-          this.player.physics.vx = 0;
-          this.player.physics.vy = 0;
-          this.player.physics.facing = 'left';
+          this.pendingLobbyDialog = 'intro';
+        } else if (this.pendingSummaryWorld !== null) {
+          this.pendingLobbyDialog = this.pendingSummaryWorld;
+          this.pendingSummaryWorld = null;
         } else {
-          this.placePlayerOnGround(defaultSpawnX);
+          this.pendingLobbyDialog = null;
         }
       } else {
         this.placePlayerOnGround(defaultSpawnX);
@@ -297,17 +332,7 @@ export class Engine {
       if (isArena && currentWn !== null) {
         // Arena intro handled above
       } else if (worldKey === 'lobby') {
-        if (isNewGameIntro) {
-          setTimeout(() => {
-            this.playGameIntroDialog();
-          }, 400);
-        } else if (this.pendingSummaryWorld !== null) {
-          const wn = this.pendingSummaryWorld;
-          this.pendingSummaryWorld = null;
-          setTimeout(() => {
-            this.playWorldSummaryDialog(wn);
-          }, 400);
-        }
+        // Lobby dialog will trigger smoothly upon landing from drop-in!
       } else if (currentWn !== null) {
         this.playWorldIntro(currentWn, worldName);
       }
@@ -325,22 +350,30 @@ export class Engine {
       bossSpawn,
       () => {
         // VICTORY: Player collected scroll!
-        this.player.evolveUp();
-        this.completedWorlds.add(wn);
-        this.saveGameProgress();
+        // Immediately stop player movement
+        this.player.physics.vx = 0;
 
-        // Spawn return portal to Lobby in arena (towering vertical portal standing upright on floor)
-        const arenaFloor = 768;
-        const portalH = 380;
-        const portalW = 220;
-        this.level.portals.push({
-          id: 'arena_return_portal',
-          bounds: new AABB(1350, arenaFloor - portalH, portalW, portalH),
-          targetWorld: 'lobby',
-          label: 'POWRÓT DO LOBBY',
+        // Run evolution cutscene (control freeze, blink old skin, swap skin + EVOLUTION UP, blink new skin)
+        this.player.evolveUp(() => {
+          this.completedWorlds.add(wn);
+          this.saveGameProgress();
+
+          // Spawn return portal in DEAD CENTER of arena floor
+          setTimeout(() => {
+            const arenaFloor = 768;
+            const portalH = 380;
+            const portalW = 220;
+            const centerX = Math.round((CONFIG.LOGICAL_WIDTH - portalW) / 2); // 850px, DEAD CENTER OF ARENA!
+            this.level.portals.push({
+              id: 'arena_return_portal',
+              bounds: new AABB(centerX, arenaFloor - portalH, portalW, portalH),
+              targetWorld: 'lobby',
+              label: 'POWRÓT DO LOBBY',
+            });
+            this.loadPortalsForLevel(this.level, 'lobby');
+            this.pendingSummaryWorld = wn;
+          }, 400);
         });
-        this.loadPortalsForLevel(this.level, 'lobby');
-        this.pendingSummaryWorld = wn;
       },
       () => {
         // DEFEAT: Retry bossfight
@@ -370,7 +403,8 @@ export class Engine {
       } else if (tgt === 'ending') {
         folder = '/assets/ending/portal';
       } else if (tgt === 'dynamic_world' || worldKey === 'lobby') {
-        const targetWn = Math.min(5, Math.max(1, this.player.skinId));
+        const maxCompleted = this.completedWorlds.size > 0 ? Math.max(...Array.from(this.completedWorlds)) : 0;
+        const targetWn = Math.min(5, Math.max(this.player.skinId, maxCompleted + 1));
         folder = `/assets/worlds/${targetWn}/portal`;
       } else if (tgt.startsWith('world')) {
         const wnStr = tgt.replace('world', '').replace('_arena', '');
@@ -485,6 +519,7 @@ export class Engine {
         this.worldIntroTitle = worldNameFound || title.replace(/^Świat \d+:\s*/, '');
         this.worldIntroTimer = 2.1;
         this.pendingWorldIntroText = introText;
+        this.worldIntroWn = wn;
       }
     } catch {
       // Ignore
@@ -632,7 +667,7 @@ export class Engine {
       if (this.worldIntroTimer <= 0) {
         const title = this.worldIntroTitle || 'Wstęp';
         this.worldIntroTitle = null;
-        this.dialog.startWorldIntro(title, this.pendingWorldIntroText);
+        this.dialog.startWorldIntro(title, this.pendingWorldIntroText, this.worldIntroWn);
       }
       return;
     }
@@ -685,10 +720,32 @@ export class Engine {
       this.input.selectedSkin = null;
     }
 
-    // When dialog is open OR during active bossfight, controls are completely locked!
-    // (1:1 with Python prototype: cannot move, cannot jump while fighting boss)
+    // Lobby drop-in landing check (1:1 with Python: player falls in from top, lock input until landing)
+    if (this.lobbyDropinActive) {
+      if (this.lobbyDropinLockTimer > 0) {
+        this.lobbyDropinLockTimer -= dt;
+      }
+      if (this.player.physics.onGround && this.lobbyDropinLockTimer <= 0) {
+        this.lobbyDropinActive = false;
+        if (this.pendingLobbyDialog === 'intro') {
+          setTimeout(() => this.playGameIntroDialog(), 250);
+          this.pendingLobbyDialog = null;
+        } else if (typeof this.pendingLobbyDialog === 'number') {
+          const wn = this.pendingLobbyDialog;
+          this.pendingLobbyDialog = null;
+          setTimeout(() => this.playWorldSummaryDialog(wn), 250);
+        }
+      }
+    }
+
+    // When dialog is open OR during active bossfight OR during lobby drop-in OR respawn/evo blinking, controls are locked!
+    // (1:1 with Python prototype: cannot move, cannot jump while fighting boss, respawning or evolving)
     const rawInput = this.input.getMovementInput();
-    const isControlLocked = this.dialog.isOpen || (this.bossfight.active && !this.bossfight.bossDefeated);
+    const isControlLocked = this.dialog.isOpen ||
+      (this.bossfight.active && !this.bossfight.bossDefeated) ||
+      this.lobbyDropinActive ||
+      this.player.physics.respawnState === 'blinking' ||
+      this.player.evoBlinkActive;
     if (isControlLocked) {
       this.player.physics.vx = 0;
     }
@@ -761,7 +818,9 @@ export class Engine {
         if (interactPressed) {
           let target = portal.targetWorld;
           if (target === 'dynamic_world') {
-            target = `world${Math.min(5, this.player.skinId)}`;
+            const maxCompleted = this.completedWorlds.size > 0 ? Math.max(...Array.from(this.completedWorlds)) : 0;
+            const targetWn = Math.min(5, Math.max(this.player.skinId, maxCompleted + 1));
+            target = `world${targetWn}`;
           } else if (target === 'arena') {
             const m = this.level.key.match(/^(?:world)?([1-5])$/);
             const wn = m ? m[1] : '1';
@@ -794,7 +853,7 @@ export class Engine {
     if (quiz) {
       this.dialog.startQuiz(
         {
-          title: `Interakcja #${triggerId}`,
+          title: this.level.name || 'Wybór reakcji',
           avatar: quiz.avatar,
           context: quiz.context,
           sageMessage: quiz.sageMessage,
@@ -819,7 +878,7 @@ export class Engine {
     // Fallback quiz
     this.dialog.startQuiz(
       {
-        title: `Interakcja #${triggerId}`,
+        title: this.level.name || 'Wybór reakcji',
         avatar: 'mail',
         context: 'Otrzymujesz pilną wiadomość z prośbą o natychmiastowe kliknięcie linku i potwierdzenie danych logowania pod groźbą zablokowania konta.',
         sageMessage: 'Instytucje i serwisy nigdy nie wywierają sztucznej presji czasu ani nie żądają haseł przez linki.',
