@@ -82,6 +82,16 @@ export class Player {
     });
   }
 
+  public async preloadAllSkins(): Promise<void> {
+    await Promise.all([
+      this.loadSkin(1),
+      this.loadSkin(2),
+      this.loadSkin(3),
+      this.loadSkin(4),
+      this.loadSkin(5),
+    ]);
+  }
+
   public setSkin(id: number): void {
     if (id >= 1 && id <= 5) {
       this.skinId = id;
@@ -227,7 +237,10 @@ export class Player {
     const w = this.physics.width;
     const h = this.physics.height;
 
-    const currentSkin = this.skins.get(this.skinId);
+    let currentSkin = this.skins.get(this.skinId);
+    if (!currentSkin || !currentSkin.idle) {
+      currentSkin = this.skins.get(1) || Array.from(this.skins.values())[0];
+    }
     let frameToDraw: HTMLImageElement | null = null;
 
     if (currentSkin) {
@@ -239,6 +252,13 @@ export class Player {
         frameToDraw = currentSkin.run[this.runFrameIndex] || currentSkin.idle;
       } else {
         frameToDraw = currentSkin.idle;
+      }
+    }
+
+    if (!frameToDraw || !frameToDraw.complete || frameToDraw.naturalWidth <= 0) {
+      const skin1 = this.skins.get(1);
+      if (skin1 && skin1.idle && skin1.idle.complete) {
+        frameToDraw = skin1.idle;
       }
     }
 
@@ -263,9 +283,6 @@ export class Player {
       } else {
         ctx.drawImage(frameToDraw, drawX, drawY, targetW, targetH);
       }
-    } else {
-      // Fallback procedural cyberpunk avatar if sprite is still loading
-      this.drawProceduralFallback(ctx, screenX, screenY, w, h);
     }
 
     ctx.restore();
@@ -327,24 +344,5 @@ export class Player {
 
       ctx.restore();
     }
-  }
-
-  private drawProceduralFallback(
-    ctx: CanvasRenderingContext2D,
-    x: number,
-    y: number,
-    w: number,
-    h: number
-  ): void {
-    const grad = ctx.createLinearGradient(x, y, x, y + h);
-    grad.addColorStop(0, '#00e5ff');
-    grad.addColorStop(0.5, '#1e88e5');
-    grad.addColorStop(1, '#0d47a1');
-
-    ctx.fillStyle = grad;
-    ctx.fillRect(x, y, w, h);
-    ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(x, y, w, h);
   }
 }

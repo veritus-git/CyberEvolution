@@ -19,7 +19,7 @@ export interface QuizInteractionData {
 export class InteractionDialog {
   public isOpen: boolean = false;
   public get isChoicesVisible(): boolean {
-    return this.isOpen && this.mode === 'quiz' && this.quizStage === 'choices';
+    return (this.isOpen && this.mode === 'quiz' && this.quizStage === 'choices') || this.isDeathMenuActive;
   }
 
   private overlayElement: HTMLElement;
@@ -57,6 +57,16 @@ export class InteractionDialog {
   private conversationIndex: number = 0;
   private playerEvoLevel: number = 1;
   private onCompleteCallback?: () => void;
+
+  // Death Menu state (1:1 with Python prototype: Retry Boss vs Restart World)
+  private deathMenuElement: HTMLElement;
+  private deathMenuTitle: HTMLElement;
+  private deathMenuOpt0: HTMLElement;
+  private deathMenuOpt1: HTMLElement;
+  private isDeathMenuActive: boolean = false;
+  private deathMenuSelection: number = 0;
+  private onRetryBossCallback?: () => void;
+  private onRestartWorldCallback?: () => void;
 
   constructor(container: HTMLElement) {
     this.overlayElement = document.createElement('div');
@@ -122,11 +132,42 @@ export class InteractionDialog {
     this.containerElement.appendChild(this.panelElement);
 
     this.overlayElement.appendChild(this.containerElement);
+
+    // Death menu panel (1:1 with Python prototype: Retry Boss vs Restart World)
+    this.deathMenuElement = document.createElement('div');
+    this.deathMenuElement.className = 'death-menu-panel hidden';
+
+    this.deathMenuTitle = document.createElement('div');
+    this.deathMenuTitle.className = 'death-menu-title';
+    this.deathMenuTitle.textContent = 'Przegrałeś';
+
+    this.deathMenuOpt0 = document.createElement('div');
+    this.deathMenuOpt0.className = 'death-menu-option selected';
+    this.deathMenuOpt0.textContent = 'Walcz ponownie';
+    this.deathMenuOpt0.onclick = (e) => {
+      e.stopPropagation();
+      this.confirmDeathMenu(0);
+    };
+
+    this.deathMenuOpt1 = document.createElement('div');
+    this.deathMenuOpt1.className = 'death-menu-option';
+    this.deathMenuOpt1.textContent = 'Przejdź świat jeszcze raz';
+    this.deathMenuOpt1.onclick = (e) => {
+      e.stopPropagation();
+      this.confirmDeathMenu(1);
+    };
+
+    this.deathMenuElement.appendChild(this.deathMenuTitle);
+    this.deathMenuElement.appendChild(this.deathMenuOpt0);
+    this.deathMenuElement.appendChild(this.deathMenuOpt1);
+    this.overlayElement.appendChild(this.deathMenuElement);
+
     container.appendChild(this.overlayElement);
 
     // Click / touch to advance
     this.overlayElement.addEventListener('click', () => {
       if (!this.isOpen) return;
+      if (this.isDeathMenuActive) return;
       if (this.mode === 'quiz' && this.quizStage === 'choices') return;
       this.advance();
     });
@@ -134,6 +175,23 @@ export class InteractionDialog {
     // Keyboard navigation
     window.addEventListener('keydown', (e) => {
       if (!this.isOpen) return;
+
+      if (this.isDeathMenuActive) {
+        if (e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'Digit1') {
+          e.preventDefault();
+          this.deathMenuSelection = 0;
+          this.renderDeathMenu();
+        } else if (e.code === 'ArrowDown' || e.code === 'KeyS' || e.code === 'Digit2') {
+          e.preventDefault();
+          this.deathMenuSelection = 1;
+          this.renderDeathMenu();
+        } else if (e.code === 'Enter' || e.code === 'Space' || e.code === 'KeyE') {
+          e.preventDefault();
+          this.confirmDeathMenu(this.deathMenuSelection);
+        }
+        return;
+      }
+
       if (e.code === 'KeyE' || e.code === 'Space' || e.code === 'Enter') {
         e.preventDefault();
         e.stopPropagation();
@@ -255,9 +313,9 @@ export class InteractionDialog {
   /**
    * Start Boss Intro dialogue (1:1 with Python: Centered on screen, dark backdrop, Boss avatar)
    */
-  public startBossIntro(bossName: string, introText: string, wn: number, onComplete?: () => void): void {
+  public startBossIntro(bossName: string, introText: string, wn: number, onComplete?: () => void, stageTitle?: string): void {
     this.mode = 'conversation';
-    this.titleElement.textContent = `${bossName} — Wstęp`;
+    this.titleElement.textContent = stageTitle ? `${bossName} — ${stageTitle}` : `${bossName} — Wstęp`;
     this.speakerElement.textContent = `${bossName}:`;
     this.speakerElement.style.color = '#ff9999';
     this.avatarBox.style.display = '';
@@ -498,12 +556,46 @@ export class InteractionDialog {
     this.hintElement.textContent = 'ENTER aby przejść dalej';
   }
 
+  public showDeathMenu(onRetryBoss: () => void, onRestartWorld: () => void): void {
+    this.isOpen = true;
+    this.isDeathMenuActive = true;
+    this.deathMenuSelection = 0;
+    this.onRetryBossCallback = onRetryBoss;
+    this.onRestartWorldCallback = onRestartWorld;
+
+    this.containerElement.classList.add('hidden');
+    this.deathMenuElement.classList.remove('hidden');
+    this.overlayElement.classList.remove('hidden');
+    this.overlayElement.classList.add('dark-backdrop');
+    document.body.classList.remove('cursor-hidden');
+    this.renderDeathMenu();
+  }
+
+  private renderDeathMenu(): void {
+    this.deathMenuOpt0.classList.toggle('selected', this.deathMenuSelection === 0);
+    this.deathMenuOpt1.classList.toggle('selected', this.deathMenuSelection === 1);
+  }
+
+  private confirmDeathMenu(index: number): void {
+    const retryCb = this.onRetryBossCallback;
+    const restartCb = this.onRestartWorldCallback;
+    this.close();
+    if (index === 0 && retryCb) {
+      retryCb();
+    } else if (index === 1 && restartCb) {
+      restartCb();
+    }
+  }
+
   public close(): void {
     this.isOpen = false;
+    this.isDeathMenuActive = false;
     if (this.animFrameId) cancelAnimationFrame(this.animFrameId);
     this.overlayElement.classList.add('hidden');
     this.overlayElement.classList.remove('dark-backdrop');
     this.containerElement.classList.remove('position-center');
+    this.containerElement.classList.remove('hidden');
+    this.deathMenuElement.classList.add('hidden');
     this.choicesContainer.classList.add('hidden');
     this.avatarBox.style.display = '';
     this.bodyElement.textContent = '';

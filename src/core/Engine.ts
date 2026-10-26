@@ -54,6 +54,7 @@ export class Engine {
   // Arena intro & World intro animation state
   private arenaIntroActive: boolean = false;
   private arenaIntroWn: number | null = null;
+  private arenaIntroSkipBossDialog: boolean = false;
   private worldIntroTitle: string | null = null;
   private worldIntroWn: number = 1;
   private worldIntroTimer: number = 0;
@@ -177,9 +178,9 @@ export class Engine {
 
   public async init(initialWorld: string = 'lobby'): Promise<void> {
     try {
-      await this.player.loadSkin(1);
+      await this.player.preloadAllSkins();
     } catch (e) {
-      console.warn('Skin 1 load failed:', e);
+      console.warn('Skin preload failed:', e);
     }
 
     const params = new URLSearchParams(window.location.search);
@@ -330,7 +331,8 @@ export class Engine {
 
       // Handle Dialogs and Bossfight:
       if (isArena && currentWn !== null) {
-        // Arena intro handled above
+        // Pre-initialize and start bossfight immediately so boss is visible as player runs in!
+        await this.startBossfight(currentWn, this.arenaIntroSkipBossDialog);
       } else if (worldKey === 'lobby') {
         // Lobby dialog will trigger smoothly upon landing from drop-in!
       } else if (currentWn !== null) {
@@ -343,22 +345,20 @@ export class Engine {
     }
   }
 
-  private async startBossfight(wn: number): Promise<void> {
+  private async startBossfight(wn: number, skipIntro: boolean = false): Promise<void> {
     const bossSpawn = this.level.bossSpawns[0] || null;
     await this.bossfight.start(
       wn,
       bossSpawn,
+      skipIntro,
       () => {
-        // VICTORY: Player collected scroll!
-        // Immediately stop player movement
+        // VICTORY: Player collected scroll (Worlds 1..4)!
         this.player.physics.vx = 0;
 
-        // Run evolution cutscene (control freeze, blink old skin, swap skin + EVOLUTION UP, blink new skin)
         this.player.evolveUp(() => {
           this.completedWorlds.add(wn);
           this.saveGameProgress();
 
-          // Spawn return portal in DEAD CENTER of arena floor
           setTimeout(() => {
             const arenaFloor = 768;
             const portalH = 380;
@@ -376,20 +376,72 @@ export class Engine {
         });
       },
       () => {
-        // DEFEAT: Retry bossfight
+        // DEFEAT: Show Death Menu (1:1 with Python prototype!)
         setTimeout(() => {
-          this.startBossfight(wn);
-        }, 1000);
+          this.dialog.showDeathMenu(
+            () => {
+              this.retryBossfight(wn);
+            },
+            () => {
+              this.restartWorld(wn);
+            }
+          );
+        }, 400);
+      },
+      () => {
+        // WORLD 5 FINAL VICTORY: Mędrzec outro dialogue + Black Ending Portal!
+        this.completedWorlds.add(5);
+        this.saveGameProgress();
+        setTimeout(() => {
+          const outroText =
+            this.bossfight.bossData?.outro ||
+            'Udało ci się.\nZrozumiałeś, że bezpieczeństwo nie polega na strachu, ale na świadomości.\nKażdy świat był lekcją — o zaufaniu, prywatności, ochronie i odpowiedzialności.\nTeraz to ty jesteś strażnikiem swojego świata.\nCyberEwolucja nie kończy się tu… ona trwa w każdym twoim wyborze.';
+          this.dialog.startBossIntro(
+            'Mędrzec',
+            outroText,
+            5,
+            () => {
+              // Spawn black ending portal in dead center of arena floor
+            const arenaFloor = 768;
+            const portalH = 380;
+            const portalW = 220;
+            const centerX = Math.round((CONFIG.LOGICAL_WIDTH - portalW) / 2);
+            this.level.portals.push({
+              id: 'ending_portal',
+              bounds: new AABB(centerX, arenaFloor - portalH, portalW, portalH),
+              targetWorld: 'ending',
+              label: 'WRÓĆ DO RZECZYWISTOŚCI',
+            });
+            this.loadPortalsForLevel(this.level, 'world5_arena');
+          },
+          'Zakończenie'
+        );
+        }, 600);
       }
     );
+  }
 
-    // If boss has intro text, show the boss introduction window (Point 6)!
-    if (this.bossfight.isIntroActive && this.bossfight.bossData) {
-      const bData = this.bossfight.bossData;
-      this.dialog.startBossIntro(bData.name, bData.intro, wn, () => {
-        this.bossfight.finishIntro();
-      });
-    }
+  private retryBossfight(wn: number): void {
+    this.arenaIntroSkipBossDialog = true;
+    this.placePlayerOnGround(250);
+    const groundY = this.player.physics.y;
+    this.player.physics.x = -150;
+    this.player.physics.y = groundY;
+    this.player.physics.vx = 260;
+    this.player.physics.vy = 0;
+    this.player.physics.facing = 'right';
+    this.player.physics.onGround = true;
+    this.player.animTimer = 0;
+    this.player.runFrameIndex = 0;
+    this.arenaIntroActive = true;
+    this.arenaIntroWn = wn;
+    this.startBossfight(wn, true /* skipIntro */);
+  }
+
+  private restartWorld(wn: number): void {
+    this.arenaIntroSkipBossDialog = false;
+    this.completedWorlds.delete(wn);
+    this.triggerWorldTransition(`world${wn}`);
   }
 
   private async loadPortalsForLevel(lvl: Level, worldKey: string): Promise<void> {
@@ -592,10 +644,17 @@ export class Engine {
         if (this.pendingWorldSwitch) {
           const target = this.pendingWorldSwitch;
           this.pendingWorldSwitch = null;
-          this.loadWorld(target).then(() => {
-            this.transitionState = 'wipe_in';
-            this.transitionTimer = 0;
-          });
+          if (target === 'ending') {
+            this.transitionState = 'none';
+            this.introSequence.playEnding(() => {
+              this.startMenu.show();
+            });
+          } else {
+            this.loadWorld(target).then(() => {
+              this.transitionState = 'wipe_in';
+              this.transitionTimer = 0;
+            });
+          }
         }
       }
     } else if (this.transitionState === 'wipe_in') {
@@ -683,7 +742,14 @@ export class Engine {
         this.player.runFrameIndex = 0;
         this.arenaIntroActive = false;
         if (this.arenaIntroWn !== null) {
-          this.startBossfight(this.arenaIntroWn);
+          if (!this.arenaIntroSkipBossDialog && this.bossfight.bossData?.intro) {
+            const bData = this.bossfight.bossData;
+            this.dialog.startBossIntro(bData.name, bData.intro, this.arenaIntroWn, () => {
+              this.bossfight.finishIntro();
+            });
+          } else {
+            this.bossfight.finishIntro();
+          }
         }
       } else {
         this.player.physics.x += step;
@@ -809,7 +875,10 @@ export class Engine {
       if (playerBounds.intersects(portal.bounds)) {
         const isArena = portal.targetWorld === 'arena';
         const isLobby = portal.targetWorld === 'lobby';
-        this.activeHint = isLobby
+        const isEnding = portal.targetWorld === 'ending';
+        this.activeHint = isEnding
+          ? 'E: wróć do rzeczywistości'
+          : isLobby
           ? 'E: powrót do lobby'
           : isArena
           ? 'E: wejdź do areny'
@@ -817,6 +886,10 @@ export class Engine {
 
         if (interactPressed) {
           let target = portal.targetWorld;
+          if (target === 'ending') {
+            this.triggerWorldTransition('ending');
+            return;
+          }
           if (target === 'dynamic_world') {
             const maxCompleted = this.completedWorlds.size > 0 ? Math.max(...Array.from(this.completedWorlds)) : 0;
             const targetWn = Math.min(5, Math.max(this.player.skinId, maxCompleted + 1));

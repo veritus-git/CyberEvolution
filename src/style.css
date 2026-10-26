@@ -87,6 +87,10 @@ html, body {
   background: #020617;
 }
 
+.hidden {
+  display: none !important;
+}
+
 /* Game canvas: fixed logical resolution, CSS-only scaling to fit screen */
 #game-canvas {
   display: block;
@@ -611,4 +615,59 @@ body.cursor-hidden #ui-container {
   color: #94a3b8;
   text-align: right;
 }
+
+/* Death Menu overlay (1:1 with Python prototype: panel_w=620, panel_h=200) */
+.death-menu-panel {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 620px;
+  max-width: 90vw;
+  background: rgba(16, 18, 24, 0.95);
+  border: 2px solid rgba(185, 185, 220, 0.85);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px;
+  gap: 14px;
+  box-shadow: 0 0 35px rgba(220, 40, 40, 0.45);
+  pointer-events: auto;
+  animation: dialogFadeInCenter 0.25s ease-out forwards;
+}
+
+.death-menu-title {
+  font-family: 'Jersey 10', 'VT323', monospace;
+  font-size: 34px;
+  color: #ffcccc;
+  text-shadow: 0 0 10px rgba(255, 60, 60, 0.8);
+  margin-bottom: 6px;
+  letter-spacing: 1px;
+}
+
+.death-menu-option {
+  width: 90%;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-family: 'Jersey 10', 'VT323', monospace;
+  font-size: 24px;
+  color: #dcdcdc;
+  text-align: center;
+  cursor: pointer;
+  background: rgba(40, 42, 54, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.12s ease;
+}
+
+.death-menu-option.selected,
+.death-menu-option:hover {
+  color: #ffffff;
+  background: rgba(70, 70, 110, 0.85);
+  border-color: #00e5ff;
+  box-shadow: 0 0 14px rgba(0, 229, 255, 0.5);
+  transform: scale(1.02);
+}
+
 

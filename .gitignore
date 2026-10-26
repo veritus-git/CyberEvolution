@@ -4,3 +4,5 @@ dist/
 target/
 *.log
 public
+__pycache__/
+*.pyc

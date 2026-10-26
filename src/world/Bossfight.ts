@@ -89,7 +89,7 @@ export class Bossfight {
   public inputCooldownTimer: number = 0;
 
   // Slide-in animation from above (gentle ease-out glide)
-  public animState: 'enter' | 'visible' | 'exit' | 'hidden' = 'enter';
+  public animState: 'enter' | 'visible' | 'exit' | 'hidden' = 'hidden';
   public animTimer: number = 0;
   public animDur: number = 1.1;
   public topMarginPx: number = 28;
@@ -104,6 +104,7 @@ export class Bossfight {
 
   private onVictoryCallback?: () => void;
   private onDefeatCallback?: () => void;
+  private onWorld5DefeatedCallback?: () => void;
 
   constructor() {
     // Keyboard navigation
@@ -139,12 +140,15 @@ export class Bossfight {
   public async start(
     worldNum: number,
     bossSpawn: AABB | null,
-    onVictory: () => void,
-    onDefeat: () => void
+    skipIntro: boolean = false,
+    onVictory?: () => void,
+    onDefeat?: () => void,
+    onWorld5Defeated?: () => void
   ): Promise<void> {
     this.worldNumber = worldNum;
     this.onVictoryCallback = onVictory;
     this.onDefeatCallback = onDefeat;
+    this.onWorld5DefeatedCallback = onWorld5Defeated;
     this.active = true;
     this.bossDefeated = false;
     this.bossBlinkActive = false;
@@ -154,6 +158,7 @@ export class Bossfight {
     this.inputCooldownTimer = 0.5;
     this.scrollActive = false;
     this.bossSpawnRect = bossSpawn;
+    this.animState = 'hidden';
 
     // HP map per world number (1:1 with Python _get_boss_hp_static)
     const hpMap: Record<number, number> = { 1: 500, 2: 600, 3: 700, 4: 800, 5: 1000 };
@@ -175,31 +180,40 @@ export class Bossfight {
       this.bossH = 608;
     }
 
-    // Load boss images
+    // Load boss images independently of scroll
     try {
-      const [b1, b2, scroll] = await Promise.all([
+      const [b1, b2] = await Promise.all([
         MaskParser.loadImage(`/assets/worlds/${worldNum}/boss/boss1.png`),
         MaskParser.loadImage(`/assets/worlds/${worldNum}/boss/boss2.png`),
-        MaskParser.loadImage(`/assets/worlds/${worldNum}/arena/zwoj.png`),
       ]);
       this.bossFrames = [b1, b2];
-      this.scrollImg = scroll;
-    } catch {
+    } catch (e) {
+      console.warn(`Boss frames load failed for world ${worldNum}:`, e);
       this.bossFrames = null;
+    }
+
+    // Only worlds 1..4 have a scroll (world 5 has no scroll)
+    if (worldNum < 5) {
+      try {
+        this.scrollImg = await MaskParser.loadImage(`/assets/worlds/${worldNum}/arena/zwoj.png`);
+      } catch {
+        this.scrollImg = null;
+      }
+    } else {
+      this.scrollImg = null;
     }
 
     // Load boss questions
     await this.loadBossData(worldNum);
 
-    // If boss has intro text, start in intro phase (HP bars and quiz card hidden until player dismisses dialog)
-    if (this.bossData && this.bossData.intro) {
-      this.isIntroActive = true;
-      this.animState = 'hidden';
-    } else {
+    if (skipIntro) {
       this.isIntroActive = false;
       this.animState = 'enter';
       this.animTimer = 0.0;
       this.pickNext();
+    } else {
+      this.isIntroActive = true;
+      this.animState = 'hidden';
     }
   }
 
@@ -236,6 +250,7 @@ export class Bossfight {
     const lines = raw.split('\n');
     let name = 'Boss';
     let intro = '';
+    let outro = '';
     const questions: BossQuestion[] = [];
 
     let curQ = '';
@@ -269,6 +284,8 @@ export class Bossfight {
         name = line.replace('BOSSNAME:', '').trim();
       } else if (line.startsWith('INTRO:')) {
         intro = line.replace('INTRO:', '').trim();
+      } else if (line.startsWith('OUTRO:')) {
+        outro = line.replace('OUTRO:', '').trim().replace(/\\n/g, '\n');
       } else if (line.startsWith('Q:')) {
         flushQ();
         curQ = line.replace('Q:', '').trim();
@@ -285,7 +302,7 @@ export class Bossfight {
     }
     flushQ();
 
-    this.bossData = { name, intro, questions };
+    this.bossData = { name, intro, outro, questions };
     this.questionsAll = [...questions];
     this.questions = shuffleArray([...this.questionsAll]);
   }
@@ -339,9 +356,10 @@ export class Bossfight {
     }
   }
 
-  private triggerBossDefeat(): void {
+  public triggerBossDefeat(): void {
     this.bossDefeated = true;
     this.bossBlinkActive = false;
+    this.animState = 'hidden';
     // Slower, dramatic death blinking (1.6s total) before bursting into pixel explosion!
     this.bossDeathTimer = 1.6;
     this.bossShakeTimer = 1.6;
@@ -368,7 +386,7 @@ export class Bossfight {
     }
   }
 
-  private triggerPlayerDefeat(): void {
+  public triggerPlayerDefeat(): void {
     this.animState = 'hidden';
     if (this.onDefeatCallback) {
       this.onDefeatCallback();
@@ -402,16 +420,23 @@ export class Bossfight {
       }
     }
 
-    // Boss defeat sequence: dramatic blinking + trembling -> pixel explosion -> drop scroll
+    // Boss defeat sequence: dramatic blinking + trembling -> pixel explosion -> drop scroll (or outro in World 5)
     if (this.bossDefeated && this.bossDeathTimer > 0) {
       this.bossDeathTimer -= dt;
       this.bossShakeTimer = 0.2; // Continuous trembling
       if (this.bossDeathTimer <= 0) {
         this.spawnBossDeathExplosion();
-        this.scrollActive = true;
-        this.scrollX = this.bossX + this.bossW / 2 - this.scrollSize / 2;
-        this.scrollY = this.bossY + this.bossH - this.scrollSize - 20;
-        this.scrollBobTimer = 0;
+        if (this.worldNumber === 5) {
+          this.scrollActive = false;
+          if (this.onWorld5DefeatedCallback) {
+            this.onWorld5DefeatedCallback();
+          }
+        } else {
+          this.scrollActive = true;
+          this.scrollX = this.bossX + this.bossW / 2 - this.scrollSize / 2;
+          this.scrollY = this.bossY + this.bossH - this.scrollSize - 20;
+          this.scrollBobTimer = 0;
+        }
       }
     }
 

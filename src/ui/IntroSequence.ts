@@ -79,14 +79,33 @@ export class IntroSequence {
     this.showPage(0);
   }
 
-  public playEnding(onFinished: () => void): void {
+  public async playEnding(onFinished: () => void): Promise<void> {
     this.onFinishedCallback = onFinished;
     this.isActive = true;
     this.overlayElement.classList.remove('hidden');
 
-    const endingText =
-      'GRATULACJE!\n\nPokonałeś wszystkie zagrożenia czyhające w CyberOtchłani.\nTwoja cyfrowa ewolucja dobiegła końca.\n\nBądź bezpieczny w sieci — weryfikuj linki, stosuj silne hasła i dbaj o swoją prywatność!';
-    this.pages = [endingText];
+    let text =
+      'Nagle ocknąłęś się jak ze snu, siedząc przed komputerem\nJasna strona poczty na ekranie oświetla Ci twarz\n---\nTwój kursor znajduje sie na podejrzanym linku, ale...\nZamiast w niego kliknąć, przenosisz mail do kosza\n---\nNauki Mędrca czegoś cię naczyły\nIdź w świat z tą świadomością w głowie\n---\nKONIEC';
+
+    try {
+      const res = await fetch('/assets/ending/ending_story.txt');
+      if (res.ok) {
+        text = await res.text();
+      }
+    } catch {
+      // Use fallback
+    }
+
+    const normalized = text.replace(/\\n/g, '\n');
+    this.pages = normalized
+      .split(/\n?\s*---+\s*\n?/)
+      .map((p) => p.trim())
+      .filter((p) => p.length > 0);
+
+    if (this.pages.length === 0) {
+      this.pages = [normalized.trim()];
+    }
+
     this.currentPageIndex = 0;
     this.showPage(0);
   }
