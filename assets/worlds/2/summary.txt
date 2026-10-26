@@ -1,6 +1,5 @@
-MEDRZEC: Hasła i klucze to twoje pierwsze linie obrony — widziałeś, jak łatwo je stracić.
-PLAYER: Uczę się tworzyć długie i unikalne hasła oraz włączać 2FA.
-MEDRZEC: To właściwa droga — pamiętaj, że menedżer haseł to twój sejf, ale klucz leży w nawyku.
-PLAYER: Nie będę podawać haseł przez telefon ani e-mailem i będę regularnie je zmieniać.
-MEDRZEC: Dobrze — dbaj o klucze i nie pozwól, by ktoś kupił je na skróty.
-MEDRZEC: Ruszaj dalej z tą ostrożnością — krypta nie wybacza nieuwagi.
+MEDRZEC: W kryptach zapada cisza. Czego nauczyła cię konfrontacja z Pożeraczem Kluczy?
+PLAYER: Że moje konto i uprawnienia to nie jest zabawa. Każda aplikacja, której bezmyślnie pozwolę na dostęp do profilu, może ukraść moje dane.
+MEDRZEC: Słusznie. Oszuści rzadko łamią skomplikowane zabezpieczenia — wolą zmanipulować człowieka, by sam oddał im kody i dostęp.
+PLAYER: I żaden prawdziwy moderator platformy nie straszy usunięciem konta w prywatnej wiadomości z podejrzanym linkiem.
+MEDRZEC: Twoja świadomość rośnie w siłę. Przed nami Świat 3 — Maskarada Luster. Przygotuj się na świat pozorów, gdzie sztuczne uśmiechy skrywają bezwzględną manipulację.

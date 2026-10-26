@@ -1,5 +1,5 @@
 WORLDNAME: Krypty Kluczy
-INTROTEXT: To Krypty Kluczy — miejsce, gdzie sekrety mają swoje grobowce.
-Każdy zapomniany login to drzwi pozostawione otwarte.
-Strzeż swoich haseł jak oddechu, bo Key Reaper zawsze czeka w cieniu.
-Tylko ci, którzy nauczą się zamykać swoje ślady, wyjdą stąd wolni.
+INTROTEXT: To Krypty Kluczy — podziemia skradzionych tożsamości i utraconych profili.
+Każdy lekkomyślnie zatwierdzony token to drzwi otwarte dla cyfrowych drapieżców.
+Strzeż swoich danych i uprawnień jak oddechu, bo Key Reaper poluje na twoje konta.
+Tylko ci, którzy potrafią chronić swoje granice, wyjdą stąd wolni.

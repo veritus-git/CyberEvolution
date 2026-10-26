@@ -1,123 +1,121 @@
 BOSSNAME: Mirror Queen
-INTRO: Jestem Mirror Queen — widzę cię dokładniej niż ty sam.\nKażdy filtr, każdy post, każda iluzja, którą stworzyłeś, należy teraz do mnie. \nPowiedz, kim jesteś bez swojego odbicia… jeśli w ogóle potrafisz to jeszcze powiedzieć.
-
-Q: Dlaczego nie należy publikować swojej lokalizacji w czasie rzeczywistym?
-A: Bo może to ujawnić, gdzie przebywasz i kiedy Twój dom jest pusty.
-B: Bo algorytmy źle pokazują mapę.
-C: Bo posty z lokalizacją mają mniej wyświetleń.
+INTRO: Spójrz w moją lśniącą twarz-ekran! Widzisz tę chmarę serduszek, lajków i roześmianych masek krążących wokół moich skrzydeł? To ja jestem Mirror Queen — architektka waszej cyfrowej próżności. Sprawiam, że czujesz się nikim, dopóki tłum nie rzuci ci garści polubień. Uczysz się kłamać, filtrować swoje życie i gonić za sztuczną aprobatą. Kim jesteś, gdy zgasną powiadomienia na twoim ekranie? Zobaczmy, czy potrafisz zbić moje lustro pozorów!
+Q: Twój ulubiony streamer nagle zachwala stronę z „darmowymi skrzynkami z drogimi ubraniami”. O czym musisz pamiętać?
+A: Że twórcy często otrzymują ogromne sumy za promowanie hazardu i naciąganie nieletnich widzów.
+B: Że streamer na pewno osobiście zweryfikował uczciwość każdego losowania.
+C: Że darmowe nagrody są finansowane przez organizacje charytatywne.
 CORRECT: A
 ---
-Q: Co grozi osobie, która regularnie pokazuje swoje codzienne życie online?
-A: Ułatwia śledzenie jej nawyków i miejsc, w których bywa.
-B: Zyskuje mniej obserwujących.
-C: Może zgubić telefon przez przeładowanie aplikacji.
+Q: Zgodnie z polskim prawem i wytycznymi UOKiK, post sponsorowany influencera:
+A: Może ukryć informację o zapłacie małym drukiem na samym dole komentarzy.
+B: Musi być jasno, czytelnie i od razu oznaczony jako płatna współpraca (np. #reklama lub #materiałsponsorowany).
+C: Nie wymaga żadnych oznaczeń, jeśli influencer osobiście lubi ten produkt.
+CORRECT: B
+---
+Q: Kolega z klasy pisze na czacie: „Podaj mi 6-cyfrowy kod, który zaraz przyjdzie do ciebie SMS-em, bo głosuję w konkursie”. Co robisz?
+A: Podaję kod od razu — kumplowi trzeba pomóc.
+B: Bezwzględnie odmawiam i dzwonię do kolegi — to klasyczny atak wyłudzenia konta lub drogiej subskrypcji SMS.
+C: Wpisuję kod w komentarzu pod jego najnowszym zdjęciem.
+CORRECT: B
+---
+Q: Jak codzienne przeglądanie wyidealizowanych, wyretuszowanych zdjęć w social mediach wpływa na nastolatków?
+A: Zawsze buduje pewność siebie i motywuje do działania.
+B: Może prowadzić do zaniżonej samooceny, kompleksów i złudnego poczucia, że życie innych jest idealne.
+C: Nie ma absolutnie żadnego wpływu na psychikę i nastrój.
+CORRECT: B
+---
+Q: Czym jest „astroturfing” w mediach społecznościowych?
+A: Pielęgnacją wirtualnych ogrodów w grach symulacyjnych.
+B: Sztucznym tworzeniem pozorów masowego poparcia dla produktu lub idei za pomocą armii botów i opłaconych profili.
+C: Nowym filtrem fotograficznym na TikToku.
+CORRECT: B
+---
+Q: Co to jest „oversharing” i dlaczego bywa niebezpieczny?
+A: Publikowanie zbyt wielu prywatnych i intymnych szczegółów ze swojego życia, co ułatwia śledzenie i kradzież danych.
+B: Przesyłanie zbyt wielu memów do znajomych.
+C: Przeciążenie pamięci smartfona przez zbyt dużą liczbę plików.
 CORRECT: A
 ---
-Q: Dlaczego nie warto klikać w linki przesyłane w wiadomościach konkursowych?
-A: Bo mogą prowadzić do fałszywych stron logowania i kradzieży danych.
-B: Bo zajmują dużo czasu.
-C: Bo są nudne.
+Q: Jak najłatwiej rozpoznać profil bota w komentarzach pod postem?
+A: Posiada oficjalny certyfikat i długą historię autorskich publikacji.
+B: Brak zdjęcia lub twarz z generatora AI, ciąg losowych cyfr w nicku i szablonowe, powtarzające się komentarze.
+C: Komentuje wyłącznie w języku łacińskim.
+CORRECT: B
+---
+Q: Co to jest technologia Deepfake?
+A: Nowy rodzaj antywirusa skanującego pamięć telefonu.
+B: Narzędzie AI umożliwiające fotorealistyczną manipulację twarzą i głosem w wideo, tworzące fałszywe wypowiedzi ludzi.
+C: Program do automatycznego montowania rolek.
+CORRECT: B
+---
+Q: Widzisz nagranie ze znaną postacią reklamującą podejrzaną inwestycję. Na co zwrócisz uwagę, by wykryć fałszywkę?
+A: Na nienaturalne ruchy ust, rozmycia krawędzi twarzy, metaliczny głos i brak potwierdzenia w oficjalnych mediach.
+B: Na to, czy postać ma modne ubrania.
+C: Na liczbę wyświetleń wideo.
 CORRECT: A
 ---
-Q: Co jest bezpieczniejsze: publikować zdjęcia z podróży w trakcie wyjazdu, czy po powrocie?
-A: Po powrocie – wtedy nie zdradzasz, że Twój dom stoi pusty.
-B: W trakcie – bo wtedy post jest bardziej aktualny.
-C: Nie ma różnicy.
+Q: Dlaczego algorytmy platform społecznościowych tak chętnie promują dramy i konflikty?
+A: Ponieważ chcą uczyć użytkowników kulturalnej dyskusji.
+B: Ponieważ oburzenie i kłótnie generują najwięcej komentarzy i najdłużej zatrzymują odbiorców przed ekranem.
+C: To przypadek, algorytmy nie biorą pod uwagę zaangażowania.
+CORRECT: B
+---
+Q: Jeśli twórca internetowy oferuje „poradnik szybkiego bogactwa” za 150 zł, to w rzeczywistości:
+A: Chce bezinteresownie pomóc wszystkim swoim obserwatorom.
+B: Zarabia głównie na sprzedaży bezwartościowych materiałów naiwnym fanom.
+C: Realizuje projekt rządowy.
+CORRECT: B
+---
+Q: Co zrobić, gdy nieznany profil na czacie próbuje wyciągać intymne zdjęcia i szantażuje ich ujawnieniem?
+A: Spełnić jego żądania, licząc na to, że da ci spokój.
+B: Nie ulegać szantażowi, zabezpieczyć dowody (zrzuty ekranu), zgłosić sprawę na policję lub zaufanemu dorosłemu.
+C: Skasować całą historię czatu bez robienia zrzutów.
+CORRECT: B
+---
+Q: Czym różni się relacja jednostronna (parasocjalna) z influencerem od prawdziwej relacji?
+A: W relacji parasocjalnej odbiorca czuje silną więź z twórcą, lecz twórca traktuje odbiorcę jedynie jako liczbę w statystykach.
+B: Relacja parasocjalna wymaga codziennych spotkań w świecie realnym.
+C: Obie relacje są dokładnie takie same.
 CORRECT: A
 ---
-Q: Dlaczego należy uważać na quizy i ankiety w social media?
-A: Bo mogą zbierać dane osobowe i odpowiedzi do budowania profilu użytkownika.
-B: Bo nie mają sensu merytorycznego.
-C: Bo są zbyt długie.
+Q: Dlaczego nie powinno się publikować w sieci zdjęć biletów lotniczych czy legitymacji?
+A: Ponieważ kody kreskowe i QR zawierają wrażliwe dane osobowe, które łatwo odczytać i wykorzystać.
+B: Bo zdjęcia mogą mieć za słabą ostrość.
+C: Ponieważ platformy natychmiast blokują profile za zdjęcia dokumentów.
 CORRECT: A
 ---
-Q: Jak można sprawdzić, czy prośba o pomoc online jest prawdziwa?
-A: Potwierdzić to z osobą innym kanałem – np. dzwoniąc lub pisząc bezpośrednio.
-B: Kliknąć w link i zobaczyć, co się stanie.
-C: Udostępnić ją znajomym, by szybciej pomóc.
+Q: Jak sprawdzić, czy sklep internetowy promowany przez influencera nie jest fałszywką (scamem)?
+A: Sprawdzić dane rejestrowe firmy (NIP, KRS), opinie na niezależnych forach i zasady zwrotu towaru.
+B: Uwierzyć, jeśli w sklepie widnieje zegar z napisem 'Promocja kończy się za 5 minut'.
+C: Wystarczy, że sklep ma ładne logo.
 CORRECT: A
 ---
-Q: Dlaczego warto ograniczać liczbę informacji o sobie w sieci?
-A: Bo każda informacja może zostać wykorzystana przeciwko Tobie.
-B: Bo posty się nie ładują przy zbyt dużej ilości danych.
-C: Bo Internet nie lubi długich opisów.
-CORRECT: A
+Q: Czym jest zjawisko „sharentingu”?
+A: Wymianą plików w chmurze rodzinnej.
+B: Bezrefleksyjnym publikowaniem przez dorosłych wizerunku i intymnych chwil dzieci w internecie bez ich zgody.
+C: Nowym sposobem na wypożyczanie sprzętu elektronicznego.
+CORRECT: B
 ---
-Q: Co robić, gdy aplikacja prosi o dostęp do galerii lub mikrofonu?
-A: Zastanowić się, czy naprawdę jest to potrzebne i odmówić, jeśli nie.
-B: Zawsze zezwolić, bo inaczej aplikacja nie zadziała.
-C: Nie czytać komunikatu i nacisnąć OK.
-CORRECT: A
+Q: Gdy wirtualny doradca lub chatbot w social mediach zadaje pytania o twoje hasła i problemy rodzinne:
+A: Odpowiadam szczerze — to przecież sztuczna inteligencja.
+B: Zachowuję ostrożność i nie podaję poufnych danych, które mogą zostać przetworzone lub skradzione.
+C: Pytam bota o radę finansową.
+CORRECT: B
 ---
-Q: Dlaczego nie warto opowiadać chatbotowi o swoich prywatnych problemach?
-A: Bo rozmowy mogą być zapisywane i analizowane.
-B: Bo chatbot nie odpowie poprawnie.
-C: Bo sztuczna inteligencja nie rozumie emocji.
-CORRECT: A
+Q: Jaka postawa pomaga zachować równowagę psychiczną wobec kultury lajków i filtrów?
+A: Spędzanie każdej wolnej chwili na poprawianiu zdjęć.
+B: Świadomość, że wartość człowieka nie zależy od cyfrowych polubień, a social media pokazują tylko wyreżyserowany teatr.
+C: Kupowanie followersów za kieszonkowe.
+CORRECT: B
 ---
-Q: Jak zachować prywatność w social mediach?
-A: Ustawiając widoczność postów tylko dla znajomych i unikając danych osobowych.
-B: Usuwając wszystkie komentarze innych użytkowników.
-C: Wstawiając jak najwięcej zdjęć, by zmylić algorytmy.
-CORRECT: A
+Q: Co oznacza pojęcie „UGC” (User-Generated Content) w kontekście ukrytej reklamy?
+A: Błąd serwera bazy danych.
+B: Materiały stylizowane na spontaniczne opinie zwykłych użytkowników, które w rzeczywistości są opłaconymi zleceniami marketingowymi.
+C: Certyfikat jakości grafiki komputerowej.
+CORRECT: B
 ---
-Q: Dlaczego nie powinno się udostępniać cudzych zdjęć bez zgody?
-A: Bo to narusza prywatność i prawa wizerunku tej osoby.
-B: Bo post z cudzym zdjęciem może być zablokowany.
-C: Bo zdjęcia innych zajmują miejsce w pamięci telefonu.
-CORRECT: A
----
-Q: Co może się stać, jeśli zbyt często uczestniczysz w trendach i wyzwaniach internetowych?
-A: Oddajesz swoje dane (np. zdjęcia, głos, twarz) algorytmom do analizy.
-B: Zwiększasz zasięgi, ale obniżasz jakość konta.
-C: Możesz zostać zablokowany za spam.
-CORRECT: A
----
-Q: Dlaczego emocjonalne posty mogą być niebezpieczne?
-A: Bo pokazują Twoje słabości i ułatwiają manipulację.
-B: Bo nikt ich nie czyta.
-C: Bo mają mniej polubień.
-CORRECT: A
----
-Q: Co robić, gdy ktoś prosi Cię o repost jego treści z oznaczeniem lokalizacji?
-A: Poprosić o zgodę i nie ujawniać prywatnych miejsc bez przemyślenia.
-B: Udostępnić, by zwiększyć zasięg znajomego.
-C: Nie sprawdzać, tylko kliknąć ‘udostępnij’.
-CORRECT: A
----
-Q: Jak chronić swoje zdjęcia przed nieautoryzowanym użyciem?
-A: Publikować mniej i używać znaków wodnych lub ustawień prywatności.
-B: Zgłaszać każde zdjęcie, które ktoś udostępnił.
-C: Nigdy nie robić zdjęć.
-CORRECT: A
----
-Q: Dlaczego lepiej nie publikować starych wspomnień z sieci?
-A: Bo ujawniają zmiany wyglądu i miejsca, które można wykorzystać do identyfikacji.
-B: Bo nikt już nie pamięta tych czasów.
-C: Bo zdjęcia sprzed lat mają gorszą jakość.
-CORRECT: A
----
-Q: Jak zachować się wobec fałszywego profilu podszywającego się pod Ciebie?
-A: Zgłosić konto jako podszywanie się i ostrzec znajomych.
-B: Napisać do niego, by się przyznał.
-C: Udawać, że to zabawne.
-CORRECT: A
----
-Q: Co oznacza pojęcie prywatności cyfrowej?
-A: Kontrolowanie tego, jakie informacje o Tobie trafiają do sieci i kto ma do nich dostęp.
-B: Ukrywanie się przed znajomymi w internecie.
-C: Nieposiadanie żadnego konta w social mediach.
-CORRECT: A
----
-Q: Dlaczego post typu „Wygrałeś telefon, zaloguj się Facebookiem” jest niebezpieczny?
-A: Bo wykorzystuje dane logowania do kradzieży konta.
-B: Bo to tylko reklama, nie konkurs.
-C: Bo Facebook blokuje takie loginy.
-CORRECT: A
----
-Q: Co jest najważniejszą zasadą bezpieczeństwa w social mediach?
-A: Myśl, zanim opublikujesz – Internet nigdy nie zapomina.
-B: Usuwaj wszystkie posty po tygodniu.
-C: Nie komentuj niczego w sieci.
-CORRECT: A
----
+Q: Co jest najlepszą tarczą przed manipulacją w Maskaradzie Luster?
+A: Ślepe naśladowanie każdego internetowego trendu.
+B: Krytyczny dystans do internetowych idoli, asertywność i pielęgnowanie prawdziwych pasji poza ekranem.
+C: Całkowite odcięcie się od znajomych ze szkoły.
+CORRECT: B

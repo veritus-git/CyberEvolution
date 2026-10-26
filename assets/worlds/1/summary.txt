@@ -1,6 +1,5 @@
-MEDRZEC: Widziałeś, jak łatwo oko może zostać oszukane. Co zapamiętałeś z tej wędrówki?
-PLAYER: Żeby nie klikać pierwszego lepszego linku i zawsze weryfikować źródło.
-MEDRZEC: Dobrze — pamiętaj, że pilność i strach to narzędzia oszustów.
-PLAYER: Będę sprawdzać nadawcę, numer i wchodzić tylko przez oficjalne strony.
-MEDRZEC: Dokładnie. Trzymaj tę rutynę — każdy spokojny klik to mały zwycięski krok.
-MEDRZEC: Idź dalej i nie pozwól, by błyskotki odciągnęły twoją uwagę.
+MEDRZEC: Za tobą pierwsze ulice Miasta Iluzji. Zaczynasz dostrzegać, czym karmiono cię w nocy na telefonie?
+PLAYER: Tak… Zrozumiałem, że krzykliwe nagłówki i viralowe dramy są projektowane po to, by wywołać natychmiastowe emocje.
+MEDRZEC: Właśnie. Algorytm nie dba o prawdę — dba o twoją uwagę i kliknięcia. Gdy czujesz nagłą wściekłość lub strach, to znak, że ktoś manipuluje twoim umysłem.
+PLAYER: Zamiast natychmiast klikać i udostępniać w emocjach, muszę się zatrzymać i sprawdzić źródło.
+MEDRZEC: Pięknie powiedziane. Pierwszy krok ku wolności zrobiony. Przed nami Krypty Kluczy — tam stawką jest twoja tożsamość. Ruszajmy!

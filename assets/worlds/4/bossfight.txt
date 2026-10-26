@@ -1,123 +1,121 @@
-BOSSNAME: Encryptor
-INTRO: Jestem Encryptor. \nZnam smak ciszy, gdy twoje pliki znikają, a ekran staje się czarny. \nSzyfruję nie tylko dane, ale też twoje wspomnienia. \nPowiedz, ile jesteś gotów stracić, żeby odzyskać to, czego nigdy nie zabezpieczyłeś.
-
-Q: Co jest bezpieczniejsze – kopia plików na tym samym dysku czy na osobnym nośniku?
-A: Na osobnym nośniku lub w zaszyfrowanej chmurze.
-B: Na tym samym dysku, bo to szybciej.
-C: Nie ma znaczenia, kopia to kopia.
+BOSSNAME: Chronos Paniki
+INTRO: Spójrz w moją bezlitosną tarczę! Widzisz, jak moje wskazówki tną sekundy, a czerwone obwody buzują alarmem? Jestem Chronos Paniki — zegar, który wyłącza wasze mózgi! 'Zostało tylko 5 minut!', 'Reaguj natychmiast!', 'Zobacz, zanim usuną!'. Gdy włączam odliczanie, gubicie rozsądek, a zaczynacie krzyczeć i nienawidzić. Czy potrafisz zatrzymać mój bieg i zachować spokój w samym oku cyfrowego cyklonu? Spróbuj, nim wybije twoja ostatnia godzina!
+Q: Do czego służy manipulatorom sztuczna presja czasu („Masz tylko 3 minuty, działaj!”)?
+A: Do ułatwienia spokojnego i logicznego namysłu.
+B: Do wywołania stresu i paniki, które blokują krytyczne myślenie i skłaniają do pochopnych decyzji.
+C: Do optymalizacji zużycia baterii w smartfonie.
+CORRECT: B
+---
+Q: Czym jest zjawisko „doxingu” (doxxingu) w sieci?
+A: Nowym filtrem graficznym w mediach społecznościowych.
+B: Złośliwym ujawnianiem prywatnych danych osoby (adresu, telefonu, szkoły), by ściągnąć na nią falę nękania.
+C: Sposobem na przyspieszenie łącza internetowego.
+CORRECT: B
+---
+Q: Jak działa mechanizm „króliczej nory” (rabbit hole) w algorytmach polecających?
+A: Poleca wyłącznie filmy przyrodnicze.
+B: Po obejrzeniu kontrowersyjnego filmu algorytm podsuwa coraz bardziej skrajne i spiskowe materiały, by utrzymać uwagę.
+C: Blokuje dostęp do konta w godzinach nocnych.
+CORRECT: B
+---
+Q: Znajomi planują zmasowany najazd (rajd hejterski) na profil rówieśnika. Jakie konsekwencje im grożą?
+A: Żadne, w internecie panuje całkowita anonimowość.
+B: Odpowiedzialność prawna za uporczywe nękanie (stalking), zniesławienie oraz wyrządzenie krzywdy psychicznej.
+C: Jedynie pochwała od administratora za wysoką aktywność.
+CORRECT: B
+---
+Q: Co charakteryzuje syndrom „oblężonej twierdzy” w radykalizujących grupach online?
+A: Przekonanie, że całe otoczenie spiskuje przeciwko nim, a jedyną prawdę posiada ich anonimowy lider.
+B: Zabezpieczenie domowego Wi-Fi hasłem.
+C: Budowanie fortyfikacji w grach sieciowych.
 CORRECT: A
 ---
-Q: Dlaczego nie warto trzymać dysku z kopią cały czas podłączonego?
-A: Bo może zostać zaszyfrowany razem z głównymi danymi podczas ataku.
-B: Bo szybciej się rozładowuje.
-C: Bo zajmuje miejsce na biurku.
+Q: Czy mowa nienawiści (hate speech) jest usprawiedliwiona wolnością słowa?
+A: Tak, wolność słowa pozwala na bezkarne obrażanie i grożenie każdemu.
+B: Nie, wolność słowa nie obejmuje naruszania godności, bezpieczeństwa i praw drugiego człowieka.
+C: Tak, jeśli wpis zostanie usunięty po 24 godzinach.
+CORRECT: B
+---
+Q: Dlaczego zradykalizowany internauta często odrzuca twarde dowody naukowe i sprostowania?
+A: Ponieważ wierzy, że każda informacja sprzeczna z jego wizją to opłacony spisek 'układu'.
+B: Ponieważ nie potrafi obsługiwać przeglądarki.
+C: Ponieważ oficjalne artykuły są zbyt tanie.
 CORRECT: A
 ---
-Q: Co należy zrobić po wykonaniu kopii zapasowej?
-A: Odłączyć nośnik i przechowywać go w bezpiecznym miejscu.
-B: Zostawić podłączony, żeby szybciej działał.
-C: Skasować, żeby zwolnić miejsce.
+Q: Jak reagować, gdy kolega z klasy zaczyna głosić skrajne, nienawistne poglądy pod wpływem forów?
+A: Wyśmiać go publicznie na forum klasy.
+B: Spokojnie z nim porozmawiać w cztery oczy, zapytać o źródła tych teorii i zachęcić do aktywności w realnym świecie.
+C: Natychmiast zablokować go bez słowa wyjaśnienia.
+CORRECT: B
+---
+Q: Co to jest „polaryzacja społeczna” napędzana przez algorytmy social mediów?
+A: Dzielenie ludzi na wrogie, zwalczające się obozy, niszczące przestrzeń do porozumienia i dialogu.
+B: Oglądanie filmów w trybie portretowym.
+C: Zmiana biegunowości baterii w telefonie.
 CORRECT: A
 ---
-Q: Jak najlepiej zabezpieczyć kopie plików w chmurze?
-A: Szyfrować je lokalnie przed wysłaniem.
-B: Wysłać je bez szyfrowania, bo chmura i tak je chroni.
-C: Trzymać wszystko w folderze publicznym.
+Q: Ktoś w komentarzach pisze: „Oni wszyscy są podludźmi, trzeba ich wyeliminować!”. To przykład:
+A: Spokojnej i rzeczowej debaty publicznej.
+B: Dehumanizacji i mowy nienawiści, mającej na celu odebranie grupie ludzi ludzkiej godności.
+C: Błędu ortograficznego w słowniku.
+CORRECT: B
+---
+Q: Gdy post zostaje oznaczony przez niezależnych weryfikatorów jako „fałszywy montaż”:
+A: Oznacza to, że fact-checkerzy wykazali manipulację i warto zapoznać się z dowodami w sprostowaniu.
+B: Świadczy to o tym, że post zawiera niewygodną prawdę, którą ktoś próbuje zatuszować.
+C: Post natychmiast ulega samozniszczeniu na dysku.
 CORRECT: A
 ---
-Q: Po co testować przywracanie kopii zapasowych?
-A: Żeby mieć pewność, że backup naprawdę działa i można go odtworzyć.
-B: Żeby zająć czas pracownikom.
-C: Żeby stworzyć nowe pliki.
+Q: Dlaczego teorie spiskowe zyskują tak dużą popularność w momentach kryzysu?
+A: Ponieważ zawsze opierają się na twardych dowodach naukowych.
+B: Ponieważ dają proste, czarno-białe odpowiedzi na skomplikowane zjawiska i zaspokajają potrzebę kontroli.
+C: Ponieważ są oficjalnie nauczane w szkołach.
+CORRECT: B
+---
+Q: Co zrobić, gdy trafisz w sieci na zamknięty kanał nawołujący do przemocy fizycznej?
+A: Zgłosić kanał administratorom oraz zespołowi Dyżurnet.pl lub organom ścigania.
+B: Kłócić się z członkami grupy przez całą noc.
+C: Zaprosić tam wszystkich swoich znajomych.
 CORRECT: A
 ---
-Q: Co powinieneś zrobić, gdy komputer zostanie zainfekowany ransomware?
-A: Odłączyć go od sieci i rozpocząć odzyskiwanie z czystych kopii.
-B: Czekać, aż problem zniknie sam.
-C: Zapłacić okup, żeby szybciej odzyskać dane.
+Q: Czym różni się merytoryczna dyskusja od internetowego hejtu?
+A: Dyskusja opiera się na argumentach i szacunku dla rozmówcy, a hejt służy wyłącznie upokorzeniu drugiej osoby.
+B: Dyskusja ma mniej niż 5 zdań, a hejt więcej.
+C: Hejt pisze się wyłącznie wielkimi literami.
 CORRECT: A
 ---
-Q: Dlaczego nie należy otwierać podejrzanych załączników w e-mailach?
-A: Bo mogą zawierać złośliwe oprogramowanie, które zaszyfruje pliki.
-B: Bo e-maile z załącznikami są zbyt duże.
-C: Bo załączniki spowalniają komputer.
+Q: Czym jest „spirala milczenia” w dyskusjach internetowych?
+A: Wyłączeniem dźwięku w telefonie.
+B: Zjawiskiem, w którym umiarkowani użytkownicy milkną z obawy przed atakiem, przez co skrajne głosy wydają się większością.
+C: Błędem w aplikacji czatu.
+CORRECT: B
+---
+Q: Jaki jest główny cel internetowego trolla publikującego agresywne prowokacje?
+A: Dzielenie się rzetelną wiedzą akademicką.
+B: Wywołanie wściekłości, podziałów, zniszczenie spokoju i czerpanie satysfakcji z reakcji ofiar.
+C: Optymalizacja kodu strony.
+CORRECT: B
+---
+Q: Jaka jest najskuteczniejsza zasada w starciu z internetowym trollem?
+A: Odpowiadać na każdą obelgę ze zdwojoną siłą.
+B: „Nie karm trolla” — nie dawać mu atencji, ignorować, zgłaszać i blokować profil.
+C: Podać mu swój adres domowy w wiadomości.
+CORRECT: B
+---
+Q: Dlaczego przebywanie wyłącznie w zamkniętych, hermetycznych bańkach światopoglądowych jest groźne?
+A: Ponieważ z czasem człowiek zatraca krytycyzm i zaczyna usprawiedliwiać agresję wobec 'innych'.
+B: Ponieważ zużywa to więcej pakietu internetowego.
+C: Ponieważ takie grupy działają wyłącznie na komputerach stacjonarnych.
 CORRECT: A
 ---
-Q: Jak można uniknąć utraty plików w przypadku ataku ransomware?
-A: Mieć aktualne kopie zapasowe przechowywane offline lub w chmurze.
-B: Wyłączyć komputer na noc.
-C: Nie korzystać z Internetu przez tydzień.
+Q: Co oznacza zasada „Odetchnij przed kliknięciem” w odporności cyfrowej?
+A: Zrobienie pauzy, opanowanie emocji i weryfikację faktów zanim cokolwiek skomentujesz lub udostępnisz.
+B: Wstrzymanie oddechu na 30 sekund przy włączaniu komputera.
+C: Wyłączenie routera na noc.
 CORRECT: A
 ---
-Q: Co zrobić, jeśli znajdziesz pendrive na korytarzu?
-A: Nie podłączać go i przekazać administratorowi lub ochronie.
-B: Podłączyć, by sprawdzić zawartość.
-C: Włożyć go do swojego komputera z ciekawości.
-CORRECT: A
----
-Q: Co oznacza, że kopia danych jest „offline”?
-A: Że jest przechowywana na nośniku odłączonym od sieci i systemu.
-B: Że nie działa, dopóki się jej nie włączy.
-C: Że jest przechowywana w folderze offline na dysku.
-CORRECT: A
----
-Q: Dlaczego nie warto ufać programom, które obiecują szybkie „odzyskanie zaszyfrowanych plików”?
-A: Bo często są fałszywe i mogą pogorszyć sytuację.
-B: Bo są zbyt drogie.
-C: Bo działają tylko w weekendy.
-CORRECT: A
----
-Q: Co zrobić, gdy pojawi się komunikat „Kliknij OK, aby przywrócić system”?
-A: Nie klikać, tylko uruchomić komputer w trybie awaryjnym i przeskanować go.
-B: Kliknąć, żeby sprawdzić, co się stanie.
-C: Zrestartować komputer kilka razy.
-CORRECT: A
----
-Q: Po co szyfrować własne kopie danych?
-A: Aby nikt niepowołany nie mógł ich odczytać.
-B: Żeby zajmowały mniej miejsca.
-C: Żeby wyglądały bardziej profesjonalnie.
-CORRECT: A
----
-Q: Co oznacza pojęcie „wersjonowanie plików” w kontekście backupu?
-A: Przechowywanie starszych wersji plików, by móc cofnąć zmiany lub zaszyfrowanie.
-B: Nadawanie nazw plikom z numerem wersji.
-C: Szybsze kopiowanie dużych folderów.
-CORRECT: A
----
-Q: Dlaczego nie warto przechowywać wszystkich kopii danych tylko w jednym miejscu?
-A: Bo w razie awarii lub ataku można stracić wszystko naraz.
-B: Bo wtedy trudniej je odnaleźć.
-C: Bo tworzy to bałagan.
-CORRECT: A
----
-Q: Co jest najlepszym momentem na instalację aktualizacji bezpieczeństwa?
-A: Jak najszybciej po ich wydaniu.
-B: Gdy system zaczyna działać wolniej.
-C: Tylko wtedy, gdy coś przestanie działać.
-CORRECT: A
----
-Q: Co zrobić, jeśli reklama obiecuje darmowy program zabezpieczający lub VPN?
-A: Nie klikać i pobierać tylko z oficjalnych źródeł.
-B: Kliknąć, bo może faktycznie działa.
-C: Wysłać link znajomym, by sprawdzili.
-CORRECT: A
----
-Q: Po co trzymać więcej niż jedną kopię zapasową danych?
-A: By mieć pewność, że przetrwa nawet jeśli jedna kopia zostanie uszkodzona lub skasowana.
-B: Bo tak robią profesjonaliści.
-C: Żeby mieć więcej miejsca zajętego na dyskach.
-CORRECT: A
----
-Q: Jak rozpoznać próbę oszustwa ransomware?
-A: Gdy ktoś żąda zapłaty w zamian za przywrócenie dostępu do plików.
-B: Gdy komputer się aktualizuje.
-C: Gdy pojawia się powiadomienie o backupie.
-CORRECT: A
----
-Q: Jaki jest najważniejszy wniosek z nauki w Twierdzy Kopii?
-A: Backup to nie plik – to system ochrony przed utratą danych.
-B: Backup jest potrzebny tylko dużym firmom.
-C: Kopia wystarczy raz w roku.
-CORRECT: A
----
+Q: Co stanowi ostateczne zwycięstwo nad Chronosem Paniki w Twierdzy Kopii?
+A: Wyrzucenie telefonu przez okno.
+B: Spokój ducha, odporność na manipulację czasem, odrzucenie nienawiści i szacunek dla prawdy.
+C: Założenie kolejnego anonimowego konta.
+CORRECT: B

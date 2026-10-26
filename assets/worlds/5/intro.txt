@@ -1,2 +1,5 @@
-WORLDNAME: ???
-INTROTEXT: W tym świecie nie czeka na ciebie nic nowego...
+WORLDNAME: Sanktuarium Rozumu
+INTROTEXT: Dotarłeś do Sanktuarium Cyfrowej Odporności.
+Tu nie ma już iluzji, fałszywych kluczy, zwodniczych luster ani tykających zegarów nienawiści.
+Czeka cię ostateczna próba przed samym Mędrcem.
+Udowodnij, że potrafisz myśleć samodzielnie i jesteś gotów obronić się w necie.

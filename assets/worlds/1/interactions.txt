@@ -1,41 +1,38 @@
 # world1_interactions.txt
-# Prosty format (3 bloki), KAŻDY blok rozdziel linią z trzema myślnikami: ---
-# Dostępne klucze: CONTEXT, SAGE, A, B, GOOD, BAD, SPEED_CONTEXT, SPEED_SAGE, SPEED_FEEDBACK
-# Uwaga: parser ignoruje linie zaczynające się od '#'
-# Użyj \n aby wymusić nową linię w tekście.
-# Poprawna odpowiedź (A lub B) jest LOSOWA przy każdym wejściu w interakcję.
+# Temat: Miasto Iluzji — Dezinformacja, clickbaity, fake giveaways, presja rówieśnicza
+# Boss: Monolit Algorytmu
 
 AVATAR: kurier
-CONTEXT: Kurier:\n"Dzień dobry, mam twoją paczkę. Należy dopłacić 6,70zł aby została dostarczona.\nMożesz zapłacić klikając w ten -> link <-"
-SAGE: To klasyczny chwyt – phishing na kuriera. Prawdziwa firma nigdy nie zażąda płatności przez losowy link.
-A: Otwórz link i zapłać od razu.
-B: Sprawdź numer nadawcy i wejdź na oficjalną stronę firmy.
-GOOD: Słusznie. Zawsze przechodź tylko przez oficjalne źródła, nie z wiadomości.
-BAD: Nie tym razem. Iluzje pieniędzy bywają tanie, ale kosztowne. Spróbuj jeszcze raz.
+CONTEXT: Kurier stawia przed tobą karton:\n„Siemasz! Masz nagrodę z viralowego rozdania na TikToku — najnowszy smartfon!\nMusisz tylko szybko kliknąć ten link i uiścić 8,50 zł opłaty weryfikacyjnej, nim paczka przepadnie!”
+SAGE: Uważaj. Żerują na chciwości i pośpiechu. Prawdziwe firmy nie żądają nagłych dopłat przez podejrzane linki.
+A: Klikam w link i opłacam paczkę — przecież taka okazja nie może mi uciec!
+B: Nie klikam. Sprawdzam oficjalny profil twórcy i regulamin — to typowy fake giveaway.
+GOOD: Świetnie! Nie dałeś się omamić darmowej błyskotce. Oszuści liczą na to, że chęć zysku uśpi twoją czujność.
+BAD: Zatrzymaj się! Właśnie oddałeś dane karty za obietnicę paczki, która nie istnieje. Odrzuć emocje i spróbuj ponownie.
 CORRECT: B
 SPEED_CONTEXT: 38
 SPEED_SAGE: 32
 SPEED_FEEDBACK: 36
 ---
 AVATAR: mail
-CONTEXT: E-Mail od Banku: "Twoj3 konto zostało zab1okowane! Kliknij, aby odzysk@ć dostęp.”
-SAGE: Bank nie straszy blokadą przez link w mailu. Loguj się z aplikacji lub z ręcznie wpisanego adresu.
-A: Wchodzę w link z maila i loguję się.
-B: Loguję się wyłącznie z aplikacji lub wpisując adres ręcznie.
-GOOD: Mędrzec:\n To właśnie postawa świadomego internauty. Bank nigdy nie prosi o dane przez link.
-BAD: Mędrzec:\n To pułapka – otworzyłeś furtkę złudzeniu bezpieczeństwa. Cofnij i popraw
+CONTEXT: Robot z ekranem listu miga na czerwono:\n„PILNY ALERT DLA TWOJEGO MIASTA! Masowe zatrucie wody w kranach!\nPrześlij to ostrzeżenie do 10 osób w 5 minut, nim serwery zostaną zablokowane!”
+SAGE: Panika i łańcuszki to ulubiona pożywka dezinformacji. Strach wyłącza krytyczne myślenie. Zanim coś prześlesz, weź oddech.
+A: Wysyłam natychmiast na grupę klasową — muszę ostrzec wszystkich znajomych!
+B: Zatrzymuję łańcuszek. Wchodzę na oficjalną stronę sanepidu i miasta, by zweryfikować newsa.
+GOOD: Doskonale. Zamiast stać się przekaźnikiem paniki, stałeś się tamą dla fałszu. Weryfikacja to twoja tarcza.
+BAD: Błąd! Właśnie wywołałeś fałszywą panikę wśród przyjaciół. Strach to zły doradca — cofnij się i pomyśl.
 CORRECT: B
 SPEED_CONTEXT: 38
 SPEED_SAGE: 32
 SPEED_FEEDBACK: 36
 ---
 AVATAR: znajomy
-CONTEXT: Znajomy pisze do ciebie: "Hej! Jestem w nagłej potrzebie, pożycz mi 100 zł przelewem, oddam jutro! obiecuję :)"
-SAGE: To częsta próba wyłudzenia po przejęciu konta. Czasem iluzja ma twarz, którą znasz. Co zrobisz?
-A: Wysyłam od razu przecież to mój znajomy w potrzebie!
-B: Dzwonię i potwierdzam tożsamość — nie wysyłam bez weryfikacji.
-GOOD: Rozsądnie. Głos prawdy brzmi tylko z pewnego źródła.
-BAD: Nie ufaj każdemu, kto nosi znajomą maskę. Spróbuj ponownie.
+CONTEXT: Chłopak w bluzie pokazuje ci smartfon:\n„Stary, zobacz tę dramę! Ktoś wrzucił zmanipulowany filmik o dziewczynie z równoległej klasy.\nWszyscy cisną z niej bekę w komentarzach! Dawaj, zrób dueta i podaj dalej, nie bądź odludkiem!”
+SAGE: Presja rówieśnicza w sieci bywa bezwzględna. Łatwo dołączyć do tłumu, ale trudniej spojrzeć sobie potem w twarz. Co wybierzesz?
+A: Nagrywam z tego żart — skoro cała szkoła to robi, nie chcę wyjść na dziwaka.
+B: Odmawiam. Nie będę brał udziału w nakręcaniu nagonki i rozpowszechnianiu plotek.
+GOOD: Wspaniale. Odwaga to nie płynięcie z prądem, lecz umiejętność powiedzenia 'stop', gdy tłum krzywdzi kogoś w sieci.
+BAD: Niestety… Uległeś presji tłumu. Dołączając do fali hejtu, stajesz się oprawcą. Zastanów się i wybierz jeszcze raz.
 CORRECT: B
 SPEED_CONTEXT: 38
 SPEED_SAGE: 32

@@ -1,116 +1,121 @@
-BOSSNAME: Phisher
-INTRO: Jestem Phisher. \nWidziałem każdy twój klik, każdą wiadomość, w którą uwierzyłeś. \nLudzie tacy jak ty zawsze chcą wierzyć w to, co błyszczy. \nWystarczy jedno kliknięcie — a oddasz mi wszystko, zanim zdążysz to zrozumieć.
-Q: Otrzymujesz SMS: „Twoja paczka czeka — dopłać 4,99 zł tutaj: bit.ly/XXXXX”. Co robisz?
-A: Klikam link i płacę, żeby odebrać paczkę.
-B: Wchodzę na oficjalną stronę firmy kurierskiej i sprawdzam status przesyłki.
-C: Odpowiadam SMS-em, że nie chcę dopłacić.
+BOSSNAME: Monolit Algorytmu
+INTRO: Spójrz w mój krystaliczny rdzeń. Widzisz te wirujące symbole i fioletowe linie? To ja decyduję, co czujesz, gdy przesuwasz palcem po szkle. Karmię cię szokiem, oburzeniem i fałszywym blaskiem. Im szybciej klikasz, tym mocniej zaciskam pętlę na twojej uwadze. Myślisz, że twój rozum jest silniejszy od moich kalkulacji? Pokaż mi, czy potrafisz odróżnić prawdę od mojej iluzji!
+Q: Widzisz post z nagłówkiem: „SZOK! Zobacz co wydarzyło się w twoim mieście!”. Co robisz najpierw?
+A: Od razu udostępniam, by ostrzec znajomych.
+B: Sprawdzam źródło informacji i czy inne zaufane portale o tym piszą.
+C: Piszę wściekły komentarz pod postem.
 CORRECT: B
 ---
-Q: E-mail wygląda jak od banku i prosi o „potwierdzenie danych” poprzez formularz. Jak postępujesz?
-A: Wypełniam formularz, bank musi mieć aktualne dane.
-B: Dzwonię na oficjalny numer banku zamieszczony na stronie banku i potwierdzam, czy mail jest prawdziwy.
-C: Klikam link w mailu i sprawdzam, czy strona wygląda znajomo.
+Q: Co jest głównym celem clickbaitu w mediach społecznościowych?
+A: Przekazanie rzetelnej i bezstronnej wiedzy.
+B: Wywołanie silnych emocji, by wymusić kliknięcie i zarobić na uwadze użytkownika.
+C: Zapewnienie bezpieczeństwa użytkownikom platformy.
 CORRECT: B
 ---
-Q: Co jest najpewniejszą oznaką, że strona logowania może być fałszywa?
-A: Ma przycisk „Zaloguj”.
-B: Adres strony (URL) różni się od oficjalnego lub zawiera literówki.
-C: Używa znanej czcionki.
+Q: Viralowy post twierdzi, że popularny napój powoduje natychmiastowe zatrucie. Jak to zweryfikować?
+A: Zapytać znajomych na grupie klasowej.
+B: Sprawdzić oficjalne komunikaty Sanepidu lub Głównego Inspektoratu Sanitarnego.
+C: Sprawdzić liczbę polubień pod postem.
 CORRECT: B
 ---
-Q: Dzwoni ktoś „z IT” i prosi o podanie twojego hasła do konta, bo „muszą zaktualizować system”. Co robisz?
-A: Podaję hasło — chcę szybko rozwiązać problem.
-B: Mówię, że nie udostępniam hasła i zgłaszam prośbę do prawdziwego działu IT przez oficjalny kanał.
-C: Proszę o chwilę i wpisuję hasło samemu, żeby sprawdzić.
+Q: Dostajesz wiadomość na czacie: „Wygrałeś smartfona w losowaniu! Wejdź w link i opłać kuriera 10 zł”. Co robisz?
+A: Płacę od razu — to niska cena za nowy telefon.
+B: Ignoruję i blokuję — to typowy fake giveaway wyłudzający dane karty.
+C: Wysyłam link znajomym, żeby też skorzystali.
 CORRECT: B
 ---
-Q: Otrzymujesz mail z załącznikiem „faktura.zip.exe”. Jak reagujesz?
-A: Otwieram załącznik — pewnie to ważna faktura.
-B: Nie otwieram; usuwam wiadomość lub sprawdzam u nadawcy niezależnie.
-C: Zmieniam rozszerzenie na .zip i otwieram.
+Q: Wszyscy w szkole udostępniają zmanipulowany, prześmiewczy filmik z kolegą z klasy. Co powinna zrobić odpowiedzialna osoba?
+A: Dołączyć do hejtu i nagrać własny złośliwy komentarz.
+B: Nie podawać dalej, nie lajkować i nie wspierać cyberprzemocy.
+C: Zapisać filmik i pokazywać wszystkim na korytarzu.
 CORRECT: B
 ---
-Q: Skrócone linki (np. bit.ly) w wiadomościach są:
-A: Zawsze bezpieczne, bo skracają adresy.
-B: Mogą ukrywać złośliwe adresy — warto sprawdzić pełny URL przed kliknięciem.
-C: Powinny być otwierane tylko na telefonie.
+Q: Co oznacza pojęcie „bańka informacyjna” (echo chamber)?
+A: Błąd serwera blokujący ładowanie stron.
+B: Sytuację, gdy algorytm podsuwa nam tylko treści zgodne z naszymi poglądami, odcinając od innych perspektyw.
+C: Bezpieczne połączenie szyfrowane między użytkownikami.
 CORRECT: B
 ---
-Q: Co zrobić, gdy wiadomość wywołuje w tobie poczucie pilności („natychmiast zapłać!”)?
-A: Zareagować natychmiast — pilność wymaga szybkiego działania.
-B: Zatrzymać się i zweryfikować informację niezależnie (np. przez oficjalną stronę lub telefon).
-C: Udostępnić wiadomość znajomym, by uzyskać ich opinię.
+Q: Jak najłatwiej sprawdzić, czy szokujące zdjęcie z wypadku lub protestu nie jest stare lub fałszywe?
+A: Sprawdzić, ile ma serduszek i udostępnień.
+B: Użyć wstecznego wyszukiwania obrazem (Reverse Image Search).
+C: Zaufać opisowi dodanemu przez anonimowy profil.
 CORRECT: B
 ---
-Q: Jak najlepiej sprawdzić, czy e-mail pochodzi od prawdziwej firmy?
-A: Sprawdzić nagłówek wiadomości (sender), adres nadawcy i porównać go z oficjalnym adresem firmy.
-B: Sprawdzić, czy w treści jest logo firmy.
-C: Sprawdzić liczbę znaków w temacie.
+Q: Dlaczego posty wywołujące złość i oburzenie (tzw. rage-bait) rozchodzą się w sieci najszybciej?
+A: Bo algorytmy promują treści silnie angażujące emocjonalnie, co zatrzymuje użytkownika w aplikacji.
+B: Bo zawsze zawierają najważniejszą prawdę.
+C: Bo nikt w sieci nie czyta pozytywnych wiadomości.
 CORRECT: A
 ---
-Q: Które zachowanie pomaga chronić się przed phishingiem w wiadomościach społecznościowych?
-A: Akceptować każdą prośbę o pomoc i klikać linki, żeby być pomocnym.
-B: Weryfikować prośby przez inny kanał (np. zadzwonić do znajomego) zanim klikniesz link.
-C: Odpowiadać publicznie, żeby inni też mogli pomóc.
-CORRECT: B
----
-Q: Co robić z podejrzanymi wiadomościami, które wyglądają jak phishing?
-A: Ignorować i usunąć.
-B: Oznaczyć/zgłosić do dostawcy poczty lub odpowiedniej instytucji i nie klikać linków.
-C: Otworzyć link w przeglądarce, ale nie logować się.
-CORRECT: B
----
-Q: Gdy e-mail twierdzi, że twoje konto zostanie zamknięte „w ciągu godziny”, to jest to:
-A: Klarowna informacja od firmy.
-B: Częsty trik socjotechniczny mający wywołać panikę i zmusić do szybkiego kliknięcia.
-C: Dowód, że konto naprawdę jest zagrożone.
-CORRECT: B
----
-Q: Jak zachować się przy podejrzanym SMS-ie od rzekomego kuriera?
-A: Kliknąć w link, żeby sprawdzić, bo to wygodne.
-B: Wejść na aplikację/stronę kurierską bezpośrednio i sprawdzić status przesyłki.
-C: Odpisać „OK” i wykonać prośbę nadawcy.
-CORRECT: B
----
-Q: Co oznacza „spear-phishing”?
-A: Masowe wysyłanie tego samego maila do setek osób.
-B: Ukierunkowany atak phishingowy skierowany przeciwko konkretnej osobie lub organizacji.
-C: Atak na serwery pocztowe.
-CORRECT: B
----
-Q: Która z poniższych praktyk poprawia bezpieczeństwo przy otrzymywaniu linków w mailu?
-A: Klikanie bez sprawdzenia, bo mail wygląda profesjonalnie.
-B: Najpierw najechać kursorem (desktop) lub użyć opcji podglądu, by zobaczyć docelowy URL przed kliknięciem.
-C: Kopiować link i wysyłać go znajomemu, by potwierdził.
-CORRECT: B
----
-Q: Co zrobić, jeśli przypadkowo kliknąłeś złośliwy link?
-A: Natychmiast próbować zamknąć wszystko, zmienić hasła i przeskanować urządzenie antywirusem; zgłosić incydent.
-B: Nic — pewnie nic się nie stało.
-C: Zadzwonić do nadawcy i powiedzieć „kliknąłem”.
+Q: Co powinno wzbudzić twoją czujność w sensacyjnym artykule w social mediach?
+A: Brak autora, brak daty, krzykliwe wielkie litery i mnóstwo wykrzykników.
+B: Obecność przypisów i odnośników do badań.
+C: Wyważony i spokojny ton wypowiedzi.
 CORRECT: A
 ---
-Q: Jak rozpoznać fałszywą stronę logowania?
-A: Po tym, że prosi o hasło.
-B: Po braku certyfikatu HTTPS i dziwnym URL lub literówkach w domenie.
-C: Po tym, że ma formularz z przyciskiem „Zaloguj”.
+Q: Widzisz łańcuszek: „Jeśli nie wyślesz tego do 15 osób, twoje konto zostanie skasowane o północy”. Co robisz?
+A: Wysyłam do 15 osób na wszelki wypadek.
+B: Usuwam i ignoruję — to łańcuszek żerujący na strachu.
+C: Pytam nadawcę, skąd ma takie informacje.
 CORRECT: B
 ---
-Q: Czy warto ufać wiadomościom z prośbą o „szybkie potwierdzenie numeru telefonu” od znajomego?
-A: Tak, bo to może być ważne.
-B: Nie, najpierw potwierdź prośbę innym kanałem (np. telefonicznie), bo konto znajomego mogło zostać przejęte.
-C: Tak, jeśli wiadomość ma emoji.
+Q: Jeśli w relacji na żywo widzisz link: „Darmowe skiny do gry dla pierwszych 100 osób”, powinieneś:
+A: Kliknąć natychmiast, nim nagrody się skończą.
+B: Zachować ostrożność — takie linki często służą do wyłudzania kont.
+C: Wpisać swoje dane logowania na stronie z linku.
 CORRECT: B
 ---
-Q: Która reakcja jest najbezpieczniejsza, gdy otrzymasz e-mail z linkiem do „resetu hasła” którego nie zamawiałeś?
-A: Kliknąć i wprowadzić nowe hasło, żeby zabezpieczyć konto.
-B: Zignorować wiadomość i wejść bezpośrednio na stronę serwisu, by sprawdzić stan konta.
-C: Odpisać do nadawcy, że to nie ja.
+Q: Co zrobić, gdy post w sieci wywoła w tobie nagły przypływ paniki lub agresji?
+A: Natychmiast opublikować agresywną odpowiedź.
+B: Zrobić krok w tył, ochłonąć i sprawdzić informację w wiarygodnych źródłach.
+C: Przesłać post do wszystkich kontaktów z alarmującym podpisem.
 CORRECT: B
 ---
-Q: Co jest złym objawem przy podejrzeniu phishingu w wiadomości?
-A: Treść bez błędów i dobrze sformatowana.
-B: Prośba o dane osobowe lub loginy oraz poczucie pilności.
-C: Brak załącznika.
+Q: Jak rozpoznać, czy kontrowersyjny cytat znanej osoby na grafice jest autentyczny?
+A: Jeśli grafika wygląda ładnie i nowocześnie, to na pewno prawda.
+B: Wpisać cytat w wyszukiwarkę i sprawdzić pełny kontekst wypowiedzi.
+C: Uwierzyć na słowo profilowi z memami.
 CORRECT: B
 ---
+Q: Czym różni się fakt od opinii w dyskusji internetowej?
+A: Fakt można obiektywnie zweryfikować dowodami, a opinia to subiektywny punkt widzenia.
+B: Fakty pisze się pogrubioną czcionką, a opinie kursywą.
+C: Fakt zawsze ma więcej polubień niż opinia.
+CORRECT: A
+---
+Q: Czym jest zjawisko „FOMO” (Fear of Missing Out) napędzające doomscrolling?
+A: Lękiem przed awarią domowego routera.
+B: Uporczywym strachem przed tym, że coś nas ominie, jeśli nie będziemy ciągle sprawdzać powiadomień.
+C: Rodzajem złośliwego oprogramowania na telefon.
+CORRECT: B
+---
+Q: Jaki jest najlepszy sposób na reagowanie na cyberprzemoc pod postem rówieśnika?
+A: Wdać się w wulgarną kłótnię z hejterami.
+B: Zgłosić nienawistne komentarze platformie i wesprzeć poszkodowanego prywatnie.
+C: Wyśmiać ofiarę razem z tłumem.
+CORRECT: B
+---
+Q: Dlaczego warto zwracać uwagę na datę publikacji materiału w sieci?
+A: Ponieważ archiwalne nagrania bywają publikowane jako rzekomo 'dzisiejsze', by manipulować opinią.
+B: Ponieważ po miesiącu wszystkie wpisy tracą ważność prawną.
+C: Data nie ma żadnego znaczenia dla wiarygodności treści.
+CORRECT: A
+---
+Q: Czy duża liczba lajków i udostępnień świadczy o prawdziwości newsa?
+A: Tak, miliony użytkowników nie mogą się mylić.
+B: Nie, fake newsy i emocjonalne kłamstwa często rozprzestrzeniają się szybciej niż prawda.
+C: Tak, platformy usuwają posty z fałszywymi informacjami przed zdobyciem lajków.
+CORRECT: B
+---
+Q: Co oznacza manipulacja kontekstem (tzw. wyrwanie z kontekstu)?
+A: Usunięcie zdjęcia z artykułu.
+B: Pokazanie prawdziwego fragmentu wideo lub wypowiedzi tak, by całkowicie wypaczyć jej pierwotny sens.
+C: Błąd tłumacza internetowego.
+CORRECT: B
+---
+Q: Jaką postawę promuje odporność cyfrowa wobec internetowych sensacji?
+A: Ślepe zaufanie do pierwszego napotkanego źródła.
+B: Spokój, dystans emocjonalny, zasadę ograniczonego zaufania i weryfikację faktów.
+C: Rezygnowanie z jakiejkolwiek aktywności w świecie realnym.
+CORRECT: B

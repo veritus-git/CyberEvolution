@@ -1,38 +1,38 @@
 # world2_interactions.txt
-# Temat: Krypty Kluczy — Hasła, 2FA
+# Temat: Krypty Kluczy — Kradzież tożsamości, fałszywy support, wycieki danych przez quizy
 # Boss: Key Reaper
 
 AVATAR: admin
-CONTEXT: Admin z Pomocy Technicznej:\n„Cześć! Jestem z działu pomocy. Na Twoim koncie wykryliśmy błąd logowania — podaj proszę swoje hasło, żebym mógł to naprawić.”
-SAGE: Nigdy nie podawaj hasła nikomu, nawet komuś, kto mówi, że pracuje w pomocy. Prawdziwi administratorzy nie pytają o takie dane.
-A: Podaję hasło, żeby to naprawił.
-B: Mówię, że nie udostępniam haseł i kontaktuję się z pomocą przez oficjalną stronę.
-GOOD: Dobrze. Zaufanie wymaga weryfikacji, nie tytułu.
-BAD: Zła odpowiedź. ‘Admin’ z sieci właśnie zabrał Ci Twoje konto.
+CONTEXT: Chłopak z plakietką i tabletem patrzy na ciebie surowo:\n„Dział bezpieczeństwa platformy. Twój profil został zgłoszony za naruszenie regulaminu!\nZaloguj się w naszym panelu weryfikacyjnym pod tym linkiem w 60 minut, inaczej bezpowrotnie usuniemy twoje konto!”
+SAGE: Oto maska fałszywego autorytetu. Oszuści straszą usunięciem konta, by wywołać panikę i wyłudzić login i hasło.
+A: Loguję się od razu przez podany link — nie mogę stracić profilu budowanego od lat!
+B: Nie wpisuję danych. Otwieram oficjalną aplikację i sprawdzam status konta w 'Centrum Pomocy'.
+GOOD: Znakomicie! Prawdziwe wsparcie nigdy nie żąda logowania przez linki z prywatnych wiadomości. Opanowałeś strach.
+BAD: Zły ruch! Właśnie oddałeś swoje konto w ręce cyfrowego złodzieja. Strach przesłonił ci czujność. Popraw to!
 CORRECT: B
 SPEED_CONTEXT: 38
 SPEED_SAGE: 32
 SPEED_FEEDBACK: 36
 ---
 AVATAR: aplikacja
-CONTEXT: Aplikacja „Bezpieczne Logowanie+”:\n„Zaloguj się raz, a my zapamiętamy wszystko za Ciebie!”
-SAGE: Nie każda aplikacja z napisem „security” jest bezpieczna. Wiele z nich to fałszywe menedżery haseł zbierające loginy.
-A: Instaluję — wygląda profesjonalnie.
-B: Szukam oficjalnej aplikacji z dobrymi opiniami i certyfikatami.
-GOOD: Dobrze. Sprawdzony menedżer to twój sejf, nie pułapka.
-BAD: Źle. Key Reaper już kopiuje Twój cyfrowy klucz.
+CONTEXT: Na ekranie laptopa wyświetla się animacja viralowego testu:\n„Sprawdź, która postać z anime jest twoją bratnią duszą!\nAby poznać wynik, połącz swoje konto społecznościowe i zezwól aplikacji na dostęp do listy znajomych, wiadomości i zdjęć.”
+SAGE: Czy chwilowy quiz wart jest oddania dostępu do twojego prywatnego życia? Wiele z pozoru niewinnych testów służy do drenażu danych.
+A: Zezwalam na wszystkie uprawnienia — wszyscy znajomi wstawiają ten wynik na relację!
+B: Odrzucam. Nie przyznaję obcej aplikacji uprawnień do moich prywatnych danych.
+GOOD: Rozsądnie. Twoja prywatność ma ogromną wartość. Nie warto jej wymieniać na chwilowy, bezwartościowy trend.
+BAD: Błąd! Oddałeś prywatne rozmowy i zdjęcia za jeden obrazek z quizu. Cofnij ten krok i chroń swoje granice!
 CORRECT: B
 SPEED_CONTEXT: 38
 SPEED_SAGE: 32
 SPEED_FEEDBACK: 36
 ---
 AVATAR: vpn
-CONTEXT: Darmowy VPN z Reklamy:\nNa ekranie pojawia się wyskakujące okienko: „Zabezpiecz swoje konto! Pobierz darmowy VPN już teraz!”
-SAGE: To trik. Darmowe programy ochronne często robią dokładnie odwrotnie — kradną dane zamiast je chronić.
-A: Klikam, bo to darmowa ochrona!
-B: Ignoruję i szukam sprawdzonego narzędzia z oficjalnego źródła.
-GOOD: Świetnie. Bezpieczeństwo nie rodzi się z pośpiechu.
-BAD: Źle. Reaper już instaluje się w tle Twojego systemu.
+CONTEXT: Ekran telefonu wyświetla krzykliwą ikonę rakiety:\n„Darmowy Booster Zasięgów: Zdobądź +10 000 followersów w 24 godziny bez wysiłku!\nAby aktywować, pobierz ten profil konfiguracyjny urządzenia.”
+SAGE: Obietnica drogi na skróty to odwieczna pułapka. Pod nazwą 'darmowego boostera' kryje się złośliwe oprogramowanie przejmujące telefon.
+A: Pobieram i instaluję plik — zasięgi i popularność w social mediach są najważniejsze!
+B: Ignoruję i usuwam. Instalowanie niesprawdzonych profili zagraża bezpieczeństwu całego smartfona.
+GOOD: Wspaniale. Nie ma darmowych skrótów do popularności — instalowanie obcych profili to prosta droga do utraty kontroli nad telefonem.
+BAD: Źle! Twoje urządzenie zostało zainfekowane, a dane przekazane na obcy serwer. Nigdy nie instaluj plików z nieznanych źródeł!
 CORRECT: B
 SPEED_CONTEXT: 38
 SPEED_SAGE: 32

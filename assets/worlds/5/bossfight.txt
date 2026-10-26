@@ -1,123 +1,122 @@
-BOSSNAME: Mędrzec
-INTRO: Przeszedłeś przez iluzje, klucze, lustra i kopie.\nTeraz czas dowieść, że naprawdę zrozumiałeś, jak chronić siebie i innych.\nNie odpowiadaj na pamięć — odpowiadaj rozumem
-OUTRO: Udało ci się.\nZrozumiałeś, że bezpieczeństwo nie polega na strachu, ale na świadomości.\nKażdy świat był lekcją — o zaufaniu, prywatności, ochronie i odpowiedzialności.\nTeraz to ty jesteś strażnikiem swojego świata.\nCyberEwolucja nie kończy się tu… ona trwa w każdym twoim wyborze.”
-Q: Dlaczego nie powinno się klikać w linki z nieznanych źródeł?
-A: Bo mogą prowadzić do fałszywych stron lub zainstalować złośliwe oprogramowanie.
-B: Bo linki spowalniają internet.
-C: Bo wiadomości z linkami są zawsze spamem.
-CORRECT: A
----
-Q: Co należy zrobić, jeśli dostaniesz wiadomość z prośbą o dopłatę do przesyłki?
-A: Kliknąć w link, by zapłacić natychmiast.
-B: Wejść na oficjalną stronę firmy i zweryfikować informację samodzielnie.
-C: Odpisać, że przelejesz pieniądze później.
+BOSSNAME: Mędrzec Rozumu
+INTRO: Stoisz wreszcie przed moim obliczem. Przeszedłeś przez dymiące zgliszcza clickbaitu, oparłeś się pożeraczom tożsamości, odrzuciłeś maski pozorów i wygasiłeś pożar nienawiści. Dziś nie walczysz ze złem z krwi i kości — walczysz z własnymi słabościami z tamtej nocy. Odpowiedz mi nie z pamięci, lecz z dojrzałości, którą w sobie wykułeś. Pokaż, że jesteś gotów powrócić do swojego świata jako świadomy i wolny człowiek!
+OUTRO: Udało ci się! Zbudowałeś w sobie prawdziwą cyfrową odporność. Zrozumiałeś, że najgroźniejszą bronią w sieci nie są kody ani wirusy, lecz manipulacja naszymi emocjami: wstydem, strachem i pośpiechem. Teraz to ty jesteś strażnikiem swojego rozumu. Otwieram portal powrotny. Obudź się i broń się w necie!
+Q: Jeśli w nocy trafisz na zmanipulowane wideo ze swoją twarzą i groźbą kompromitacji, co robisz najpierw?
+A: Wpadam w panikę i klikam w pierwszy link obiecujący usunięcie pliku.
+B: Zachowuję spokój, robię zrzuty ekranu jako dowód, zgłaszam naruszenie platformie i rozmawiam z zaufanym dorosłym.
+C: Płacę szantażyście pieniądze, by usunął film.
 CORRECT: B
 ---
-Q: Dlaczego nie należy podawać swojego hasła nawet komuś, kto podaje się za pracownika pomocy technicznej?
-A: Bo prawdziwi administratorzy nigdy nie proszą o hasła.
-B: Bo hasła można łatwo zmienić, więc nie ma sensu.
-C: Bo administratorzy i tak mają dostęp do wszystkiego.
+Q: Co jest najczęstszym narzędziem manipulacji wykorzystywanym przeciwko młodzieży w internecie?
+A: Nasze własne silne emocje: strach, wstyd, chciwość i pragnienie natychmiastowej akceptacji.
+B: Przestarzała wersja karty graficznej w komputerze.
+C: Brak zainstalowanej gry na telefonie.
 CORRECT: A
 ---
-Q: Co to jest uwierzytelnianie dwuskładnikowe (2FA)?
-A: Dodatkowa metoda potwierdzania tożsamości, np. kod SMS lub aplikacja.
-B: Hasło, które wpisuje się dwa razy.
-C: Zabezpieczenie, które wymaga dwóch kont użytkownika.
+Q: Jak postąpić z sensacyjnym postem wywołującym w tobie nagłe oburzenie lub wściekłość?
+A: Od razu udostępnić go z gniewnym komentarzem na grupie klasowej.
+B: Zatrzymać się, ochłonąć i zweryfikować informację w co najmniej dwóch niezależnych źródłach.
+C: Wysłać go do wszystkich kontaktów z prośbą o polubienie.
+CORRECT: B
+---
+Q: Dlaczego bezrefleksyjny nocny doomscrolling jest tak groźny dla naszej odporności cyfrowej?
+A: Bo zużywa prąd w domowym gniazdku.
+B: Ponieważ zmęczony mózg traci czujność i bezbronnie ulega emocjonalnym manipulacjom algorytmów.
+C: Ponieważ smartfon przegrzewa się w nocy.
+CORRECT: B
+---
+Q: Co to jest „fact-checking” i dlaczego jest kluczem do prawdy w sieci?
+A: Pisanie anonimowych komentarzy pod postami.
+B: Rzetelna, obiektywna weryfikacja prawdziwości faktów w oparciu o wiarygodne dowody i źródła.
+C: Kasowanie starych zdjęć z dysku.
+CORRECT: B
+---
+Q: Kiedy influencer ma prawny obowiązek oznaczyć post jako materiał reklamowy (#reklama)?
+A: Zawsze, gdy otrzymuje korzyść majątkową (pieniądze, darmowy produkt, zniżki) za promowanie marki.
+B: Tylko wtedy, gdy sam uzna to za stosowne.
+C: Nigdy, jeśli nagranie trwa krócej niż minutę.
 CORRECT: A
 ---
-Q: Co oznacza, gdy strona logowania ma adres różniący się jednym znakiem od prawdziwego?
-A: To może być fałszywa strona próbująca wyłudzić dane.
-B: To tylko literówka, nic groźnego.
-C: To nowa wersja tej samej witryny.
+Q: Jak najskuteczniej zabezpieczyć swoje profile społecznościowe przed przejęciem?
+A: Mieć wszędzie takie samo, proste hasło.
+B: Używać długich, unikalnych haseł, menedżera haseł oraz uwierzytelniania dwuskładnikowego (2FA).
+C: Nie wylogowywać się na komputerach publicznych.
+CORRECT: B
+---
+Q: Co zrobić, gdy znajomi ze szkoły nakłaniają cię do udziału w zmasowanym hejcie na inną osobę?
+A: Dołączyć do tłumu, by nie odstawać od grupy.
+B: Stanowczo odmówić i uświadomić im, że cyberprzemoc jest karalna i może zniszczyć komuś życie.
+C: Założyć anonimowe konto i pisać obelgi po kryjomu.
+CORRECT: B
+---
+Q: Czym charakteryzuje się materiał typu Deepfake?
+A: Wyraźnym czarno-białym filtrem retro.
+B: Fotorealistycznym podmienieniem twarzy i głosu przy użyciu AI w celu sfałszowania czyjejś wypowiedzi lub czynu.
+C: Zwiększoną liczbą klatek na sekundę.
+CORRECT: B
+---
+Q: Czym jest bańka filtrująca w mediach społecznościowych?
+A: Środowiskiem informacyjnym tworzonym przez algorytmy, w którym widzimy wyłącznie treści zgodne z naszymi przekonaniami.
+B: Funkcją w smartfonie chroniącą przed kurzem.
+C: Specjalnym filtrem fotograficznym wygładzającym cerę.
 CORRECT: A
 ---
-Q: Jakie hasło jest najbezpieczniejsze?
-A: Długie, unikalne i nieużywane nigdzie indziej.
-B: Krótkie, ale łatwe do zapamiętania.
-C: Takie samo na wszystkich kontach, by nie zapomnieć.
+Q: Jeśli w relacji widzisz „Konkurs na darmowy telefon — podaj kod SMS, który właśnie otrzymałeś”, to:
+A: Prawdziwa szansa na darmowy sprzęt.
+B: Pułapka mająca na celu przejęcie twojego konta lub wyłudzenie drogiej subskrypcji SMS.
+C: Oficjalna akcja dobroczynna platformy.
+CORRECT: B
+---
+Q: Jak najskuteczniej reagować na internetowych trolli i prowokatorów?
+A: Ignorować zaczepki, zgłaszać naruszenia regulaminu i blokować profile zamiast wdawać się w pyskówki.
+B: Wypisywać agresywne odpowiedzi przez całą noc.
+C: Przesyłać im swoje prywatne zdjęcia.
 CORRECT: A
 ---
-Q: Co najlepiej zrobić, gdy ktoś prosi Cię o dane logowania przez e-mail?
-A: Zignorować wiadomość i zgłosić ją jako podejrzaną.
-B: Wysłać dane, jeśli wiadomość wygląda profesjonalnie.
-C: Odpisać, by potwierdzić, że to Ty.
+Q: Czym różni się merytoryczna dyskusja od mowy nienawiści?
+A: Merytoryczna debata szanuje godność człowieka i opiera się na argumentach, mowa nienawiści dąży do upokorzenia i zniszczenia drugiej osoby.
+B: Merytoryczna dyskusja odbywa się wyłącznie w językach obcych.
+C: Nie ma między nimi żadnej różnicy.
 CORRECT: A
 ---
-Q: Jak chronić swoją prywatność w social mediach?
-A: Ustawiać widoczność postów dla znajomych i nie publikować danych osobowych.
-B: Publikować wszystko, by zdobyć zaufanie.
-C: Udostępniać lokalizację, by zwiększyć zasięgi.
+Q: Dlaczego nie należy instalować nieznanych aplikacji oferujących „darmowych followersów”?
+A: Ponieważ mogą wykradać tokeny dostępu, instalować złośliwy kod i przejmować kontrolę nad smartfonem.
+B: Ponieważ działają wyłącznie na tabletach graficznych.
+C: Ponieważ zajmują zbyt dużo miejsca na pulpicie.
 CORRECT: A
 ---
-Q: Dlaczego nie warto publikować, gdzie aktualnie się znajdujesz?
-A: Bo ujawnia, że Twój dom może być pusty.
-B: Bo takie posty mają mniej polubień.
-C: Bo inni mogą się śmiać z miejsca, w którym jesteś.
+Q: Co należy zrobić, gdy nieznana osoba w sieci szantażuje cię intymnymi materiałami?
+A: Natychmiast zapłacić lub wysłać kolejne zdjęcia w nadziei, że odpuści.
+B: Nie ulegać szantażowi, zabezpieczyć dowody, zerwać kontakt i niezwłocznie zgłosić sprawę zaufanym dorosłym oraz na policję.
+C: Skasować aplikację i udawać, że problem nie istnieje.
+CORRECT: B
+---
+Q: Jaki jest główny cel twórców dezinformacji i fake newsów?
+A: Polaryzacja społeczeństwa, wywołanie chaosu, zarobek na kliknięciach lub realizacja wrogich celów politycznych.
+B: Poprawa samopoczucia internautów.
+C: Promocja zdrowego stylu życia.
 CORRECT: A
 ---
-Q: Co zrobić, jeśli ktoś prosi o pomoc przez podejrzany link lub ankietę?
-A: Sprawdzić innym kanałem, czy to naprawdę ta osoba.
-B: Kliknąć, by szybciej pomóc.
-C: Udostępnić dalej, żeby inni też pomogli.
+Q: Jak odpowiedzialnie dbać o własną prywatność w mediach społecznościowych?
+A: Ustawiać profile jako prywatne, weryfikować listę znajomych i unikać publikowania wrażliwych szczegółów z życia.
+B: Wstawiać zdjęcia dokumentów i biletów do sieci.
+C: Akceptować zaproszenia od każdego nieznajomego profilu.
 CORRECT: A
 ---
-Q: Dlaczego nie warto rozmawiać z nieznanym chatbotem o prywatnych sprawach?
-A: Bo Twoje dane mogą być zapisywane i wykorzystywane.
-B: Bo chatbot nie zrozumie, co mówisz.
-C: Bo rozmowy z AI są nudne.
-CORRECT: A
+Q: Co zrobić, gdy zauważysz, że doomscrolling pogarsza twoje samopoczucie i wywołuje ciągły niepokój?
+A: Kupić większy ekran, by szybciej scrollować.
+B: Wprowadzić higienę cyfrową: ustalić limity czasu na telefon, wyłączyć zbędne powiadomienia i spędzać czas offline.
+C: Oglądać rolki z podwójną prędkością odtwarzania.
+CORRECT: B
 ---
-Q: Co zrobić, by chronić swoje konta przed przejęciem?
-A: Włączyć 2FA i używać silnych, różnych haseł.
-B: Używać prostych haseł, by szybciej się logować.
-C: Logować się przez linki z maili.
-CORRECT: A
+Q: Czym jest „krytyczne myślenie” w cyfrowym świecie?
+A: Negowaniem każdego faktu i ślepą wiarą we wszystkie teorie spiskowe.
+B: Umiejętnością logicznej analizy treści, sprawdzania źródeł i intencji autora oraz oddzielania faktów od manipulacji.
+C: Pisaniem złośliwych komentarzy pod każdym postem.
+CORRECT: B
 ---
-Q: Jak najlepiej zabezpieczyć kopie zapasowe danych?
-A: Trzymać je na odłączonym nośniku lub zaszyfrowanej chmurze.
-B: Trzymać je razem z głównymi plikami.
-C: Kopiować wszystko na pendrive bez szyfrowania.
+Q: Co w praktyce oznacza hasło „Broń się w necie”?
+A: Bycie świadomym, odpowiedzialnym i odpornym użytkownikiem internetu, który chroni swój umysł i szanuje innych.
+B: Zbieranie wirtualnego ekwipunku w grach wideo.
+C: Całkowity zakaz włączania komputera.
 CORRECT: A
----
-Q: Co zrobić, gdy komputer zostanie zainfekowany ransomware?
-A: Odłączyć go od sieci i rozpocząć odzyskiwanie z bezpiecznych kopii.
-B: Zapłacić okup, by odzyskać dane szybciej.
-C: Czekać, aż wirus sam zniknie.
-CORRECT: A
----
-Q: Jak można sprawdzić, czy program zabezpieczający jest prawdziwy?
-A: Pobierać go tylko z oficjalnych źródeł i sprawdzać opinie.
-B: Instalować każdy, który ma logo kłódki.
-C: Kierować się liczbą pobrań.
-CORRECT: A
----
-Q: Dlaczego nie należy podłączać znalezionego pendrive’a?
-A: Bo może zawierać złośliwe oprogramowanie.
-B: Bo może być pusty.
-C: Bo może nie działać na Twoim komputerze.
-CORRECT: A
----
-Q: Co daje regularne testowanie przywracania kopii zapasowych?
-A: Pewność, że backup faktycznie działa, gdy będzie potrzebny.
-B: Większe zużycie dysku.
-C: Spowolnienie systemu.
-CORRECT: A
----
-Q: Co oznacza, że backup jest „offline”?
-A: Jest odłączony od sieci i bezpieczny przed atakiem.
-B: Nie działa, dopóki nie włączysz komputera.
-C: Jest przechowywany w folderze bez internetu.
-CORRECT: A
----
-Q: Co jest wspólnym błędem w phishingu, social mediach i ransomware?
-A: Zaufanie bez weryfikacji źródła.
-B: Brak wystarczającej ilości danych.
-C: Zbyt długie hasła.
-CORRECT: A
----
-Q: Czego nauczyła Cię cała podróż przez światy CyberEwolucji?
-A: Że bezpieczeństwo to świadomość i codzienne decyzje.
-B: Że Internet jest całkowicie bezpieczny.
-C: Że wystarczy mieć antywirusa.
-CORRECT: A
----
