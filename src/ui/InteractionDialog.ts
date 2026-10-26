@@ -59,6 +59,7 @@ export class InteractionDialog {
   private onCompleteCallback?: () => void;
 
   // Death Menu state (1:1 with Python prototype: Retry Boss vs Restart World)
+  private deathMenuOverlay: HTMLElement;
   private deathMenuElement: HTMLElement;
   private deathMenuTitle: HTMLElement;
   private deathMenuOpt0: HTMLElement;
@@ -133,9 +134,13 @@ export class InteractionDialog {
 
     this.overlayElement.appendChild(this.containerElement);
 
-    // Death menu panel (1:1 with Python prototype: Retry Boss vs Restart World)
+    // Dedicated Death menu overlay (completely independent of retro-dialog-overlay!)
+    this.deathMenuOverlay = document.createElement('div');
+    this.deathMenuOverlay.className = 'death-menu-overlay hidden';
+    this.deathMenuOverlay.style.display = 'none';
+
     this.deathMenuElement = document.createElement('div');
-    this.deathMenuElement.className = 'death-menu-panel hidden';
+    this.deathMenuElement.className = 'death-menu-panel';
 
     this.deathMenuTitle = document.createElement('div');
     this.deathMenuTitle.className = 'death-menu-title';
@@ -160,9 +165,10 @@ export class InteractionDialog {
     this.deathMenuElement.appendChild(this.deathMenuTitle);
     this.deathMenuElement.appendChild(this.deathMenuOpt0);
     this.deathMenuElement.appendChild(this.deathMenuOpt1);
-    this.overlayElement.appendChild(this.deathMenuElement);
+    this.deathMenuOverlay.appendChild(this.deathMenuElement);
 
     container.appendChild(this.overlayElement);
+    container.appendChild(this.deathMenuOverlay);
 
     // Click / touch to advance
     this.overlayElement.addEventListener('click', () => {
@@ -256,6 +262,9 @@ export class InteractionDialog {
     onComplete?: () => void
   ): void {
     if (!lines || lines.length === 0) return;
+    this.resetDeathMenu();
+    this.containerElement.style.display = '';
+    this.overlayElement.style.display = '';
     this.avatarBox.style.display = '';
     this.containerElement.classList.remove('position-bottom', 'position-center');
     this.containerElement.classList.add('position-top');
@@ -278,6 +287,9 @@ export class InteractionDialog {
    * Start World Intro narrative dialogue (1:1 with Python: Centered on screen, dark backdrop, Sage avatar for worlds 1-4)
    */
   public startWorldIntro(title: string, text: string, wn: number = 1, onComplete?: () => void): void {
+    this.resetDeathMenu();
+    this.containerElement.style.display = '';
+    this.overlayElement.style.display = '';
     this.mode = 'conversation';
     this.titleElement.textContent = `${title} — Wstęp`;
     this.speakerElement.textContent = '';
@@ -314,6 +326,9 @@ export class InteractionDialog {
    * Start Boss Intro dialogue (1:1 with Python: Centered on screen, dark backdrop, Boss avatar)
    */
   public startBossIntro(bossName: string, introText: string, wn: number, onComplete?: () => void, stageTitle?: string): void {
+    this.resetDeathMenu();
+    this.containerElement.style.display = '';
+    this.overlayElement.style.display = '';
     this.mode = 'conversation';
     this.titleElement.textContent = stageTitle ? `${bossName} — ${stageTitle}` : `${bossName} — Wstęp`;
     this.speakerElement.textContent = `${bossName}:`;
@@ -373,6 +388,9 @@ export class InteractionDialog {
    * Start multi-stage interactive quiz with NPC
    */
   public startQuiz(data: QuizInteractionData, evo: number = 1, playerY: number = 600): void {
+    this.resetDeathMenu();
+    this.containerElement.style.display = '';
+    this.overlayElement.style.display = '';
     this.updatePosition(playerY);
     this.mode = 'quiz';
     this.quizData = data;
@@ -556,17 +574,28 @@ export class InteractionDialog {
     this.hintElement.textContent = 'ENTER aby przejść dalej';
   }
 
+  private resetDeathMenu(): void {
+    this.isDeathMenuActive = false;
+    this.deathMenuOverlay.classList.add('hidden');
+    this.deathMenuOverlay.style.display = 'none';
+  }
+
   public showDeathMenu(onRetryBoss: () => void, onRestartWorld: () => void): void {
+    if (this.animFrameId) cancelAnimationFrame(this.animFrameId);
+    this.overlayElement.classList.add('hidden');
+    this.overlayElement.style.display = 'none';
+    this.overlayElement.classList.remove('dark-backdrop');
+    this.containerElement.classList.remove('position-center');
+    this.containerElement.style.display = 'none';
+
     this.isOpen = true;
     this.isDeathMenuActive = true;
     this.deathMenuSelection = 0;
     this.onRetryBossCallback = onRetryBoss;
     this.onRestartWorldCallback = onRestartWorld;
 
-    this.containerElement.classList.add('hidden');
-    this.deathMenuElement.classList.remove('hidden');
-    this.overlayElement.classList.remove('hidden');
-    this.overlayElement.classList.add('dark-backdrop');
+    this.deathMenuOverlay.classList.remove('hidden');
+    this.deathMenuOverlay.style.display = 'flex';
     document.body.classList.remove('cursor-hidden');
     this.renderDeathMenu();
   }
@@ -589,13 +618,14 @@ export class InteractionDialog {
 
   public close(): void {
     this.isOpen = false;
-    this.isDeathMenuActive = false;
+    this.resetDeathMenu();
     if (this.animFrameId) cancelAnimationFrame(this.animFrameId);
     this.overlayElement.classList.add('hidden');
+    this.overlayElement.style.display = 'none';
     this.overlayElement.classList.remove('dark-backdrop');
     this.containerElement.classList.remove('position-center');
-    this.containerElement.classList.remove('hidden');
-    this.deathMenuElement.classList.add('hidden');
+    this.containerElement.style.display = '';
+
     this.choicesContainer.classList.add('hidden');
     this.avatarBox.style.display = '';
     this.bodyElement.textContent = '';

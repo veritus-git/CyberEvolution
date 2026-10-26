@@ -616,40 +616,56 @@ body.cursor-hidden #ui-container {
   text-align: right;
 }
 
-/* Death Menu overlay (1:1 with Python prototype: panel_w=620, panel_h=200) */
-.death-menu-panel {
+/* ==========================================================================
+   DEATH MENU OVERLAY (1:1 with Python prototype: panel_w=620, panel_h=200)
+   ========================================================================== */
+.death-menu-overlay {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 620px;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 60;
+  pointer-events: auto;
+}
+
+.death-menu-overlay.hidden {
+  display: none !important;
+}
+
+.death-menu-panel {
+  width: 580px;
   max-width: 90vw;
-  background: rgba(16, 18, 24, 0.95);
+  background: rgba(16, 18, 24, 0.96);
   border: 2px solid rgba(185, 185, 220, 0.85);
   border-radius: 12px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 24px 20px;
-  gap: 14px;
-  box-shadow: 0 0 35px rgba(220, 40, 40, 0.45);
-  pointer-events: auto;
+  padding: 28px 24px;
+  gap: 16px;
+  box-shadow: 0 0 40px rgba(220, 40, 40, 0.5), inset 0 0 15px rgba(255, 60, 60, 0.15);
   animation: dialogFadeInCenter 0.25s ease-out forwards;
 }
 
 .death-menu-title {
   font-family: 'Jersey 10', 'VT323', monospace;
-  font-size: 34px;
+  font-size: 38px;
   color: #ffcccc;
-  text-shadow: 0 0 10px rgba(255, 60, 60, 0.8);
+  text-shadow: 0 0 12px rgba(255, 60, 60, 0.85);
   margin-bottom: 6px;
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
 }
 
 .death-menu-option {
   width: 90%;
-  padding: 10px 16px;
+  padding: 12px 18px;
   border-radius: 8px;
   font-family: 'Jersey 10', 'VT323', monospace;
   font-size: 24px;
@@ -657,8 +673,8 @@ body.cursor-hidden #ui-container {
   text-align: center;
   cursor: pointer;
   background: rgba(40, 42, 54, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  transition: all 0.12s ease;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  transition: all 0.15s ease;
 }
 
 .death-menu-option.selected,
@@ -666,7 +682,7 @@ body.cursor-hidden #ui-container {
   color: #ffffff;
   background: rgba(70, 70, 110, 0.85);
   border-color: #00e5ff;
-  box-shadow: 0 0 14px rgba(0, 229, 255, 0.5);
+  box-shadow: 0 0 16px rgba(0, 229, 255, 0.5);
   transform: scale(1.02);
 }
 

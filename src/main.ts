@@ -1,3 +1,4 @@
+import './style.css';
 import { Engine } from './core/Engine';
 
 function showError(msg: string) {
