@@ -41,6 +41,10 @@ export class Renderer {
     level.updateAnimations(dt);
 
     const ctx = this.ctx;
+    ctx.imageSmoothingEnabled = false;
+    if ('imageSmoothingQuality' in ctx) {
+      (ctx as unknown as { imageSmoothingQuality: string }).imageSmoothingQuality = 'low';
+    }
 
     // Clear frame
     ctx.fillStyle = '#080a0e';

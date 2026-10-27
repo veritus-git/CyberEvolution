@@ -448,8 +448,8 @@ export class InteractionDialog {
         this.bodyElement.textContent = this.quizData.context;
       }
       this.choicesContainer.classList.remove('hidden');
-      this.renderChoices();
-      this.hintElement.textContent = '↑/↓ lub 1/2 — wybór, Enter/Spacja/E — zatwierdź';
+      const isTouch = typeof window !== 'undefined' && (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
+      this.hintElement.textContent = isTouch ? 'Dotknij wybranej opcji' : '↑/↓ lub 1/2 — wybór, Enter/Spacja/E — zatwierdź';
       this.isDoneTyping = true;
       document.body.classList.remove('cursor-hidden');
     } else if (stage === 'feedback') {

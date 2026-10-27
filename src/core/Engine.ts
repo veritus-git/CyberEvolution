@@ -31,9 +31,6 @@ export class Engine {
   public joystick: VirtualJoystick;
   public isPaused: boolean = false;
 
-  // Screen-space overlay canvas for touch controls
-  public overlayCanvas: HTMLCanvasElement;
-  private overlayCtx: CanvasRenderingContext2D;
 
   public isRunning: boolean = false;
   private lastTime: number = 0;
@@ -92,15 +89,6 @@ export class Engine {
     this.startMenu = new StartMenu(uiContainer, hasSave);
     this.pauseMenu = new PauseMenu(uiContainer);
 
-    // Overlay canvas for touch controls
-    this.overlayCanvas = document.createElement('canvas');
-    this.overlayCanvas.id = 'overlay-canvas';
-    this.overlayCanvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;';
-    uiContainer.appendChild(this.overlayCanvas);
-    const octx = this.overlayCanvas.getContext('2d', { alpha: true });
-    if (!octx) throw new Error('Could not create overlay 2D context');
-    this.overlayCtx = octx;
-
     this.joystick = new VirtualJoystick(canvas);
     this.input.setVirtualJoystick(this.joystick);
 
@@ -142,8 +130,6 @@ export class Engine {
 
   private setupWindowResize(): void {
     const onResize = () => {
-      this.overlayCanvas.width = window.innerWidth;
-      this.overlayCanvas.height = window.innerHeight;
       this.joystick.updateLayout(window.innerWidth, window.innerHeight);
     };
     window.addEventListener('resize', onResize);
@@ -808,11 +794,9 @@ export class Engine {
       this.transitionTimer / this.transitionDuration
     );
 
-    // Overlay touch controls
-    this.overlayCtx.clearRect(0, 0, this.overlayCanvas.width, this.overlayCanvas.height);
-    if (!this.startMenu.isOpen && !this.dialog.isOpen && !this.introSequence.isActive) {
-      this.joystick.renderOverlay(this.overlayCtx);
-    }
+    // Mobile Touch Controls visibility
+    const showControls = !this.startMenu.isOpen && !this.dialog.isOpen && !this.introSequence.isActive && !this.pauseMenu.isOpen;
+    this.joystick.setVisible(showControls);
 
     requestAnimationFrame((t) => this.loop(t));
   }

@@ -28,7 +28,7 @@ export class StartMenu {
     const labels: Array<{ label: string; action: StartMenuAction }> = [
       { label: 'Nowa gra', action: 'new_game' },
       { label: this.getContinueLabel(hasSave), action: 'continue' },
-      { label: '📲 Zainstaluj grę', action: 'install' },
+      { label: 'Zainstaluj grę', action: 'install' },
       { label: 'Informacje o grze', action: 'exit' },
     ];
 

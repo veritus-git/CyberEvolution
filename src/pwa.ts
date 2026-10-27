@@ -90,7 +90,7 @@ Gra pojawi się na Twoim pulpicie jako natywna aplikacja!`
   // 3. Fallback dla przeglądarek desktopowych / innych
   showPwaModal(
     'Zainstaluj aplikację CyberEvolution',
-    `Kliknij ikonę <strong>Zainstaluj aplikację 📲</strong> na pasku adresu przeglądarki (po prawej stronie obok paska adresu URL), aby zainstalować grę na swoim komputerze lub telefonie.`
+    `Kliknij ikonę <strong>Zainstaluj aplikację</strong> na pasku adresu przeglądarki (po prawej stronie paska adresu URL), aby zainstalować grę na swoim komputerze lub telefonie.`
   );
   return 'manual';
 }
