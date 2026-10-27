@@ -43,18 +43,28 @@ elif [ "$TARGET" = "prod" ] || [ "$TARGET" = "final" ]; then
     VPS_IP="100.107.9.8"
     echo "🔍 [2/3] Sprawdzanie połączenia z VPS-em Mikrus ($VPS_IP)..."
 
-    if ! ssh -o BatchMode=yes -o ConnectTimeout=3 "root@$VPS_IP" "echo OK" >/dev/null 2>&1; then
-        echo "❌ Błąd: Brak dostępu przez klucz SSH do root@$VPS_IP."
-        echo "   Aby skonfigurować dostęp, wykonaj raz: ssh-copy-id root@$VPS_IP"
+    SSH_OPTS="-o BatchMode=yes -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new"
+    if [ -f "$HOME/.ssh/id_ed25519_github" ]; then
+        SSH_OPTS="$SSH_OPTS -i $HOME/.ssh/id_ed25519_github"
+    fi
+    if [ -f "$HOME/.ssh/id_ed25519" ]; then
+        SSH_OPTS="$SSH_OPTS -i $HOME/.ssh/id_ed25519"
+    fi
+
+    if ! ssh $SSH_OPTS "frog@$VPS_IP" "echo OK" >/dev/null 2>&1; then
+        echo "❌ Błąd: Brak dostępu przez klucz SSH do frog@$VPS_IP."
         exit 1
     fi
 
     echo "🚀 [3/3] Przesyłanie wersji na serwer produkcyjny Mikrus..."
-    tar -C dist -cf - . | ssh "root@$VPS_IP" "mkdir -p /var/www/cyberevolution && tar -C /var/www/cyberevolution -xf -"
+    tar -C dist -cf - . | ssh $SSH_OPTS "frog@$VPS_IP" "tar -C /var/www/cyberevolution -xf -"
 
     echo ""
     echo "=================================================="
     echo "✅ Wdrożenie produkcyjne (FINAL) zakończone!"
+    echo "🌍 Gra jest dostępna publicznie na świecie pod adresem:"
+    echo "   🔗 http://frog02.mikr.us:31385"
+    echo "   🌐 Tailscale: http://100.107.9.8:31385"
     echo "=================================================="
 else
     echo "Nieznany cel: $TARGET. Użyj: local lub prod"
