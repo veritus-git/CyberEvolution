@@ -26,6 +26,8 @@ if [ "$TARGET" = "local" ] || [ "$TARGET" = "staging" ]; then
         SSH_OPTS="$SSH_OPTS -i $HOME/.ssh/id_ed25519"
     fi
 
+    SSH_DEST="szymon@$HOST_IP"
+
     echo "🚀 [3/3] Przesyłanie wersji do kontenera Incus 'cyberevolution'..."
     tar -C dist -cf - . | ssh $SSH_OPTS "$SSH_DEST" "incus exec cyberevolution -- tar -C /var/www/html -xf -"
 
