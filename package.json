@@ -7,8 +7,8 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "deploy": "./scripts/deploy.sh local",
-    "deploy-final": "./scripts/deploy.sh prod"
+    "deploy": "bash ./scripts/deploy.sh local",
+    "deploy-final": "bash ./scripts/deploy.sh prod"
   },
   "keywords": [],
   "author": "",
