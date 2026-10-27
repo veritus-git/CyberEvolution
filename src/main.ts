@@ -80,6 +80,11 @@ async function bootstrap() {
   // Monitorowanie orientacji (blokada widoku pionowego na telefonach)
   setupOrientationWatcher();
 
+  // Zabezpieczenie przed menu kontekstowym i lupą powiększającą na iOS
+  window.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+  }, { passive: false });
+
   // Inicjalizacja modułu PWA i Service Workera (zgodna z HTTP i gotowa na HTTPS)
   initPWA();
 

@@ -9,6 +9,7 @@ export interface Portal {
   frames?: [HTMLImageElement, HTMLImageElement] | null;
   frameIndex?: number;
   animTimer?: number;
+  alpha?: number;
 }
 
 export interface Ladder {

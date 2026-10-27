@@ -218,6 +218,10 @@ export class Renderer {
     if (portal.frames && portal.frames.length > 0) {
       const frame = portal.frames[portal.frameIndex || 0];
       if (frame && frame.complete && frame.naturalWidth > 0) {
+        ctx.save();
+        if (portal.alpha !== undefined) {
+          ctx.globalAlpha = Math.max(0, Math.min(1, portal.alpha));
+        }
         // Portals stand tall (at least 350px tall, upright and towering, never squashed or lying flat!)
         const targetH = Math.max(rh, 350);
         const scale = targetH / frame.naturalHeight;
@@ -225,7 +229,7 @@ export class Renderer {
         const drawX = Math.round(rx + rw / 2 - targetW / 2);
         const drawY = Math.round(ry + rh - targetH);
         ctx.drawImage(frame, drawX, drawY, targetW, targetH);
-        return;
+        ctx.restore();
       }
     }
   }

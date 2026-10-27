@@ -186,6 +186,19 @@ export class InteractionDialog {
       this.advance();
     });
 
+    // Global tap/click anywhere on screen to advance dialogue
+    window.addEventListener('pointerdown', (e) => {
+      if (!this.isOpen) return;
+      if (this.isDeathMenuActive) return;
+      if (this.mode === 'quiz' && this.quizStage === 'choices') return;
+
+      const target = e.target as HTMLElement | null;
+      if (target && (target.closest('.retro-choice-btn') || target.closest('.death-menu-option') || target.closest('#btn-fullscreen') || target.closest('#sound-control-wrapper') || target.closest('.sound-popup'))) {
+        return;
+      }
+      this.advance();
+    });
+
     // Keyboard navigation
     window.addEventListener('keydown', (e) => {
       if (!this.isOpen) return;
@@ -225,6 +238,19 @@ export class InteractionDialog {
   }
 
   private swapChoices: boolean = false;
+
+  private hideChoices(): void {
+    this.choicesContainer.classList.add('hidden');
+    this.choicesContainer.style.setProperty('display', 'none', 'important');
+    this.choiceA.textContent = '';
+    this.choiceB.textContent = '';
+  }
+
+  private showChoices(): void {
+    this.choicesContainer.classList.remove('hidden');
+    this.choicesContainer.style.setProperty('display', 'flex', 'important');
+    this.renderChoices();
+  }
 
   public setPlayerEvo(evo: number): void {
     this.playerEvoLevel = Math.max(1, Math.min(5, evo));
@@ -285,7 +311,7 @@ export class InteractionDialog {
     this.playerEvoLevel = evo;
     this.onCompleteCallback = onComplete;
     this.isOpen = true;
-    this.choicesContainer.classList.add('hidden');
+    this.hideChoices();
     this.overlayElement.classList.remove('hidden');
 
     this.showConversationLine(0);
@@ -324,7 +350,7 @@ export class InteractionDialog {
     };
 
     this.isOpen = true;
-    this.choicesContainer.classList.add('hidden');
+    this.hideChoices();
     this.overlayElement.classList.remove('hidden');
 
     this.startTypewriter(text);
@@ -360,7 +386,7 @@ export class InteractionDialog {
     };
 
     this.isOpen = true;
-    this.choicesContainer.classList.add('hidden');
+    this.hideChoices();
     this.overlayElement.classList.remove('hidden');
 
     this.startTypewriter(introText);
@@ -419,7 +445,7 @@ export class InteractionDialog {
     this.quizStage = stage;
 
     if (stage === 'context') {
-      this.choicesContainer.classList.add('hidden');
+      this.hideChoices();
       const avName = (this.quizData.avatar || 'mail').toLowerCase().trim();
       const safeAvatar = encodeURIComponent(avName).replace(/%2F/g, '/');
       this.avatarImg.src = `/assets/avatars/${safeAvatar}.png`;
@@ -431,7 +457,7 @@ export class InteractionDialog {
       this.adjustBodyFontSize(this.quizData.context, false);
       this.startTypewriter(this.quizData.context);
     } else if (stage === 'sage') {
-      this.choicesContainer.classList.add('hidden');
+      this.hideChoices();
       this.avatarImg.src = '/assets/avatars/medrzec.png';
       this.speakerElement.textContent = 'Wskazówka Mędrca:';
       this.speakerElement.style.color = '#ffe6b4';
@@ -447,13 +473,13 @@ export class InteractionDialog {
         this.adjustBodyFontSize(this.quizData.context, true);
         this.bodyElement.textContent = this.quizData.context;
       }
-      this.choicesContainer.classList.remove('hidden');
+      this.showChoices();
       const isTouch = typeof window !== 'undefined' && (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
       this.hintElement.textContent = isTouch ? 'Dotknij wybranej opcji' : '↑/↓ lub 1/2 — wybór, Enter/Spacja/E — zatwierdź';
       this.isDoneTyping = true;
       document.body.classList.remove('cursor-hidden');
     } else if (stage === 'feedback') {
-      this.choicesContainer.classList.add('hidden');
+      this.hideChoices();
       const isGood = feedbackText === this.quizData.goodFeedback;
       this.avatarImg.src = '/assets/avatars/medrzec.png';
       this.speakerElement.textContent = isGood ? '✓ Poprawny wybór:' : '✗ Błędna decyzja:';
@@ -641,7 +667,7 @@ export class InteractionDialog {
     this.containerElement.classList.remove('position-center');
     this.containerElement.style.display = '';
 
-    this.choicesContainer.classList.add('hidden');
+    this.hideChoices();
     this.avatarBox.style.display = '';
     this.bodyElement.textContent = '';
     this.bodyElement.classList.remove('font-xlarge', 'font-compact', 'font-dense');

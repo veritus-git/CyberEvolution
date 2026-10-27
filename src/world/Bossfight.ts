@@ -2,6 +2,7 @@ import { CONFIG } from '../core/Constants';
 import { MaskParser } from './MaskParser';
 import { Player } from '../entities/Player';
 import { AABB } from '../physics/AABB';
+import { isMobileDevice } from '../core/Device';
 
 function shuffleArray<T>(arr: T[]): T[] {
   const result = [...arr];
@@ -108,7 +109,15 @@ export class Bossfight {
 
   public choiceBounds: { x: number; y: number; width: number; height: number }[] = [];
 
+  // Mobile Bossfight UI
+  private mobileContainer: HTMLElement | null = null;
+  private mobileQuestionEl: HTMLElement | null = null;
+  private mobileChoiceBtns: HTMLButtonElement[] = [];
+  private mobileTitleEl: HTMLElement | null = null;
+
   constructor() {
+    this.createMobileUI();
+
     // Keyboard navigation
     window.addEventListener('keydown', (e) => {
       if (!this.active || this.bossDefeated || this.isIntroActive) return;
@@ -143,7 +152,7 @@ export class Bossfight {
       if (this.state === 'feedback') return;
 
       const target = e.target as HTMLElement | null;
-      if (target && (target.tagName === 'BUTTON' || target.closest('button') || target.closest('.retro-dialog-container') || target.closest('.death-menu-overlay'))) {
+      if (target && (target.tagName === 'BUTTON' || target.closest('button') || target.closest('.retro-dialog-container') || target.closest('.death-menu-overlay') || target.closest('.mobile-bossfight-ui'))) {
         return;
       }
 
@@ -182,7 +191,110 @@ export class Bossfight {
     }, { passive: false });
   }
 
-  public isIntroActive: boolean = false;
+  private createMobileUI(): void {
+    if (typeof document === 'undefined') return;
+    const existing = document.getElementById('mobile-bossfight-ui');
+    if (existing) existing.remove();
+
+    this.mobileContainer = document.createElement('div');
+    this.mobileContainer.id = 'mobile-bossfight-ui';
+    this.mobileContainer.className = 'mobile-bossfight-ui hidden';
+
+    this.mobileContainer.innerHTML = `
+      <div class="mobile-boss-card">
+        <div class="mobile-boss-header">
+          <span class="mobile-boss-title">Walka z Bossem</span>
+        </div>
+        <div class="mobile-boss-question"></div>
+        <div class="mobile-boss-choices">
+          <button class="mobile-boss-btn" data-choice="0">
+            <span class="badge">A</span>
+            <span class="choice-text"></span>
+          </button>
+          <button class="mobile-boss-btn" data-choice="1">
+            <span class="badge">B</span>
+            <span class="choice-text"></span>
+          </button>
+          <button class="mobile-boss-btn" data-choice="2">
+            <span class="badge">C</span>
+            <span class="choice-text"></span>
+          </button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(this.mobileContainer);
+
+    this.mobileTitleEl = this.mobileContainer.querySelector('.mobile-boss-title');
+    this.mobileQuestionEl = this.mobileContainer.querySelector('.mobile-boss-question');
+    const btns = this.mobileContainer.querySelectorAll('.mobile-boss-btn');
+    this.mobileChoiceBtns = Array.from(btns) as HTMLButtonElement[];
+
+    this.mobileChoiceBtns.forEach((btn, idx) => {
+      btn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.chooseOption(idx);
+      });
+    });
+  }
+
+  public chooseOption(idx: number): void {
+    if (!this.active || this.bossDefeated || this.isIntroActive) return;
+    if (this.animState !== 'visible' || this.inputCooldownTimer > 0) return;
+    if (this.state === 'feedback') return;
+    this.selection = idx;
+    this.confirmSelection();
+  }
+
+  private updateMobileUI(): void {
+    if (!this.mobileContainer) return;
+
+    const shouldShow =
+      this.active &&
+      !this.bossDefeated &&
+      !this.isIntroActive &&
+      (this.animState === 'visible' || this.animState === 'enter') &&
+      Boolean(this.cur);
+
+    if (!shouldShow) {
+      this.mobileContainer.classList.add('hidden');
+      return;
+    }
+
+    this.mobileContainer.classList.remove('hidden');
+
+    if (this.mobileTitleEl && this.bossData) {
+      this.mobileTitleEl.textContent = this.bossData.name;
+    }
+
+    if (this.mobileQuestionEl && this.cur) {
+      this.mobileQuestionEl.textContent = this.cur.q;
+    }
+
+    this.mobileChoiceBtns.forEach((btn, idx) => {
+      const textSpan = btn.querySelector('.choice-text');
+      if (textSpan && this.optTexts[idx]) {
+        textSpan.textContent = this.optTexts[idx];
+      }
+
+      btn.classList.remove('selected', 'correct', 'wrong', 'reveal-correct');
+
+      if (this.state === 'feedback') {
+        const isGood = this.selection === this.correctIdxShuffled;
+        if (idx === this.selection) {
+          btn.classList.add(isGood ? 'correct' : 'wrong');
+        }
+        if (!isGood && idx === this.correctIdxShuffled) {
+          btn.classList.add('reveal-correct');
+        }
+      } else if (idx === this.selection) {
+        btn.classList.add('selected');
+      }
+    });
+  }
+
+  public isIntroActive: boolean = true;
 
   public async start(
     worldNum: number,
@@ -193,6 +305,8 @@ export class Bossfight {
     onWorld5Defeated?: () => void
   ): Promise<void> {
     this.worldNumber = worldNum;
+    this.isIntroActive = true;
+    this.animState = 'hidden';
     this.onVictoryCallback = onVictory;
     this.onDefeatCallback = onDefeat;
     this.onWorld5DefeatedCallback = onWorld5Defeated;
@@ -205,7 +319,6 @@ export class Bossfight {
     this.inputCooldownTimer = 0.5;
     this.scrollActive = false;
     this.bossSpawnRect = bossSpawn;
-    this.animState = 'hidden';
 
     // HP map per world number (1:1 with Python _get_boss_hp_static)
     const hpMap: Record<number, number> = { 1: 500, 2: 600, 3: 700, 4: 800, 5: 1000 };
@@ -407,6 +520,7 @@ export class Bossfight {
     this.bossDefeated = true;
     this.bossBlinkActive = false;
     this.animState = 'hidden';
+    this.updateMobileUI();
     // Slower, dramatic death blinking (1.6s total) before bursting into pixel explosion!
     this.bossDeathTimer = 1.6;
     this.bossShakeTimer = 1.6;
@@ -435,6 +549,7 @@ export class Bossfight {
 
   public triggerPlayerDefeat(): void {
     this.animState = 'hidden';
+    this.updateMobileUI();
     if (this.onDefeatCallback) {
       this.onDefeatCallback();
     }
@@ -543,6 +658,7 @@ export class Bossfight {
         }
       }
     }
+    this.updateMobileUI();
   }
 
   /**
@@ -556,8 +672,8 @@ export class Bossfight {
   public render(ctx: CanvasRenderingContext2D, cameraX: number, player: Player): void {
     if (!this.active) return;
 
-    // 1. Draw Boss Quiz Card (Canvas rendered, 1:1 with Python BossQuizRuntime)
-    if (!this.bossDefeated && this.animState !== 'hidden') {
+    // 1. Draw Boss Quiz Card (Canvas rendered on desktop, 1:1 with Python BossQuizRuntime)
+    if (!this.bossDefeated && this.animState !== 'hidden' && !isMobileDevice()) {
       this.drawQuizCard(ctx);
     }
 
@@ -583,8 +699,8 @@ export class Bossfight {
       this.drawDeathParticles(ctx, cameraX);
     }
 
-    // 4. Draw HP Bars above heads (1:1 with Python _draw_hp_bars) - ONLY when not in intro and not defeated!
-    if (!this.bossDefeated && !this.isIntroActive) {
+    // 4. Draw HP Bars above heads (1:1 with Python _draw_hp_bars) - ONLY when not in intro and quiz card active!
+    if (!this.bossDefeated && !this.isIntroActive && (this.animState === 'visible' || this.animState === 'enter')) {
       this.drawHpBars(ctx, cameraX, player);
     }
 

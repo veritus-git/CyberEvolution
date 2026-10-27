@@ -1,7 +1,7 @@
 /**
  * src/ui/VirtualJoystick.ts
- * Mobile-Native dotykowy D-Pad i przyciski akcji (Skok / Interakcja E)
- * z obsługą multi-touch, haptic feedback i czystym mapowaniem cyfrowym pod 2D platforming.
+ * Mobile-Native dotykowy D-Pad (wyłącznie Lewo / Prawo) i przyciski akcji (Skok / Interakcja E)
+ * z obsługą multi-touch, haptic feedback, podświetlaniem przycisku akcji oraz dynamicznym ukrywaniem.
  */
 
 import { isMobileDevice } from '../core/Device';
@@ -21,16 +21,12 @@ export class VirtualJoystick {
   private container: HTMLElement | null = null;
   private btnLeft: HTMLElement | null = null;
   private btnRight: HTMLElement | null = null;
-  private btnUp: HTMLElement | null = null;
-  private btnDown: HTMLElement | null = null;
   private btnJump: HTMLElement | null = null;
   private btnInteract: HTMLElement | null = null;
 
-  // Cyfrowy stan kierunków
+  // Cyfrowy stan kierunków (tylko poziomo)
   private leftHeld = false;
   private rightHeld = false;
-  private upHeld = false;
-  private downHeld = false;
 
   // Akcje
   private jumpHeld = false;
@@ -58,14 +54,9 @@ export class VirtualJoystick {
     this.container.className = `touch-controls ${this.isInteractive ? '' : 'hidden'}`;
 
     this.container.innerHTML = `
-      <div class="touch-dpad">
-        <button class="touch-btn touch-btn-up" data-dir="up" aria-label="Góra / Drabina">▲</button>
-        <div class="touch-dpad-row">
-          <button class="touch-btn touch-btn-left" data-dir="left" aria-label="W lewo">◀</button>
-          <div class="touch-dpad-center"></div>
-          <button class="touch-btn touch-btn-right" data-dir="right" aria-label="W prawo">▶</button>
-        </div>
-        <button class="touch-btn touch-btn-down" data-dir="down" aria-label="W dół / Drabina">▼</button>
+      <div class="touch-dpad touch-horizontal-only">
+        <button class="touch-btn touch-btn-left" data-dir="left" aria-label="W lewo">◀</button>
+        <button class="touch-btn touch-btn-right" data-dir="right" aria-label="W prawo">▶</button>
       </div>
 
       <div class="touch-actions">
@@ -84,15 +75,11 @@ export class VirtualJoystick {
 
     this.btnLeft = this.container.querySelector('.touch-btn-left');
     this.btnRight = this.container.querySelector('.touch-btn-right');
-    this.btnUp = this.container.querySelector('.touch-btn-up');
-    this.btnDown = this.container.querySelector('.touch-btn-down');
     this.btnJump = this.container.querySelector('.touch-btn-jump');
     this.btnInteract = this.container.querySelector('.touch-btn-interact');
 
     this.bindDirection(this.btnLeft, 'left');
     this.bindDirection(this.btnRight, 'right');
-    this.bindDirection(this.btnUp, 'up');
-    this.bindDirection(this.btnDown, 'down');
 
     this.bindAction(this.btnJump, 'jump');
     this.bindAction(this.btnInteract, 'interact');
@@ -106,7 +93,7 @@ export class VirtualJoystick {
     } catch {}
   }
 
-  private bindDirection(el: HTMLElement | null, dir: 'left' | 'right' | 'up' | 'down'): void {
+  private bindDirection(el: HTMLElement | null, dir: 'left' | 'right'): void {
     if (!el) return;
 
     const onStart = (e: PointerEvent) => {
@@ -118,8 +105,6 @@ export class VirtualJoystick {
 
       if (dir === 'left') this.leftHeld = true;
       if (dir === 'right') this.rightHeld = true;
-      if (dir === 'up') this.upHeld = true;
-      if (dir === 'down') this.downHeld = true;
     };
 
     const onEnd = (e: PointerEvent) => {
@@ -130,8 +115,6 @@ export class VirtualJoystick {
 
       if (dir === 'left') this.leftHeld = false;
       if (dir === 'right') this.rightHeld = false;
-      if (dir === 'up') this.upHeld = false;
-      if (dir === 'down') this.downHeld = false;
     };
 
     el.addEventListener('pointerdown', onStart);
@@ -175,6 +158,11 @@ export class VirtualJoystick {
     el.addEventListener('pointerleave', onEnd);
   }
 
+  public setInteractAvailable(available: boolean): void {
+    if (!this.btnInteract) return;
+    this.btnInteract.classList.toggle('active-hint', available);
+  }
+
   public setVisible(visible: boolean): void {
     if (!this.container) return;
     if (visible && this.isInteractive) {
@@ -188,16 +176,12 @@ export class VirtualJoystick {
   public resetState(): void {
     this.leftHeld = false;
     this.rightHeld = false;
-    this.upHeld = false;
-    this.downHeld = false;
     this.jumpHeld = false;
     this.jumpJustPressed = false;
     this.interactJustPressed = false;
 
     this.btnLeft?.classList.remove('active');
     this.btnRight?.classList.remove('active');
-    this.btnUp?.classList.remove('active');
-    this.btnDown?.classList.remove('active');
     this.btnJump?.classList.remove('active');
     this.btnInteract?.classList.remove('active');
   }
@@ -207,7 +191,7 @@ export class VirtualJoystick {
   }
 
   public renderOverlay(_overlayCtx: CanvasRenderingContext2D): void {
-    // Przyciski są renderowane natywnie w DOM, overlayCtx nie wymaga rysowania
+    // Przyciski są renderowane natywnie w DOM
   }
 
   public getTouchState(): TouchState {
@@ -215,13 +199,9 @@ export class VirtualJoystick {
     if (this.leftHeld) moveX -= 1;
     if (this.rightHeld) moveX += 1;
 
-    let moveY = 0;
-    if (this.upHeld) moveY -= 1;
-    if (this.downHeld) moveY += 1;
-
     const state: TouchState = {
       moveX,
-      moveY,
+      moveY: 0,
       jumpPressed: this.jumpJustPressed,
       jumpHeld: this.jumpHeld,
       interactPressed: this.interactJustPressed,

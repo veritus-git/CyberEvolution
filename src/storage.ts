@@ -194,6 +194,20 @@ export class GameStorageManager {
   }
 
   /**
+   * Resetuje stan interakcji i otwartych bramek dla wskazanego świata.
+   * Używane np. przy wybraniu "Przejdź świat jeszcze raz" po porażce z bossem.
+   */
+  public resetWorldProgress(worldKey: string): void {
+    if (this.currentState.unlockedGates) {
+      delete this.currentState.unlockedGates[worldKey];
+    }
+    if (this.currentState.activatedTriggers) {
+      delete this.currentState.activatedTriggers[worldKey];
+    }
+    this.save();
+  }
+
+  /**
    * Całkowity reset postępów gracza (Nowa gra).
    */
   public resetSave(): GameSaveData {

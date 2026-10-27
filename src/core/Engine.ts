@@ -15,6 +15,7 @@ import { AABB } from '../physics/AABB';
 import { InteractionParser, QuizData } from '../world/InteractionParser';
 import { gameStorage, GameSaveData } from '../storage';
 import { isFullscreenActive, exitGameFullscreen } from '../fullscreen';
+import { AudioManager } from '../audio/AudioManager';
 
 export class Engine {
   public canvas: HTMLCanvasElement;
@@ -96,6 +97,9 @@ export class Engine {
     this.setupStartMenu();
     this.setupPauseMenu();
 
+    // Start background soundtrack manager
+    AudioManager.getInstance();
+
     // Autozapis przy minimalizacji karty / blokadzie telefonu
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden' && !this.startMenu.isOpen && !this.isPaused) {
@@ -105,6 +109,13 @@ export class Engine {
     window.addEventListener('pagehide', () => {
       if (!this.startMenu.isOpen && !this.isPaused) {
         this.saveGameProgress();
+      }
+    });
+
+    // Nasłuchiwanie na wyjście z trybu pełnoekranowego (np. przycisk ESC w przeglądarce)
+    document.addEventListener('fullscreenchange', () => {
+      if (!isFullscreenActive() && !this.startMenu.isOpen && !this.isPaused && !this.introSequence.isActive) {
+        this.togglePause();
       }
     });
 
@@ -459,6 +470,7 @@ export class Engine {
               bounds: new AABB(centerX, arenaFloor - portalH, portalW, portalH),
               targetWorld: 'lobby',
               label: 'POWRÓT DO LOBBY',
+              alpha: 0,
             });
             this.loadPortalsForLevel(this.level, 'lobby');
             this.pendingSummaryWorld = wn;
@@ -501,6 +513,7 @@ export class Engine {
               bounds: new AABB(centerX, arenaFloor - portalH, portalW, portalH),
               targetWorld: 'ending',
               label: 'WRÓĆ DO RZECZYWISTOŚCI',
+              alpha: 0,
             });
             this.loadPortalsForLevel(this.level, 'world5_arena');
           },
@@ -531,6 +544,7 @@ export class Engine {
   private restartWorld(wn: number): void {
     this.arenaIntroSkipBossDialog = false;
     this.completedWorlds.delete(wn);
+    gameStorage.resetWorldProgress(`world${wn}`);
     this.triggerWorldTransition(`world${wn}`);
   }
 
@@ -921,6 +935,35 @@ export class Engine {
 
     // Check interaction hints and triggers
     this.checkHintsAndInteractions(rawInput.interactPressed);
+
+    // Update animated portals (two-frame vortex + alpha fade-in animation)
+    for (const portal of this.level.portals) {
+      portal.animTimer = (portal.animTimer || 0) + dt;
+      if (portal.animTimer >= 0.18) {
+        portal.animTimer = 0;
+        if (portal.frames && portal.frames.length > 0) {
+          portal.frameIndex = ((portal.frameIndex || 0) + 1) % portal.frames.length;
+        }
+      }
+      if (portal.alpha !== undefined && portal.alpha < 1) {
+        portal.alpha = Math.min(1, portal.alpha + dt * 1.25);
+      }
+    }
+
+    // Dynamic visibility and active interaction highlight on mobile touch controls
+    this.joystick.setInteractAvailable(this.activeHint !== null);
+
+    const shouldShowTouch =
+      !this.startMenu.isOpen &&
+      !this.pauseMenu.isOpen &&
+      !this.introSequence.isActive &&
+      !this.dialog.isOpen &&
+      !this.arenaIntroActive &&
+      this.transitionState === 'none' &&
+      (!this.bossfight.active || this.bossfight.bossDefeated) &&
+      !this.lobbyDropinActive;
+
+    this.joystick.setVisible(shouldShowTouch);
   }
 
   public triggerWorldTransition(targetWorld: string): void {
