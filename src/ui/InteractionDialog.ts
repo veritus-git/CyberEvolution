@@ -149,6 +149,10 @@ export class InteractionDialog {
     this.deathMenuOpt0 = document.createElement('div');
     this.deathMenuOpt0.className = 'death-menu-option selected';
     this.deathMenuOpt0.textContent = 'Walcz ponownie';
+    this.deathMenuOpt0.onmouseenter = () => {
+      this.deathMenuSelection = 0;
+      this.renderDeathMenu();
+    };
     this.deathMenuOpt0.onclick = (e) => {
       e.stopPropagation();
       this.confirmDeathMenu(0);
@@ -157,6 +161,10 @@ export class InteractionDialog {
     this.deathMenuOpt1 = document.createElement('div');
     this.deathMenuOpt1.className = 'death-menu-option';
     this.deathMenuOpt1.textContent = 'Przejdź świat jeszcze raz';
+    this.deathMenuOpt1.onmouseenter = () => {
+      this.deathMenuSelection = 1;
+      this.renderDeathMenu();
+    };
     this.deathMenuOpt1.onclick = (e) => {
       e.stopPropagation();
       this.confirmDeathMenu(1);
@@ -183,11 +191,11 @@ export class InteractionDialog {
       if (!this.isOpen) return;
 
       if (this.isDeathMenuActive) {
-        if (e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'Digit1') {
+        if (e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'ArrowLeft' || e.code === 'Digit1') {
           e.preventDefault();
           this.deathMenuSelection = 0;
           this.renderDeathMenu();
-        } else if (e.code === 'ArrowDown' || e.code === 'KeyS' || e.code === 'Digit2') {
+        } else if (e.code === 'ArrowDown' || e.code === 'KeyS' || e.code === 'ArrowRight' || e.code === 'Digit2') {
           e.preventDefault();
           this.deathMenuSelection = 1;
           this.renderDeathMenu();

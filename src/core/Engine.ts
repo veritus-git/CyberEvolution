@@ -8,11 +8,13 @@ import { Renderer } from '../graphics/Renderer';
 import { VirtualJoystick } from '../ui/VirtualJoystick';
 import { InteractionDialog, ConversationLine } from '../ui/InteractionDialog';
 import { StartMenu } from '../ui/StartMenu';
+import { PauseMenu } from '../ui/PauseMenu';
 import { IntroSequence } from '../ui/IntroSequence';
 import { Bossfight } from '../world/Bossfight';
 import { AABB } from '../physics/AABB';
 import { InteractionParser, QuizData } from '../world/InteractionParser';
 import { gameStorage, GameSaveData } from '../storage';
+import { isFullscreenActive, exitGameFullscreen } from '../fullscreen';
 
 export class Engine {
   public canvas: HTMLCanvasElement;
@@ -23,9 +25,11 @@ export class Engine {
   public level: Level;
   public dialog: InteractionDialog;
   public startMenu: StartMenu;
+  public pauseMenu: PauseMenu;
   public introSequence: IntroSequence;
   public bossfight: Bossfight;
   public joystick: VirtualJoystick;
+  public isPaused: boolean = false;
 
   // Screen-space overlay canvas for touch controls
   public overlayCanvas: HTMLCanvasElement;
@@ -86,6 +90,7 @@ export class Engine {
 
     const hasSave = gameStorage.hasSave();
     this.startMenu = new StartMenu(uiContainer, hasSave);
+    this.pauseMenu = new PauseMenu(uiContainer);
 
     // Overlay canvas for touch controls
     this.overlayCanvas = document.createElement('canvas');
@@ -101,15 +106,16 @@ export class Engine {
 
     this.setupWindowResize();
     this.setupStartMenu();
+    this.setupPauseMenu();
 
     // Autozapis przy minimalizacji karty / blokadzie telefonu
     document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'hidden' && !this.startMenu.isOpen) {
+      if (document.visibilityState === 'hidden' && !this.startMenu.isOpen && !this.isPaused) {
         this.saveGameProgress();
       }
     });
     window.addEventListener('pagehide', () => {
-      if (!this.startMenu.isOpen) {
+      if (!this.startMenu.isOpen && !this.isPaused) {
         this.saveGameProgress();
       }
     });
@@ -117,12 +123,18 @@ export class Engine {
     // Mouse cursor hiding during platforming; only show when UI needs selection
     document.body.classList.add('cursor-hidden');
     window.addEventListener('mousemove', () => {
-      if (this.startMenu.isOpen || this.dialog.isChoicesVisible) {
+      if (this.startMenu.isOpen || this.dialog.isChoicesVisible || this.pauseMenu.isOpen) {
         document.body.classList.remove('cursor-hidden');
       }
     });
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'F11' || (!this.startMenu.isOpen && !this.dialog.isChoicesVisible)) {
+      if (e.code === 'Escape') {
+        if (!this.startMenu.isOpen) {
+          e.preventDefault();
+          this.togglePause();
+        }
+      }
+      if (e.key === 'F11' || (!this.startMenu.isOpen && !this.dialog.isChoicesVisible && !this.pauseMenu.isOpen)) {
         document.body.classList.add('cursor-hidden');
       }
     });
@@ -138,13 +150,45 @@ export class Engine {
     onResize();
   }
 
+  private setupPauseMenu(): void {
+    this.pauseMenu.onResume(() => {
+      this.isPaused = false;
+    });
+
+    this.pauseMenu.onExit(() => {
+      this.isPaused = false;
+      this.saveGameProgress();
+      this.startMenu.show();
+      this.renderer.suppressLetterbox = true;
+      this.loadWorld('lobby', false);
+    });
+  }
+
+  public togglePause(): void {
+    if (this.startMenu.isOpen) return;
+
+    if (this.pauseMenu.isOpen) {
+      this.pauseMenu.hide();
+      this.isPaused = false;
+    } else {
+      // Wyjście z trybu pełnoekranowego jeśli jest włączony (wymóg ESC)
+      if (isFullscreenActive()) {
+        exitGameFullscreen().catch(() => {});
+      }
+      this.pauseMenu.show();
+      this.isPaused = true;
+    }
+  }
+
   private setupStartMenu(): void {
     this.startMenu.onSelect(async (action) => {
-      if (action === 'new_game') {
+      const hasSave = gameStorage.hasSave();
+
+      // Jeśli to pierwszy raz na danym urządzeniu (!hasSave), obie opcje (nowa gra/kontynuuj) startują od prologu!
+      if (action === 'new_game' || (action === 'continue' && !hasSave)) {
         gameStorage.resetSave();
         this.completedWorlds.clear();
         this.player.setSkin(1);
-        this.saveGameProgress();
         this.startMenu.hide();
         this.renderer.suppressLetterbox = true;
 
@@ -162,14 +206,18 @@ export class Engine {
           this.player.physics.y = save.playerY;
         }
       } else if (action === 'exit') {
-        alert('CyberEvolution — edukacyjna gra 2D o cyberbezpieczeństwie.\n\nSterowanie:\n• A / D lub strzałki — ruch\n• Spacja / W / ↑ — skok\n• E — interakcja z postaciami i wspinaczka po drabinach\n• 1..5 — zmiana skórki / ewolucji\n• F2 — podgląd hitboxów\n• F11 — pełny ekran');
+        alert('CyberEvolution — edukacyjna gra 2D o cyberbezpieczeństwie.\n\nSterowanie:\n• A / D lub strzałki — ruch\n• Spacja / W / ↑ — skok\n• E — interakcja z postaciami i wspinaczka po drabinach\n• ESC — menu pauzy\n• 1..5 — zmiana skórki / ewolucji\n• F2 — podgląd hitboxów\n• F11 — pełny ekran');
       }
     });
   }
 
   public saveGameProgress(): void {
+    // NIGDY nie nadpisujemy zapisu gry gdy otwarte jest Menu Startowe!
+    if (this.startMenu.isOpen) return;
+
     try {
-      const unlocked = { ...(gameStorage.getState().unlockedGates || {}) };
+      const currentSave = gameStorage.getState();
+      const unlocked = { ...(currentSave.unlockedGates || {}) };
       const currentUnlocked: number[] = [];
       for (const gate of this.level.gates) {
         if (!gate.locked) {
@@ -180,7 +228,7 @@ export class Engine {
         unlocked[this.level.key] = currentUnlocked;
       }
 
-      const activated = { ...(gameStorage.getState().activatedTriggers || {}) };
+      const activated = { ...(currentSave.activatedTriggers || {}) };
       const currentActivated: number[] = [];
       for (const trig of this.level.triggers) {
         if (trig.activated) {
@@ -391,7 +439,7 @@ export class Engine {
         this.playWorldIntro(currentWn, worldName);
       }
 
-      if (!isNewGameIntro) {
+      if (!isNewGameIntro && !this.startMenu.isOpen) {
         this.saveGameProgress();
       }
     } catch (e) {
@@ -721,7 +769,7 @@ export class Engine {
       }
     }
 
-    if (this.transitionState !== 'wipe_out') {
+    if (!this.isPaused && this.transitionState !== 'wipe_out') {
       const maxSubstep = 0.010;
       const substeps = Math.max(1, Math.ceil(rawDt / maxSubstep));
       const subDt = rawDt / substeps;

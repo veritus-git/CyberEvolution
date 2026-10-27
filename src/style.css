@@ -635,6 +635,36 @@ body.cursor-hidden #ui-container {
     padding: 4px 10px !important;
     font-size: 13px !important;
   }
+
+  .death-menu-panel {
+    padding: 10px 18px !important;
+    max-height: 94vh !important;
+  }
+  .death-menu-title {
+    font-size: 24px !important;
+    margin-bottom: 8px !important;
+  }
+  .death-menu-option {
+    height: 32px !important;
+    font-size: 18px !important;
+    margin: 2px auto !important;
+  }
+
+  .pause-menu-panel {
+    padding: 10px 18px !important;
+    max-height: 94vh !important;
+  }
+  .pause-menu-title {
+    font-size: 24px !important;
+    margin-bottom: 10px !important;
+  }
+  .pause-menu-options {
+    gap: 6px !important;
+  }
+  .pause-menu-option {
+    height: 34px !important;
+    font-size: 19px !important;
+  }
 }
 
 /* ==========================================================================
@@ -734,8 +764,7 @@ body.cursor-hidden #ui-container {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.75);
-  backdrop-filter: blur(4px);
+  background: rgba(0, 0, 0, 0.70);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -748,51 +777,135 @@ body.cursor-hidden #ui-container {
 }
 
 .death-menu-panel {
-  width: 580px;
+  width: 620px;
   max-width: 90vw;
-  background: rgba(16, 18, 24, 0.96);
-  border: 2px solid rgba(185, 185, 220, 0.85);
-  border-radius: 12px;
+  background: rgba(16, 18, 24, 0.90);
+  border: 2px solid rgb(185, 185, 220);
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 28px 24px;
-  gap: 16px;
-  box-shadow: 0 0 40px rgba(220, 40, 40, 0.5), inset 0 0 15px rgba(255, 60, 60, 0.15);
-  animation: dialogFadeInCenter 0.25s ease-out forwards;
+  padding: 18px 20px 20px 20px;
+  box-sizing: border-box;
+  box-shadow: none;
 }
 
 .death-menu-title {
   font-family: 'Jersey 10', 'VT323', monospace;
-  font-size: 38px;
-  color: #ffcccc;
-  text-shadow: 0 0 12px rgba(255, 60, 60, 0.85);
-  margin-bottom: 6px;
-  letter-spacing: 1.5px;
+  font-size: 32px;
+  color: rgb(255, 220, 220);
+  text-shadow: none;
+  margin: 0 0 16px 0;
+  text-align: center;
+  letter-spacing: 1px;
 }
 
 .death-menu-option {
-  width: 90%;
-  padding: 12px 18px;
+  width: calc(100% - 40px);
+  margin: 4px auto;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border-radius: 8px;
   font-family: 'Jersey 10', 'VT323', monospace;
   font-size: 24px;
-  color: #dcdcdc;
-  text-align: center;
+  color: rgb(200, 200, 200);
+  background: transparent;
+  border: none;
   cursor: pointer;
-  background: rgba(40, 42, 54, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  transition: all 0.15s ease;
+  user-select: none;
+  box-sizing: border-box;
 }
 
 .death-menu-option.selected,
 .death-menu-option:hover {
-  color: #ffffff;
-  background: rgba(70, 70, 110, 0.85);
-  border-color: #00e5ff;
-  box-shadow: 0 0 16px rgba(0, 229, 255, 0.5);
-  transform: scale(1.02);
+  color: rgb(255, 255, 255);
+  background: rgba(70, 70, 90, 0.43);
+  border: none;
+  box-shadow: none;
+  transform: none;
+}
+
+/* ==========================================================================
+   PAUSE MENU (1:1 with Pygame original)
+   ========================================================================== */
+.pause-menu-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  background: rgba(0, 0, 0, 0.63);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  pointer-events: auto;
+}
+
+.pause-menu-overlay.hidden {
+  display: none !important;
+}
+
+.pause-menu-panel {
+  width: 520px;
+  max-width: 90vw;
+  background: rgb(20, 22, 28);
+  border: 2px solid rgb(70, 72, 84);
+  border-radius: 16px;
+  padding: 20px 24px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  box-shadow: none;
+}
+
+.pause-menu-title {
+  font-family: 'Jersey 10', 'VT323', monospace;
+  font-size: 36px;
+  color: rgb(220, 220, 255);
+  margin: 0 0 22px 0;
+  text-align: center;
+  letter-spacing: 1px;
+}
+
+.pause-menu-options {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+
+.pause-menu-option {
+  width: calc(100% - 80px);
+  max-width: 440px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-family: 'Jersey 10', 'VT323', monospace;
+  font-size: 26px;
+  color: rgb(200, 200, 200);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+.pause-menu-option.selected,
+.pause-menu-option:hover {
+  color: rgb(255, 255, 255);
+  background: rgb(70, 70, 90);
+  border: none;
+  box-shadow: none;
+  transform: none;
 }
 
 /* ==========================================================================
