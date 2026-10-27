@@ -15,29 +15,43 @@
     <title>CyberEvolution — Cyberpunkowa Gra 2D</title>
     <link rel="stylesheet" href="/src/style.css" />
     <script>
+      function shouldIgnoreError(msg) {
+        if (!msg) return true;
+        var s = String(msg).toLowerCase();
+        return s.indexOf('script error') !== -1 ||
+               s.indexOf('resizeobserver') !== -1 ||
+               s.indexOf('notsupportederror') !== -1 ||
+               s.indexOf('notallowederror') !== -1 ||
+               s.indexOf('fullscreen') !== -1 ||
+               s.indexOf('orientation') !== -1;
+      }
       window.addEventListener('error', function(e) {
+        var msg = e.message || e;
+        if (shouldIgnoreError(msg)) return;
         var b = document.getElementById('error-banner');
         if (b) {
-          b.textContent = 'Błąd: ' + (e.message || e);
+          b.textContent = 'Błąd: ' + msg;
           b.classList.remove('hidden');
         }
       });
       window.addEventListener('unhandledrejection', function(e) {
+        var msg = e.reason?.message || e.reason;
+        if (shouldIgnoreError(msg)) return;
         var b = document.getElementById('error-banner');
         if (b) {
-          b.textContent = 'Błąd Promise: ' + (e.reason?.message || e.reason);
+          b.textContent = 'Błąd: ' + msg;
           b.classList.remove('hidden');
         }
       });
     </script>
   </head>
   <body>
+    <!-- Zawsze dostępny przycisk pełnego ekranu dla mobile -->
+    <button id="btn-fullscreen" class="mobile-fullscreen-btn hidden" aria-label="Pełny ekran" title="Włącz / Wyłącz pełny ekran">⛶</button>
+
     <div id="app">
       <canvas id="game-canvas"></canvas>
       <div id="ui-container">
-        <!-- Dyskretny przycisk pełnego ekranu dla mobile -->
-        <button id="btn-fullscreen" class="mobile-fullscreen-btn hidden" aria-label="Pełny ekran" title="Włącz / Wyłącz pełny ekran">⛶</button>
-
         <!-- Pasek narzędzi deweloperskich (widoczny tylko pod F2 / debug=1) -->
         <div id="mobile-top-bar" class="mobile-top-bar hidden">
           <button id="btn-switch-world" class="mobile-btn">Świat: Lobby</button>

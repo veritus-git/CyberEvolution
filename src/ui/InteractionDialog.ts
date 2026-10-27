@@ -450,7 +450,12 @@ export class InteractionDialog {
       this.avatarImg.src = '/assets/avatars/medrzec.png';
       this.speakerElement.textContent = isGood ? '✓ Poprawny wybór:' : '✗ Błędna decyzja:';
       this.speakerElement.style.color = isGood ? '#4ade80' : '#f87171';
-      this.hintElement.textContent = isGood ? 'ENTER aby przejść dalej' : 'ENTER aby spróbować ponownie';
+      const isTouch = typeof window !== 'undefined' && (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
+      if (isGood) {
+        this.hintElement.textContent = isTouch ? 'Dotknij ekranu, aby przejść dalej' : 'ENTER aby przejść dalej';
+      } else {
+        this.hintElement.textContent = isTouch ? 'Dotknij ekranu, aby spróbować ponownie' : 'ENTER aby spróbować ponownie';
+      }
       const fb = feedbackText || '';
       this.adjustBodyFontSize(fb, false);
       this.startTypewriter(fb);
@@ -556,7 +561,8 @@ export class InteractionDialog {
         this.typedChars = page.length;
         this.bodyElement.textContent = page;
         this.isDoneTyping = true;
-        this.hintElement.textContent = 'ENTER aby przejść dalej';
+        const isTouch = typeof window !== 'undefined' && (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
+        this.hintElement.textContent = isTouch ? 'Dotknij ekranu, aby przejść dalej' : 'ENTER aby przejść dalej';
       } else {
         this.bodyElement.textContent = page.substring(0, Math.floor(this.typedChars));
         this.animFrameId = requestAnimationFrame(tick);
@@ -571,7 +577,8 @@ export class InteractionDialog {
     this.typedChars = page.length;
     this.bodyElement.textContent = page;
     this.isDoneTyping = true;
-    this.hintElement.textContent = 'ENTER aby przejść dalej';
+    const isTouch = typeof window !== 'undefined' && (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
+    this.hintElement.textContent = isTouch ? 'Dotknij ekranu, aby przejść dalej' : 'ENTER aby przejść dalej';
   }
 
   private resetDeathMenu(): void {

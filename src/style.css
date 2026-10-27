@@ -117,24 +117,24 @@ html, body {
 
 /* Dyskretny przycisk pełnego ekranu dla urządzeń mobilnych */
 .mobile-fullscreen-btn {
-  position: absolute;
-  top: max(10px, env(safe-area-inset-top));
-  right: max(14px, env(safe-area-inset-right));
-  width: 44px;
-  height: 44px;
+  position: fixed !important;
+  top: max(8px, env(safe-area-inset-top));
+  right: max(10px, env(safe-area-inset-right));
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(15, 23, 42, 0.75);
-  border: 1px solid rgba(0, 229, 255, 0.45);
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(0, 229, 255, 0.6);
   color: #00e5ff;
-  border-radius: 10px;
-  font-size: 22px;
+  border-radius: 8px;
+  font-size: 20px;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(6px);
   -webkit-backdrop-filter: blur(6px);
-  z-index: 40;
+  z-index: 9999 !important;
   pointer-events: auto;
   touch-action: manipulation;
   transition: all 0.15s ease;
@@ -142,7 +142,7 @@ html, body {
 
 .mobile-fullscreen-btn:active {
   transform: scale(0.92);
-  background: rgba(0, 229, 255, 0.3);
+  background: rgba(0, 229, 255, 0.35);
 }
 
 .mobile-fullscreen-btn.hidden {
@@ -564,46 +564,76 @@ body.cursor-hidden #ui-container {
 
 /* Responsywność dla ekranów panoramicznych o niskiej wysokości (smartfony w trybie landscape) */
 @media (max-height: 520px) {
+  .start-menu-overlay {
+    background-size: contain !important;
+    background-color: #080a0e !important;
+  }
+  .start-menu-card {
+    padding: 10px 22px !important;
+    gap: 8px !important;
+    max-height: 94vh !important;
+    max-width: 360px !important;
+  }
+  .start-menu-title {
+    font-size: 24px !important;
+    letter-spacing: 1px !important;
+  }
+  .start-menu-options {
+    gap: 6px !important;
+  }
+  .start-menu-btn {
+    padding: 6px 14px !important;
+    font-size: 14px !important;
+  }
+
   .retro-dialog-container {
-    height: min(210px, 86vh) !important;
-    gap: 10px;
-    width: min(1300px, 94vw);
-  }
-  .retro-dialog-container.position-top {
-    top: max(8px, env(safe-area-inset-top)) !important;
-  }
-  .retro-dialog-container.position-bottom {
-    bottom: max(8px, env(safe-area-inset-bottom)) !important;
+    position: absolute !important;
+    left: max(10px, env(safe-area-inset-left)) !important;
+    right: max(10px, env(safe-area-inset-right)) !important;
+    width: auto !important;
+    max-width: 860px !important;
+    margin: 0 auto !important;
+    transform: none !important;
+    top: auto !important;
+    bottom: max(6px, env(safe-area-inset-bottom)) !important;
+    height: min(130px, 46vh) !important;
+    gap: 8px !important;
   }
   .retro-avatar-box {
-    width: 140px !important;
+    width: 90px !important;
     height: 100% !important;
-    padding: 6px;
+    padding: 4px !important;
+    flex-shrink: 0 !important;
   }
   .retro-panel-box {
     height: 100% !important;
-    padding: 8px 16px !important;
-    gap: 4px;
+    padding: 6px 12px !important;
+    gap: 2px !important;
+    overflow-y: auto !important;
   }
   .retro-dialog-title {
-    font-size: 15px !important;
-    margin-bottom: 2px !important;
+    font-size: 12px !important;
+    margin-bottom: 1px !important;
   }
   .retro-dialog-speaker {
-    font-size: 14px !important;
-    margin-bottom: 4px !important;
+    font-size: 12px !important;
+    margin-bottom: 2px !important;
   }
   .retro-dialog-body {
-    font-size: clamp(14px, 2.2vw, 17px) !important;
-    line-height: 1.35 !important;
+    font-size: clamp(12px, 1.7vw, 15px) !important;
+    line-height: 1.25 !important;
+  }
+  .retro-dialog-hint {
+    font-size: 11px !important;
+    padding-top: 1px !important;
   }
   .retro-dialog-choices {
-    gap: 6px !important;
-    margin-top: 4px !important;
+    gap: 4px !important;
+    margin-top: 2px !important;
   }
   .retro-choice-btn {
-    padding: 6px 12px !important;
-    font-size: 14px !important;
+    padding: 4px 10px !important;
+    font-size: 13px !important;
   }
 }
 
@@ -840,6 +870,86 @@ body.cursor-hidden #ui-container {
   line-height: 1.5;
   margin: 0;
 }
+
+/* ==========================================================================
+   PWA INSTALL MODAL (iOS & Desktop custom prompt)
+   ========================================================================== */
+.pwa-modal-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  background: rgba(4, 6, 12, 0.88);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+.pwa-modal-overlay.hidden {
+  display: none !important;
+}
+
+.pwa-modal-card {
+  background: #0f172a;
+  border: 2px solid #00e5ff;
+  border-radius: 14px;
+  padding: 24px 28px;
+  max-width: 480px;
+  width: 90%;
+  box-shadow: 0 10px 40px rgba(0, 229, 255, 0.35);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  color: #ffffff;
+  text-align: left;
+  animation: dialogFadeInCenter 0.25s ease-out forwards;
+}
+
+.pwa-modal-title {
+  font-family: 'Jersey 10', 'VT323', monospace;
+  font-size: 26px;
+  color: #00e5ff;
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+  margin: 0;
+}
+
+.pwa-modal-body {
+  font-size: 15px;
+  line-height: 1.6;
+  color: #e2e8f0;
+  white-space: pre-line;
+}
+
+.pwa-modal-body strong {
+  color: #00e5ff;
+}
+
+.pwa-modal-btn {
+  align-self: flex-end;
+  background: #00e5ff;
+  color: #020617;
+  border: none;
+  font-family: inherit;
+  font-weight: bold;
+  padding: 10px 22px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.15s ease;
+}
+
+.pwa-modal-btn:hover,
+.pwa-modal-btn:active {
+  background: #38bdf8;
+  transform: scale(0.97);
+}
+
 
 
 

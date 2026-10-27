@@ -1,31 +1,51 @@
 /**
  * public/sw.js
- * Minimalny, odporny Service Worker dla CyberEvolution.
- * Używa strategii Network-First: pobiera zawsze najświeższe pliki z serwera,
- * a w razie braku sieci sięga do pamięci podręcznej (offline support).
+ * Service Worker dla CyberEvolution z pre-cachingiem pod instalowalność PWA w Brave/Chrome.
  */
 
-const CACHE_NAME = 'cyberevolution-v1';
+const CACHE_NAME = 'cyberevolution-v2';
+const STATIC_ASSETS = [
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/icon-192.png',
+  '/icon-512.png',
+];
 
-self.addEventListener('install', () => {
+self.addEventListener('install', (event) => {
   self.skipWaiting();
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(STATIC_ASSETS).catch((err) => {
+        console.warn('[SW] Błąd pre-cache zasobów:', err);
+      });
+    })
+  );
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
+        })
+      );
+    }).then(() => self.clients.claim())
+  );
 });
 
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
-  // Ignorujemy zapytania o schemacie innym niż http/https (np. chrome-extension:)
   const url = new URL(event.request.url);
   if (!url.protocol.startsWith('http')) return;
 
   event.respondWith(
     fetch(event.request)
       .then((networkResponse) => {
-        // Klonujemy odpowiedź sieciową do pamięci podręcznej w tle
         if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
           const responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME).then((cache) => {
@@ -35,7 +55,6 @@ self.addEventListener('fetch', (event) => {
         return networkResponse;
       })
       .catch(() => {
-        // Fallback offline z cache
         return caches.match(event.request).then((cachedResponse) => {
           if (cachedResponse) return cachedResponse;
           if (event.request.mode === 'navigate') {

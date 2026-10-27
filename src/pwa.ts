@@ -1,7 +1,6 @@
 /**
  * src/pwa.ts
- * Obsługa instalacji PWA, rejestracji Service Workera i promptów instalacyjnych.
- * Bezpiecznie ignoruje brak HTTPS na HTTP bez błędów w konsoli.
+ * Obsługa instalacji PWA, rejestracji Service Workera i modalów instalacyjnych na telefonach.
  */
 
 import { isIOS, isStandaloneApp } from './core/Device';
@@ -22,66 +21,117 @@ declare global {
 }
 
 let deferredInstallPrompt: BeforeInstallPromptEvent | null = null;
+let pwaInitialized = false;
 
-/**
- * Inicjalizuje Service Workera oraz obsługę przycisku instalacji PWA.
- */
-export function initPWA(
-  installButton: HTMLElement | null,
-  iosHintElement?: HTMLElement | null
-): void {
-  // 1. Bezpieczna rejestracja Service Workera (wymaga HTTPS lub localhost)
+// Rejestracja Service Workera natychmiast, bez czekania na minione zdarzenie load
+function registerServiceWorker(): void {
   const isSecure = typeof window !== 'undefined' && (window.isSecureContext || window.location.hostname === 'localhost');
   if ('serviceWorker' in navigator && isSecure) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker
-        .register('/sw.js')
-        .then(() => console.log('[PWA] Service Worker zarejestrowany pomyślnie.'))
-        .catch((err) => console.warn('[PWA] Błąd rejestracji SW:', err));
-    });
-  } else {
-    console.log('[PWA] Połączenie nie jest bezpiecznym kontekstem HTTPS - rejestracja SW i prompt PWA będą aktywne po wdrożeniu certyfikatu SSL.');
+    navigator.serviceWorker
+      .register('/sw.js')
+      .then((reg) => console.log('[PWA] Service Worker aktywny w zasięgu:', reg.scope))
+      .catch((err) => console.warn('[PWA] Błąd rejestracji SW:', err));
   }
+}
 
-  // Jeśli gra jest już uruchomiona jako aplikacja z pulpitu, ukrywamy elementy instalacji
-  if (isStandaloneApp()) {
-    installButton?.classList.add('hidden');
-    iosHintElement?.classList.add('hidden');
-    return;
+if (typeof window !== 'undefined') {
+  registerServiceWorker();
+  if (document.readyState !== 'complete') {
+    window.addEventListener('load', registerServiceWorker);
   }
+}
 
-  // 2. Obsługa iOS (Safari nie wspiera beforeinstallprompt - pokazujemy wskazówkę)
-  if (isIOS() && iosHintElement) {
-    iosHintElement.classList.remove('hidden');
-  }
-
-  // 3. Przechwycenie zdarzenia instalacji na Androidzie / Desktopie
+// Przechwycenie zdarzenia instalacji na Chromium (Brave / Chrome / Edge / Android)
+if (typeof window !== 'undefined') {
   window.addEventListener('beforeinstallprompt', (e: BeforeInstallPromptEvent) => {
     e.preventDefault();
     deferredInstallPrompt = e;
+    console.log('[PWA] Przechwycono zdarzenie beforeinstallprompt - aplikacja gotowa do instalacji!');
+  });
+}
 
-    if (installButton) {
-      installButton.classList.remove('hidden');
+/**
+ * Wywołuje proces instalacji PWA:
+ * - Na Chromium otwiera natywne okienko "Zainstaluj aplikację"
+ * - Na iOS wyświetla ilustrowany modal z instrukcją "Dodaj do ekranu początkowego"
+ */
+export async function promptPWAInstall(): Promise<'accepted' | 'dismissed' | 'ios' | 'already_installed' | 'manual'> {
+  if (isStandaloneApp()) {
+    showPwaModal('Aplikacja zainstalowana', 'Gra CyberEvolution jest już uruchomiona jako zainstalowana aplikacja na Twoim urządzeniu.');
+    return 'already_installed';
+  }
+
+  // 1. Jeśli przeglądarka udostępniła natywny prompt (Android / Chrome / Brave Desktop)
+  if (deferredInstallPrompt) {
+    try {
+      await deferredInstallPrompt.prompt();
+      const choice = await deferredInstallPrompt.userChoice;
+      deferredInstallPrompt = null;
+      return choice.outcome;
+    } catch {
+      // Fallback do modala w razie błędu
     }
-  });
+  }
 
-  // 4. Obsługa kliknięcia w przycisk "Zainstaluj grę"
-  installButton?.addEventListener('click', async () => {
-    if (!deferredInstallPrompt) return;
+  // 2. Jeśli to iPhone / iPad (iOS Safari / Brave)
+  if (isIOS()) {
+    showPwaModal(
+      'Instalacja na iPhonie / iPadzie',
+      `Aby grać w pełnym ekranie bez pasków przeglądarki:
+1. Stuknij ikonę <strong>Udostępnij</strong> ⎋ (lub menu z trzema kropkami <strong>...</strong>).
+2. Z listy wybierz <strong>„Dodaj do ekranu początkowego” ⊞</strong>.
+3. Kliknij <strong>„Dodaj”</strong> w prawym górnym rogu.
 
-    await deferredInstallPrompt.prompt();
-    const { outcome } = await deferredInstallPrompt.userChoice;
-    console.log(`[PWA] Wybór gracza: ${outcome}`);
+Gra pojawi się na Twoim pulpicie jako natywna aplikacja!`
+    );
+    return 'ios';
+  }
 
-    deferredInstallPrompt = null;
-    installButton.classList.add('hidden');
-  });
+  // 3. Fallback dla przeglądarek desktopowych / innych
+  showPwaModal(
+    'Zainstaluj aplikację CyberEvolution',
+    `Kliknij ikonę <strong>Zainstaluj aplikację 📲</strong> na pasku adresu przeglądarki (po prawej stronie obok paska adresu URL), aby zainstalować grę na swoim komputerze lub telefonie.`
+  );
+  return 'manual';
+}
 
-  // 5. Ukrycie przycisku po instalacji
-  window.addEventListener('appinstalled', () => {
-    console.log('[PWA] Gra CyberEvolution została zainstalowana na urządzeniu!');
-    deferredInstallPrompt = null;
-    installButton?.classList.add('hidden');
-    iosHintElement?.classList.add('hidden');
-  });
+/**
+ * Wyświetla elegancki cyberpunkowy modal z instrukcją instalacji.
+ */
+export function showPwaModal(title: string, messageHtml: string): void {
+  let modal = document.getElementById('pwa-install-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'pwa-install-modal';
+    modal.className = 'pwa-modal-overlay';
+    modal.innerHTML = `
+      <div class="pwa-modal-card">
+        <h3 id="pwa-modal-title" class="pwa-modal-title"></h3>
+        <div id="pwa-modal-body" class="pwa-modal-body"></div>
+        <button id="pwa-modal-close" class="pwa-modal-btn">Rozumiem</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    const closeBtn = modal.querySelector('#pwa-modal-close');
+    closeBtn?.addEventListener('click', () => {
+      modal?.classList.add('hidden');
+    });
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal?.classList.add('hidden');
+    });
+  }
+
+  const titleEl = modal.querySelector('#pwa-modal-title');
+  const bodyEl = modal.querySelector('#pwa-modal-body');
+  if (titleEl) titleEl.textContent = title;
+  if (bodyEl) bodyEl.innerHTML = messageHtml;
+
+  modal.classList.remove('hidden');
+}
+
+export function initPWA(): void {
+  if (pwaInitialized) return;
+  pwaInitialized = true;
+  registerServiceWorker();
 }

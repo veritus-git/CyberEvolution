@@ -1,11 +1,27 @@
 import './style.css';
 import { Engine } from './core/Engine';
 import { isMobileDevice, isPortrait } from './core/Device';
-import { toggleGameFullscreen, requestGameFullscreen } from './fullscreen';
+import { toggleGameFullscreen } from './fullscreen';
 import { gameStorage } from './storage';
 import { initPWA } from './pwa';
 
+function shouldIgnoreError(msg: unknown): boolean {
+  if (!msg) return true;
+  const s = String(msg).toLowerCase();
+  return (
+    s.includes('script error') ||
+    s.includes('resizeobserver') ||
+    s.includes('notsupportederror') ||
+    s.includes('notallowederror') ||
+    s.includes('fullscreen') ||
+    s.includes('orientation') ||
+    s.includes('failed') ||
+    s.includes('user denied')
+  );
+}
+
 function showError(msg: string) {
+  if (shouldIgnoreError(msg)) return;
   const banner = document.getElementById('error-banner');
   if (banner) {
     banner.textContent = msg;
@@ -16,10 +32,13 @@ function showError(msg: string) {
 }
 
 window.addEventListener('error', (e) => {
+  if (shouldIgnoreError(e.message || e)) return;
   showError(`Runtime error: ${e.message}`);
 });
 window.addEventListener('unhandledrejection', (e) => {
-  showError(`Async error: ${e.reason?.message || e.reason}`);
+  const reason = e.reason?.message || e.reason;
+  if (shouldIgnoreError(reason)) return;
+  showError(`Async error: ${reason}`);
 });
 
 function setupOrientationWatcher() {
@@ -62,7 +81,7 @@ async function bootstrap() {
   setupOrientationWatcher();
 
   // Inicjalizacja modułu PWA i Service Workera (zgodna z HTTP i gotowa na HTTPS)
-  initPWA(null, null);
+  initPWA();
 
   // Prośba o ochronę zapisu gry przed czyszczeniem pamięci (Persistent Storage API)
   gameStorage.requestPersistentStorage().catch(() => {});
@@ -85,7 +104,8 @@ async function bootstrap() {
   await engine.init(initialWorld);
 
   // Obsługa przełączania pełnego ekranu
-  fullscreenBtn?.addEventListener('click', async () => {
+  fullscreenBtn?.addEventListener('click', async (e) => {
+    e.stopPropagation();
     await toggleGameFullscreen('landscape');
   });
 
@@ -99,15 +119,6 @@ async function bootstrap() {
       toggleGameFullscreen('landscape');
     }
   });
-
-  // Przełączanie w pełny ekran przy rozpoczęciu gry na telefonie
-  if (isMobile) {
-    canvas.addEventListener('click', () => {
-      if (!engine.startMenu.isOpen) {
-        requestGameFullscreen('landscape').catch(() => {});
-      }
-    }, { once: true });
-  }
 
   // World switching (dev button)
   worldBtn?.addEventListener('click', () => {

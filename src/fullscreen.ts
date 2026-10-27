@@ -1,8 +1,11 @@
 /**
  * src/fullscreen.ts
  * Kompleksowa obsługa Fullscreen API oraz blokady orientacji ekranu (Screen Orientation API).
- * Działa na połączeniach HTTPS oraz HTTP, z obsługą prefiksów WebKit dla starszych urządzeń.
+ * Działa na połączeniach HTTPS oraz HTTP, z obsługą prefiksów WebKit i bezpiecznym fallbackiem na iOS.
  */
+
+import { isIOS } from './core/Device';
+import { promptPWAInstall } from './pwa';
 
 interface FullscreenElement extends HTMLElement {
   webkitRequestFullscreen?: (options?: FullscreenOptions) => Promise<void>;
@@ -40,6 +43,15 @@ export async function requestGameFullscreen(
   lockOrientation: OrientationLockType = 'landscape'
 ): Promise<boolean> {
   if (typeof document === 'undefined') return false;
+
+  // Na iPhone przeglądarka Safari/Brave nie wspiera requestFullscreen na elementach DOM
+  if (isIOS()) {
+    try {
+      window.scrollTo(0, 1);
+    } catch {}
+    return true;
+  }
+
   const elem = document.documentElement as FullscreenElement;
 
   try {
@@ -58,13 +70,13 @@ export async function requestGameFullscreen(
           lockOrientation
         );
       } catch {
-        // Ignorujemy brak wsparcia lub odrzucenie blokady na iOS/desktopie
+        // Ignorujemy brak wsparcia
       }
     }
 
     return true;
   } catch (err) {
-    console.warn('[Fullscreen] Nie udało się włączyć pełnego ekranu:', err);
+    console.warn('[Fullscreen] Informacja:', err);
     return false;
   }
 }
@@ -88,10 +100,17 @@ export async function exitGameFullscreen(): Promise<void> {
 
 /**
  * Przełącza tryb pełnoekranowy (włącz / wyłącz).
+ * Na iPhone wyświetla wskazówkę dodania do ekranu początkowego PWA.
  */
 export async function toggleGameFullscreen(
   lockOrientation: OrientationLockType = 'landscape'
 ): Promise<void> {
+  if (isIOS()) {
+    // Na iOS pełny ekran bez pasków przeglądarki uzyskuje się przez dodanie PWA do pulpitu
+    promptPWAInstall().catch(() => {});
+    return;
+  }
+
   if (isFullscreenActive()) {
     await exitGameFullscreen();
   } else {

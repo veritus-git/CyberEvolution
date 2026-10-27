@@ -137,10 +137,17 @@ export class IntroSequence {
   }
 
   private updateHint(): void {
+    const isTouch = typeof window !== 'undefined' && (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
     const isLast = this.currentPageIndex >= this.pages.length - 1;
-    this.hintElement.textContent = isLast
-      ? 'Kliknij dowolny klawisz, aby rozpocząć'
-      : 'Kliknij Enter aby przejść dalej';
+    if (isTouch) {
+      this.hintElement.textContent = isLast
+        ? 'Dotknij ekranu, aby rozpocząć'
+        : 'Dotknij ekranu, aby przejść dalej';
+    } else {
+      this.hintElement.textContent = isLast
+        ? 'Kliknij dowolny klawisz, aby rozpocząć'
+        : 'Kliknij Enter aby przejść dalej';
+    }
   }
 
   private advance(): void {

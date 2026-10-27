@@ -1,4 +1,7 @@
 import { gameStorage } from '../storage';
+import { promptPWAInstall } from '../pwa';
+
+export type StartMenuAction = 'new_game' | 'continue' | 'install' | 'exit';
 
 export class StartMenu {
   public isOpen: boolean = true;
@@ -22,9 +25,10 @@ export class StartMenu {
     this.titleElement.textContent = 'CyberEvolution';
     this.menuBox.appendChild(this.titleElement);
 
-    const labels: Array<{ label: string; action: 'new_game' | 'continue' | 'exit' }> = [
+    const labels: Array<{ label: string; action: StartMenuAction }> = [
       { label: 'Nowa gra', action: 'new_game' },
       { label: this.getContinueLabel(hasSave), action: 'continue' },
+      { label: '📲 Zainstaluj grę', action: 'install' },
       { label: 'Informacje o grze', action: 'exit' },
     ];
 
@@ -65,7 +69,7 @@ export class StartMenu {
         this.updateSelection();
       } else if (e.code === 'Enter' || e.code === 'Space' || e.code === 'KeyE') {
         e.preventDefault();
-        const actions: Array<'new_game' | 'continue' | 'exit'> = ['new_game', 'continue', 'exit'];
+        const actions: StartMenuAction[] = ['new_game', 'continue', 'install', 'exit'];
         this.triggerAction(actions[this.selectedIndex]);
       }
     });
@@ -107,7 +111,11 @@ export class StartMenu {
     });
   }
 
-  private triggerAction(action: 'new_game' | 'continue' | 'exit'): void {
+  private triggerAction(action: StartMenuAction): void {
+    if (action === 'install') {
+      promptPWAInstall().catch(() => {});
+      return;
+    }
     if (this.onSelectCallback) {
       this.onSelectCallback(action);
     }
