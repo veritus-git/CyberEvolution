@@ -115,14 +115,48 @@ html, body {
   z-index: 10;
 }
 
-/* Mobile top bar */
+/* Dyskretny przycisk pełnego ekranu dla urządzeń mobilnych */
+.mobile-fullscreen-btn {
+  position: absolute;
+  top: max(10px, env(safe-area-inset-top));
+  right: max(14px, env(safe-area-inset-right));
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(0, 229, 255, 0.45);
+  color: #00e5ff;
+  border-radius: 10px;
+  font-size: 22px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 40;
+  pointer-events: auto;
+  touch-action: manipulation;
+  transition: all 0.15s ease;
+}
+
+.mobile-fullscreen-btn:active {
+  transform: scale(0.92);
+  background: rgba(0, 229, 255, 0.3);
+}
+
+.mobile-fullscreen-btn.hidden {
+  display: none !important;
+}
+
+/* Mobile top bar (deweloperski panel pod F2) */
 .mobile-top-bar {
   position: absolute;
-  top: 10px;
-  right: 14px;
+  top: max(10px, env(safe-area-inset-top));
+  right: max(68px, calc(env(safe-area-inset-right) + 54px));
   display: flex;
   gap: 8px;
-  z-index: 20;
+  z-index: 35;
   pointer-events: auto;
 }
 
@@ -519,12 +553,57 @@ body.cursor-hidden #ui-container {
 @media (max-width: 680px) {
   .retro-dialog-container {
     flex-direction: column;
-    max-height: 80vh;
+    max-height: 85vh;
   }
   .retro-avatar-box {
-    width: 140px;
-    height: 140px;
+    width: 120px;
+    height: 120px;
     align-self: center;
+  }
+}
+
+/* Responsywność dla ekranów panoramicznych o niskiej wysokości (smartfony w trybie landscape) */
+@media (max-height: 520px) {
+  .retro-dialog-container {
+    height: min(210px, 86vh) !important;
+    gap: 10px;
+    width: min(1300px, 94vw);
+  }
+  .retro-dialog-container.position-top {
+    top: max(8px, env(safe-area-inset-top)) !important;
+  }
+  .retro-dialog-container.position-bottom {
+    bottom: max(8px, env(safe-area-inset-bottom)) !important;
+  }
+  .retro-avatar-box {
+    width: 140px !important;
+    height: 100% !important;
+    padding: 6px;
+  }
+  .retro-panel-box {
+    height: 100% !important;
+    padding: 8px 16px !important;
+    gap: 4px;
+  }
+  .retro-dialog-title {
+    font-size: 15px !important;
+    margin-bottom: 2px !important;
+  }
+  .retro-dialog-speaker {
+    font-size: 14px !important;
+    margin-bottom: 4px !important;
+  }
+  .retro-dialog-body {
+    font-size: clamp(14px, 2.2vw, 17px) !important;
+    line-height: 1.35 !important;
+  }
+  .retro-dialog-choices {
+    gap: 6px !important;
+    margin-top: 4px !important;
+  }
+  .retro-choice-btn {
+    padding: 6px 12px !important;
+    font-size: 14px !important;
   }
 }
 
@@ -685,5 +764,82 @@ body.cursor-hidden #ui-container {
   box-shadow: 0 0 16px rgba(0, 229, 255, 0.5);
   transform: scale(1.02);
 }
+
+/* ==========================================================================
+   ROTATE DEVICE OVERLAY (Portrait mode blocker on mobile)
+   ========================================================================== */
+.rotate-device-overlay {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  background: #07090e;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+}
+
+.rotate-device-overlay.hidden {
+  display: none !important;
+}
+
+.rotate-device-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 18px;
+  max-width: 380px;
+}
+
+.rotate-device-phone-animation {
+  width: 52px;
+  height: 84px;
+  border: 3px solid #00e5ff;
+  border-radius: 10px;
+  position: relative;
+  box-shadow: 0 0 20px rgba(0, 229, 255, 0.45);
+  animation: phoneRotateAnim 2.4s ease-in-out infinite alternate;
+}
+
+.phone-screen {
+  position: absolute;
+  top: 6px;
+  left: 4px;
+  right: 4px;
+  bottom: 8px;
+  background: rgba(0, 229, 255, 0.15);
+  border-radius: 4px;
+}
+
+@keyframes phoneRotateAnim {
+  0%, 25% {
+    transform: rotate(0deg);
+  }
+  75%, 100% {
+    transform: rotate(90deg);
+  }
+}
+
+.rotate-device-title {
+  font-family: 'Jersey 10', 'VT323', monospace;
+  font-size: 28px;
+  color: #00e5ff;
+  text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+.rotate-device-desc {
+  font-size: 15px;
+  color: #b9b9dc;
+  line-height: 1.5;
+  margin: 0;
+}
+
 
 

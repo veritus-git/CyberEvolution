@@ -1,3 +1,5 @@
+import { gameStorage } from '../storage';
+
 export class StartMenu {
   public isOpen: boolean = true;
   public selectedIndex: number = 0;
@@ -22,7 +24,7 @@ export class StartMenu {
 
     const labels: Array<{ label: string; action: 'new_game' | 'continue' | 'exit' }> = [
       { label: 'Nowa gra', action: 'new_game' },
-      { label: hasSave ? 'Kontynuuj' : 'Kontynuuj (brak zapisu)', action: 'continue' },
+      { label: this.getContinueLabel(hasSave), action: 'continue' },
       { label: 'Informacje o grze', action: 'exit' },
     ];
 
@@ -69,9 +71,29 @@ export class StartMenu {
     });
   }
 
+  private getContinueLabel(hasSave: boolean): string {
+    if (!hasSave) return 'Kontynuuj (brak zapisu)';
+    const save = gameStorage.getState();
+    const worldNames: Record<string, string> = {
+      lobby: 'Lobby',
+      world1: 'Świat 1',
+      world1_arena: 'Arena 1',
+      world2: 'Świat 2',
+      world2_arena: 'Arena 2',
+      world3: 'Świat 3',
+      world3_arena: 'Arena 3',
+      world4: 'Świat 4',
+      world4_arena: 'Arena 4',
+      world5: 'Świat 5',
+      world5_arena: 'Arena 5',
+    };
+    const w = worldNames[save.currentWorld] || save.currentWorld;
+    return `Kontynuuj (${w}, Ewolucja ${save.playerSkin || 1})`;
+  }
+
   public setHasSave(hasSave: boolean): void {
     if (this.options[1]) {
-      this.options[1].textContent = hasSave ? 'Kontynuuj' : 'Kontynuuj (brak zapisu)';
+      this.options[1].textContent = this.getContinueLabel(hasSave);
     }
   }
 
@@ -95,6 +117,7 @@ export class StartMenu {
     this.isOpen = true;
     this.overlayElement.classList.remove('hidden');
     this.selectedIndex = 0;
+    this.setHasSave(gameStorage.hasSave());
     this.updateSelection();
   }
 

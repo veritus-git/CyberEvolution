@@ -12,6 +12,7 @@ import { IntroSequence } from '../ui/IntroSequence';
 import { Bossfight } from '../world/Bossfight';
 import { AABB } from '../physics/AABB';
 import { InteractionParser, QuizData } from '../world/InteractionParser';
+import { gameStorage, GameSaveData } from '../storage';
 
 export class Engine {
   public canvas: HTMLCanvasElement;
@@ -83,7 +84,7 @@ export class Engine {
     this.introSequence = new IntroSequence(uiContainer);
     this.bossfight = new Bossfight();
 
-    const hasSave = Boolean(localStorage.getItem('cyberevo_save'));
+    const hasSave = gameStorage.hasSave();
     this.startMenu = new StartMenu(uiContainer, hasSave);
 
     // Overlay canvas for touch controls
@@ -100,6 +101,18 @@ export class Engine {
 
     this.setupWindowResize();
     this.setupStartMenu();
+
+    // Autozapis przy minimalizacji karty / blokadzie telefonu
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden' && !this.startMenu.isOpen) {
+        this.saveGameProgress();
+      }
+    });
+    window.addEventListener('pagehide', () => {
+      if (!this.startMenu.isOpen) {
+        this.saveGameProgress();
+      }
+    });
 
     // Mouse cursor hiding during platforming; only show when UI needs selection
     document.body.classList.add('cursor-hidden');
@@ -126,8 +139,9 @@ export class Engine {
   }
 
   private setupStartMenu(): void {
-    this.startMenu.onSelect((action) => {
+    this.startMenu.onSelect(async (action) => {
       if (action === 'new_game') {
+        gameStorage.resetSave();
         this.completedWorlds.clear();
         this.player.setSkin(1);
         this.saveGameProgress();
@@ -138,10 +152,15 @@ export class Engine {
           this.loadWorld('lobby', true);
         });
       } else if (action === 'continue') {
-        this.loadGameProgress();
+        const save = this.loadGameProgress();
         this.startMenu.hide();
         this.renderer.suppressLetterbox = true;
-        this.loadWorld('lobby', false);
+        const targetWorld = save.currentWorld || 'lobby';
+        await this.loadWorld(targetWorld, false);
+        if (targetWorld !== 'lobby' && typeof save.playerX === 'number' && typeof save.playerY === 'number') {
+          this.player.physics.x = save.playerX;
+          this.player.physics.y = save.playerY;
+        }
       } else if (action === 'exit') {
         alert('CyberEvolution — edukacyjna gra 2D o cyberbezpieczeństwie.\n\nSterowanie:\n• A / D lub strzałki — ruch\n• Spacja / W / ↑ — skok\n• E — interakcja z postaciami i wspinaczka po drabinach\n• 1..5 — zmiana skórki / ewolucji\n• F2 — podgląd hitboxów\n• F11 — pełny ekran');
       }
@@ -150,30 +169,52 @@ export class Engine {
 
   public saveGameProgress(): void {
     try {
-      const data = {
-        evo: this.player.skinId,
-        completed: Array.from(this.completedWorlds),
-      };
-      localStorage.setItem('cyberevo_save', JSON.stringify(data));
+      const unlocked = { ...(gameStorage.getState().unlockedGates || {}) };
+      const currentUnlocked: number[] = [];
+      for (const gate of this.level.gates) {
+        if (!gate.locked) {
+          currentUnlocked.push(gate.id);
+        }
+      }
+      if (currentUnlocked.length > 0) {
+        unlocked[this.level.key] = currentUnlocked;
+      }
+
+      const activated = { ...(gameStorage.getState().activatedTriggers || {}) };
+      const currentActivated: number[] = [];
+      for (const trig of this.level.triggers) {
+        if (trig.activated) {
+          currentActivated.push(trig.id);
+        }
+      }
+      if (currentActivated.length > 0) {
+        activated[this.level.key] = currentActivated;
+      }
+
+      gameStorage.save({
+        currentWorld: this.level.key,
+        playerSkin: this.player.skinId,
+        playerX: Math.round(this.player.physics.x),
+        playerY: Math.round(this.player.physics.y),
+        completedWorlds: Array.from(this.completedWorlds),
+        unlockedGates: unlocked,
+        activatedTriggers: activated,
+      });
       this.startMenu.setHasSave(true);
-    } catch {
-      // Ignore
+    } catch (e) {
+      console.warn('Save game error:', e);
     }
   }
 
-  public loadGameProgress(): void {
-    try {
-      const raw = localStorage.getItem('cyberevo_save');
-      if (raw) {
-        const data = JSON.parse(raw);
-        if (data.evo) this.player.setSkin(data.evo);
-        if (Array.isArray(data.completed)) {
-          this.completedWorlds = new Set(data.completed);
-        }
-      }
-    } catch {
-      // Ignore
+  public loadGameProgress(): GameSaveData {
+    const save = gameStorage.getState();
+    if (save.playerSkin) {
+      this.player.setSkin(save.playerSkin);
     }
+    if (Array.isArray(save.completedWorlds)) {
+      this.completedWorlds = new Set(save.completedWorlds);
+    }
+    return save;
   }
 
   public async init(initialWorld: string = 'lobby'): Promise<void> {
@@ -287,6 +328,17 @@ export class Engine {
       // Atomically swap the level and place player with zero flicker!
       this.level = newLevel;
 
+      // Restore unlocked gates and activated triggers from persistent storage
+      const savedGates = gameStorage.getState().unlockedGates[worldKey] || [];
+      for (const gId of savedGates) {
+        newLevel.openGate(gId);
+      }
+      const savedTrigs = gameStorage.getState().activatedTriggers[worldKey] || [];
+      for (const tId of savedTrigs) {
+        const trig = newLevel.triggers.find((t) => t.id === tId);
+        if (trig) trig.activated = true;
+      }
+
       // Spawn positioning
       if (isArena && currentWn !== null) {
         // Arena entrance intro: compute floor ground level so player's feet are exactly on ground
@@ -337,6 +389,10 @@ export class Engine {
         // Lobby dialog will trigger smoothly upon landing from drop-in!
       } else if (currentWn !== null) {
         this.playWorldIntro(currentWn, worldName);
+      }
+
+      if (!isNewGameIntro) {
+        this.saveGameProgress();
       }
     } catch (e) {
       console.error(`Failed to load world "${worldKey}":`, e);
@@ -940,6 +996,9 @@ export class Engine {
             this.solidsNeedRefresh = true;
             const trig = this.level.triggers.find((t) => t.id === triggerId);
             if (trig) trig.activated = true;
+            gameStorage.markGateUnlocked(this.level.key, triggerId);
+            gameStorage.markTriggerActivated(this.level.key, triggerId);
+            this.saveGameProgress();
           },
         },
         this.player.skinId,
@@ -965,6 +1024,9 @@ export class Engine {
           this.solidsNeedRefresh = true;
           const trig = this.level.triggers.find((t) => t.id === triggerId);
           if (trig) trig.activated = true;
+          gameStorage.markGateUnlocked(this.level.key, triggerId);
+          gameStorage.markTriggerActivated(this.level.key, triggerId);
+          this.saveGameProgress();
         },
       },
       this.player.skinId,

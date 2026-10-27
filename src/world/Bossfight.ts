@@ -106,6 +106,8 @@ export class Bossfight {
   private onDefeatCallback?: () => void;
   private onWorld5DefeatedCallback?: () => void;
 
+  public choiceBounds: { x: number; y: number; width: number; height: number }[] = [];
+
   constructor() {
     // Keyboard navigation
     window.addEventListener('keydown', (e) => {
@@ -133,6 +135,51 @@ export class Bossfight {
         this.confirmSelection();
       }
     });
+
+    // Touch / Pointer navigation for mobile & mouse
+    window.addEventListener('pointerdown', (e) => {
+      if (!this.active || this.bossDefeated || this.isIntroActive) return;
+      if (this.animState !== 'visible' || this.inputCooldownTimer > 0) return;
+      if (this.state === 'feedback') return;
+
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === 'BUTTON' || target.closest('button') || target.closest('.retro-dialog-container') || target.closest('.death-menu-overlay'))) {
+        return;
+      }
+
+      const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      if (
+        e.clientX < rect.left ||
+        e.clientX > rect.right ||
+        e.clientY < rect.top ||
+        e.clientY > rect.bottom
+      ) {
+        return;
+      }
+
+      const scaleX = CONFIG.LOGICAL_WIDTH / rect.width;
+      const scaleY = CONFIG.LOGICAL_HEIGHT / rect.height;
+      const logicalX = (e.clientX - rect.left) * scaleX;
+      const logicalY = (e.clientY - rect.top) * scaleY;
+
+      for (let i = 0; i < this.choiceBounds.length; i++) {
+        const b = this.choiceBounds[i];
+        if (
+          b &&
+          logicalX >= b.x &&
+          logicalX <= b.x + b.width &&
+          logicalY >= b.y &&
+          logicalY <= b.y + b.height
+        ) {
+          e.preventDefault();
+          this.selection = i;
+          this.confirmSelection();
+          return;
+        }
+      }
+    }, { passive: false });
   }
 
   public isIntroActive: boolean = false;
@@ -607,11 +654,22 @@ export class Bossfight {
     curY += 6;
 
     // Choices (shuffled)
+    this.choiceBounds = [];
     ctx.font = "22px 'Jersey 10', 'VT323', monospace";
     for (let i = 0; i < this.optTexts.length; i++) {
       const isSel = i === this.selection;
       const tag = ['A', 'B', 'C'][i];
       const optStr = `${tag}. ${this.optTexts[i]}`;
+
+      const boxW = panelW - 32;
+      const boxH = 30;
+      const boxY = curY - 4;
+      this.choiceBounds.push({
+        x: cardX + 16,
+        y: boxY,
+        width: boxW,
+        height: boxH,
+      });
 
       let textColor = '#dcdcdc';
       let bgColor: string | null = null;
@@ -644,7 +702,7 @@ export class Bossfight {
       const textMetrics = ctx.measureText(optStr);
       if (bgColor) {
         ctx.fillStyle = bgColor;
-        ctx.fillRect(cardX + 16, curY - 3, Math.min(panelW - 32, textMetrics.width + 16), 28);
+        ctx.fillRect(cardX + 16, boxY, Math.min(boxW, textMetrics.width + 16), boxH);
       }
 
       ctx.fillStyle = textColor;
@@ -654,8 +712,12 @@ export class Bossfight {
 
     // Bottom-left mini help instruction
     ctx.font = "16px 'Jersey 10', 'VT323', monospace";
-    ctx.fillStyle = '#646464';
-    ctx.fillText('Wybór: strzałki ↑/↓ lub 1–3, zatwierdź Enter', cardX + 18, cardY + panelH - 24);
+    ctx.fillStyle = '#8c8c8c';
+    const isTouch = typeof window !== 'undefined' && (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
+    const hintMsg = isTouch
+      ? 'Dotknij wybranej odpowiedzi A, B lub C, aby zatwierdzić'
+      : 'Wybór: strzałki ↑/↓ lub 1–3, zatwierdź Enter';
+    ctx.fillText(hintMsg, cardX + 18, cardY + panelH - 24);
 
     ctx.restore();
   }

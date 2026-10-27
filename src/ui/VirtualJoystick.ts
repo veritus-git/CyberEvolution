@@ -1,3 +1,5 @@
+import { isMobileDevice } from '../core/Device';
+
 export interface TouchState {
   moveX: number;
   moveY: number;
@@ -42,7 +44,7 @@ export class VirtualJoystick {
   public forceDebugVisible: boolean = false;
 
   constructor(_listenTarget?: HTMLElement) {
-    this.isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+    this.isTouchDevice = isMobileDevice();
     this.setupListeners();
   }
 
@@ -90,6 +92,7 @@ export class VirtualJoystick {
       this.jumpActive = true;
       this.jumpJustPressed = true;
       this.jumpPointerId = e.pointerId;
+      try { navigator.vibrate?.(10); } catch {}
       e.preventDefault();
       return;
     }
@@ -100,6 +103,7 @@ export class VirtualJoystick {
       this.interactActive = true;
       this.interactJustPressed = true;
       this.interactPointerId = e.pointerId;
+      try { navigator.vibrate?.(10); } catch {}
       e.preventDefault();
       return;
     }

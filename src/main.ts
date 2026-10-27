@@ -1,5 +1,9 @@
 import './style.css';
 import { Engine } from './core/Engine';
+import { isMobileDevice, isPortrait } from './core/Device';
+import { toggleGameFullscreen, requestGameFullscreen } from './fullscreen';
+import { gameStorage } from './storage';
+import { initPWA } from './pwa';
 
 function showError(msg: string) {
   const banner = document.getElementById('error-banner');
@@ -15,16 +19,23 @@ window.addEventListener('error', (e) => {
   showError(`Runtime error: ${e.message}`);
 });
 window.addEventListener('unhandledrejection', (e) => {
-  showError(`Async error: ${e.reason}`);
+  showError(`Async error: ${e.reason?.message || e.reason}`);
 });
 
-function toggleFullscreen() {
-  const el = document.documentElement;
-  if (!document.fullscreenElement) {
-    el.requestFullscreen?.().catch(() => {});
-  } else {
-    document.exitFullscreen?.().catch(() => {});
-  }
+function setupOrientationWatcher() {
+  const overlay = document.getElementById('rotate-device-overlay');
+  const check = () => {
+    if (!overlay) return;
+    if (isMobileDevice() && isPortrait()) {
+      overlay.classList.remove('hidden');
+    } else {
+      overlay.classList.add('hidden');
+    }
+  };
+
+  window.addEventListener('resize', check);
+  window.addEventListener('orientationchange', check);
+  check();
 }
 
 async function bootstrap() {
@@ -34,25 +45,38 @@ async function bootstrap() {
   const fullscreenBtn = document.getElementById('btn-fullscreen') as HTMLButtonElement;
   const debugBtn = document.getElementById('btn-toggle-debug') as HTMLButtonElement;
   const skinBtn = document.getElementById('btn-cycle-skin') as HTMLButtonElement;
+  const worldBtn = document.getElementById('btn-switch-world') as HTMLButtonElement;
 
   if (!canvas || !uiContainer) {
     throw new Error('Canvas or UI container not found.');
   }
 
-  // Show top bar on touch devices, hidden on PC until F2
-  const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-  if (isTouch) {
-    mobileTopBar?.classList.remove('hidden');
+  const isMobile = isMobileDevice();
+
+  // Na urządzeniach mobilnych pokazujemy dedykowany przycisk pełnego ekranu
+  if (isMobile && fullscreenBtn) {
+    fullscreenBtn.classList.remove('hidden');
   }
+
+  // Monitorowanie orientacji (blokada widoku pionowego na telefonach)
+  setupOrientationWatcher();
+
+  // Inicjalizacja modułu PWA i Service Workera (zgodna z HTTP i gotowa na HTTPS)
+  initPWA(null, null);
+
+  // Prośba o ochronę zapisu gry przed czyszczeniem pamięci (Persistent Storage API)
+  gameStorage.requestPersistentStorage().catch(() => {});
 
   // Font loading with short timeout — never block on this
   try {
     await Promise.race([
       document.fonts?.load?.('16px "Jersey 10"') ?? Promise.resolve(),
       document.fonts?.ready ?? Promise.resolve(),
-      new Promise(r => setTimeout(r, 600)),
+      new Promise((r) => setTimeout(r, 600)),
     ]);
-  } catch { /* ignore font failures */ }
+  } catch {
+    /* ignore font failures */
+  }
 
   const params = new URLSearchParams(window.location.search);
   const initialWorld = params.get('world') || 'lobby';
@@ -60,27 +84,45 @@ async function bootstrap() {
   const engine = new Engine(canvas, uiContainer);
   await engine.init(initialWorld);
 
-  // Fullscreen
-  fullscreenBtn?.addEventListener('click', toggleFullscreen);
-  window.addEventListener('keydown', (e) => {
-    if (e.code === 'F11') { e.preventDefault(); toggleFullscreen(); }
-    if (e.code === 'KeyF' && !engine.dialog.isOpen) { toggleFullscreen(); }
+  // Obsługa przełączania pełnego ekranu
+  fullscreenBtn?.addEventListener('click', async () => {
+    await toggleGameFullscreen('landscape');
   });
 
-  // World switching
-  const worldBtn = document.getElementById('btn-switch-world') as HTMLButtonElement;
+  // Skróty klawiszowe F11 i F dla komputerów (desktop)
+  window.addEventListener('keydown', (e) => {
+    if (e.code === 'F11') {
+      e.preventDefault();
+      toggleGameFullscreen('landscape');
+    }
+    if (e.code === 'KeyF' && !engine.dialog.isOpen && !engine.startMenu.isOpen) {
+      toggleGameFullscreen('landscape');
+    }
+  });
+
+  // Przełączanie w pełny ekran przy rozpoczęciu gry na telefonie
+  if (isMobile) {
+    canvas.addEventListener('click', () => {
+      if (!engine.startMenu.isOpen) {
+        requestGameFullscreen('landscape').catch(() => {});
+      }
+    }, { once: true });
+  }
+
+  // World switching (dev button)
   worldBtn?.addEventListener('click', () => {
     const nextKey = engine.level.key === 'lobby' ? 'world1' : 'lobby';
     engine.loadWorld(nextKey);
     if (worldBtn) worldBtn.textContent = nextKey === 'lobby' ? 'Świat: Lobby' : 'Świat: 1';
   });
 
-  // Skin cycling
-  let currentSkin = 1;
+  // Skin cycling (dev button)
+  let currentSkin = engine.player.skinId || 1;
   skinBtn?.addEventListener('click', () => {
     currentSkin = (currentSkin % 5) + 1;
     engine.player.setSkin(currentSkin);
     skinBtn.textContent = `Skin: ${currentSkin}`;
+    engine.saveGameProgress();
   });
 
   // Debug toggle (sync UI with F2 keyboard shortcut)
@@ -88,7 +130,7 @@ async function bootstrap() {
     const isDbg = engine.renderer.showDebug;
     engine.joystick.forceDebugVisible = isDbg;
     if (debugBtn) debugBtn.style.color = isDbg ? '#22c55e' : '#00e5ff';
-    if (!isTouch && mobileTopBar) {
+    if (mobileTopBar) {
       mobileTopBar.classList.toggle('hidden', !isDbg);
     }
   };
