@@ -18,10 +18,16 @@ if [ "$TARGET" = "local" ] || [ "$TARGET" = "staging" ]; then
         echo "   -> Wykryto połączenie przez Tailscale ($HOST_IP)"
     fi
 
-    SSH_DEST="szymon@$HOST_IP"
+    SSH_OPTS="-o BatchMode=yes -o ConnectTimeout=5 -o StrictHostKeyChecking=accept-new"
+    if [ -f "$HOME/.ssh/id_ed25519_github" ]; then
+        SSH_OPTS="$SSH_OPTS -i $HOME/.ssh/id_ed25519_github"
+    fi
+    if [ -f "$HOME/.ssh/id_ed25519" ]; then
+        SSH_OPTS="$SSH_OPTS -i $HOME/.ssh/id_ed25519"
+    fi
 
     echo "🚀 [3/3] Przesyłanie wersji do kontenera Incus 'cyberevolution'..."
-    tar -C dist -cf - . | ssh -o BatchMode=yes -o ConnectTimeout=5 "$SSH_DEST" "incus exec cyberevolution -- tar -C /var/www/html -xf -"
+    tar -C dist -cf - . | ssh $SSH_OPTS "$SSH_DEST" "incus exec cyberevolution -- tar -C /var/www/html -xf -"
 
     echo ""
     echo "=================================================="
