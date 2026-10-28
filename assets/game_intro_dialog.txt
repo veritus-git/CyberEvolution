@@ -8,4 +8,4 @@ PLAYER: Muszę stąd uciec! Jak mam wrócić do domu?
 MEDRZEC: Aby powrócić, musisz przejść przez 4 kręgi manipulacji i wykuć w sobie cyfrową odporność.\nPomogę ci przejrzeć te sztuczki, ale wybory musisz podejmować sam.
 PLAYER: A co jeśli znowu dam się nabrać na ich podstępy?
 MEDRZEC: Będziesz tkwić w tej sieciowej pułapce bez końca.\nDlatego nie ulegaj emocjom, sprawdzaj źródła i myśl krytycznie!\nWejdź w portal do pierwszego świata – Miasta Iluzji.
-MEDRZEC: Sterowanie:\nA/D lub </> - poruszanie się\nSpacja/W/▲ - skok\nE - interakcja z obiektami\nESC - Menu Pauzy\nAby odblokować dalszą cześć mapy, upewnij się że zaliczyłeś interakcję
+MEDRZEC: Sterowanie:\nA/D lub </> - poruszanie się\nSpacja/W/▲ - skok\nE - interakcja z obiektami\nESC - Menu Pauzy\nAby odblokować dalszą część mapy, upewnij się, że zaliczyłeś interakcję.
