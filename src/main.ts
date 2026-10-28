@@ -161,7 +161,12 @@ async function bootstrap() {
   // Settings modal (volume sliders & sound controls)
   settingsBtn?.addEventListener('click', (e) => {
     e.stopPropagation();
-    engine.pauseModal.show(engine.startMenu.isOpen);
+    const fromStart = engine.startMenu.isOpen;
+    engine.pauseModal.show(fromStart);
+    if (!fromStart) {
+      engine.isPaused = true;
+      engine.dialog.isPaused = true;
+    }
   });
 
   // Audio mute toggle

@@ -57,13 +57,32 @@ export class PauseModal {
       </div>
 
       <div class="pause-menu-buttons">
-        <button class="pause-btn primary" id="pause-resume">▶ Wznów grę</button>
-        <button class="pause-btn" id="pause-help">❔ Sterowanie i pomoc</button>
-        <button class="pause-btn" id="pause-restart">↺ Zrestartuj poziom</button>
-        <button class="pause-btn danger" id="pause-lobby">⮌ Powrót do Lobby</button>
+        <button class="pause-btn primary" id="pause-resume">
+          <span class="pause-btn-icon">▶</span>
+          <span class="pause-btn-text">Wznów grę</span>
+          <span class="pause-btn-spacer"></span>
+        </button>
+        <button class="pause-btn" id="pause-help">
+          <span class="pause-btn-icon">?</span>
+          <span class="pause-btn-text">Sterowanie i pomoc</span>
+          <span class="pause-btn-spacer"></span>
+        </button>
+        <button class="pause-btn" id="pause-restart">
+          <span class="pause-btn-icon">↺</span>
+          <span class="pause-btn-text">Zrestartuj poziom</span>
+          <span class="pause-btn-spacer"></span>
+        </button>
+        <button class="pause-btn danger" id="pause-lobby">
+          <span class="pause-btn-icon">⮌</span>
+          <span class="pause-btn-text">Powrót do Lobby</span>
+          <span class="pause-btn-spacer"></span>
+        </button>
       </div>
     `;
 
+    this.overlayElement.innerHTML = `
+      <div class="vhs-pause-indicator">PAUZA ⏸</div>
+    `;
     this.overlayElement.appendChild(this.cardElement);
     container.appendChild(this.overlayElement);
 
@@ -172,16 +191,19 @@ export class PauseModal {
     this.isOpen = true;
     this.syncAudioUI();
 
-    const resumeBtn = this.cardElement.querySelector('#pause-resume') as HTMLElement;
+    const resumeText = this.cardElement.querySelector('#pause-resume .pause-btn-text') as HTMLElement;
+    const resumeIcon = this.cardElement.querySelector('#pause-resume .pause-btn-icon') as HTMLElement;
     const restartBtn = this.cardElement.querySelector('#pause-restart') as HTMLElement;
     const lobbyBtn = this.cardElement.querySelector('#pause-lobby') as HTMLElement;
 
     if (isFromStartMenu) {
-      if (resumeBtn) resumeBtn.textContent = '✓ Zamknij ustawienia';
+      if (resumeText) resumeText.textContent = 'Zamknij ustawienia';
+      if (resumeIcon) resumeIcon.textContent = '✓';
       if (restartBtn) restartBtn.style.display = 'none';
       if (lobbyBtn) lobbyBtn.style.display = 'none';
     } else {
-      if (resumeBtn) resumeBtn.textContent = '▶ Wznów grę';
+      if (resumeText) resumeText.textContent = 'Wznów grę';
+      if (resumeIcon) resumeIcon.textContent = '▶';
       if (restartBtn) restartBtn.style.display = '';
       if (lobbyBtn) lobbyBtn.style.display = '';
     }

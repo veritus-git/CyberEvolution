@@ -1,3 +1,5 @@
+import { sound } from '../core/Audio';
+
 export class IntroSequence {
   public isActive: boolean = false;
 
@@ -124,14 +126,24 @@ export class IntroSequence {
       const dt = Math.min((now - this.lastTime) / 1000, 0.05);
       this.lastTime = now;
 
+      const prevCount = Math.floor(this.currentChars);
       this.currentChars += this.speed * dt;
+      const nextCount = Math.min(Math.floor(this.currentChars), this.fullText.length);
+
+      if (nextCount > prevCount) {
+        const char = this.fullText[nextCount - 1];
+        if (char && char.trim().length > 0) {
+          sound.playDialogBlip();
+        }
+      }
+
       if (this.currentChars >= this.fullText.length) {
         this.currentChars = this.fullText.length;
         this.textElement.textContent = this.fullText;
         this.isDone = true;
         this.updateHint();
       } else {
-        this.textElement.textContent = this.fullText.substring(0, Math.floor(this.currentChars));
+        this.textElement.textContent = this.fullText.substring(0, nextCount);
         this.animFrame = requestAnimationFrame(tick);
       }
     };

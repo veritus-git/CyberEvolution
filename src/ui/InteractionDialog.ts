@@ -20,6 +20,7 @@ export interface QuizInteractionData {
 
 export class InteractionDialog {
   public isOpen: boolean = false;
+  public isPaused: boolean = false;
   public get isChoicesVisible(): boolean {
     return (this.isOpen && this.mode === 'quiz' && this.quizStage === 'choices') || this.isDeathMenuActive;
   }
@@ -186,15 +187,22 @@ export class InteractionDialog {
     // Unified single tap/click listener anywhere on screen to advance dialogue
     window.addEventListener('pointerup', (e) => {
       if (!this.isOpen) return;
+      if (this.isPaused) return;
       if (this.isDeathMenuActive) return;
       if (this.mode === 'quiz' && this.quizStage === 'choices') return;
 
       const target = e.target as HTMLElement | null;
       if (
         target &&
-        (target.closest('.retro-choice-btn') ||
+        (target.closest('.pause-menu-overlay') ||
+          target.closest('.game-info-overlay') ||
+          target.closest('.player-hud-bar') ||
+          target.closest('.retro-choice-btn') ||
           target.closest('.death-menu-option') ||
           target.closest('#btn-fullscreen') ||
+          target.closest('#btn-settings') ||
+          target.closest('#btn-audio') ||
+          target.closest('#btn-help') ||
           target.closest('#sound-control-wrapper') ||
           target.closest('.sound-popup'))
       ) {
@@ -206,6 +214,7 @@ export class InteractionDialog {
     // Keyboard navigation
     window.addEventListener('keydown', (e) => {
       if (!this.isOpen) return;
+      if (this.isPaused) return;
 
       if (this.isDeathMenuActive) {
         if (e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'ArrowLeft' || e.code === 'Digit1') {

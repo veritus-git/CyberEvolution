@@ -94,6 +94,7 @@ export class Engine {
 
     this.pauseModal.onResume = () => {
       this.isPaused = false;
+      this.dialog.isPaused = false;
       this.updateSoundControlVisibility();
     };
     this.pauseModal.onOpenHelp = () => {
@@ -223,9 +224,11 @@ export class Engine {
       this.pauseModal.hide();
       this.pauseMenu.hide();
       this.isPaused = false;
+      this.dialog.isPaused = false;
     } else {
       this.pauseModal.show();
       this.isPaused = true;
+      this.dialog.isPaused = true;
     }
     this.updateSoundControlVisibility();
   }
@@ -841,7 +844,10 @@ export class Engine {
       }
     }
 
-    if (!this.isPaused && this.transitionState !== 'wipe_out' && !this.pauseModal.isOpen && !this.infoModal.isOpen) {
+    const isGamePaused = this.isPaused || this.pauseModal.isOpen || this.infoModal.isOpen;
+    this.dialog.isPaused = isGamePaused;
+
+    if (!isGamePaused && this.transitionState !== 'wipe_out') {
       const maxSubstep = 0.010;
       const substeps = Math.max(1, Math.ceil(rawDt / maxSubstep));
       const subDt = rawDt / substeps;
@@ -878,7 +884,7 @@ export class Engine {
         this.level,
         this.player,
         this.camera,
-        rawDt,
+        isGamePaused ? 0 : rawDt,
         this.fps,
         this.activeHint,
         this.bossfight,
