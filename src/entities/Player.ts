@@ -229,24 +229,24 @@ export class Player {
       }
       this.isRunningPrev = false;
     } else if (isRunning) {
-      // Faster, responsive running animation: 130ms per frame
-      if (this.animTimer >= 0.13) {
+      // Steady running animation: 250ms per frame
+      if (this.animTimer >= 0.25) {
         this.runFrameIndex = (this.runFrameIndex + 1) % 2;
         this.animTimer = 0;
       }
 
-      // Footstep sound: immediate first step upon moving, then frequent steps every 130ms
+      // Steady, pleasant footstep cadence: 250ms between steps
       if (!this.isRunningPrev) {
-        this.footstepTimer = 0;
-        sound.playFootstep();
+        // First footfall lands naturally shortly after initiating stride (~80ms)
+        this.footstepTimer = 0.17;
+        this.isRunningPrev = true;
       } else {
         this.footstepTimer += dt;
-        if (this.footstepTimer >= 0.13) {
+        if (this.footstepTimer >= 0.25) {
           this.footstepTimer = 0;
           sound.playFootstep();
         }
       }
-      this.isRunningPrev = true;
     } else {
       this.animTimer = 0;
       this.runFrameIndex = 0;

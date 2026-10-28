@@ -10,24 +10,24 @@ export interface AudioSettings {
   isMuted: boolean;
 }
 
-const SETTINGS_KEY = 'cyberevo_audio_settings_v3';
+const SETTINGS_KEY = 'cyberevo_audio_settings_v4';
 
 export class AudioManager {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
   private musicGain: GainNode | null = null;
   private sfxGain: GainNode | null = null;
-  private noiseBuffer: AudioBuffer | null = null;
 
   public isMuted: boolean = false;
   public masterVolume: number = 0.7;
-  public musicVolume: number = 0.05;
+  public musicVolume: number = 0.10;
   public sfxVolume: number = 0.45;
 
   private isMusicPlaying: boolean = false;
   private musicTimer: number | null = null;
   private stepIndex: number = 0;
   private lastFootstepTime: number = 0;
+  private footstepStep: number = 0;
   private lastBlipTime: number = 0;
 
   // Synthwave Chord Progression in A Minor (Am, F, C, G)
@@ -182,19 +182,6 @@ export class AudioManager {
     }
   }
 
-  private getNoiseBuffer(): AudioBuffer | null {
-    if (!this.ctx) return null;
-    if (!this.noiseBuffer) {
-      const bufferSize = Math.floor(this.ctx.sampleRate * 0.35); // 350ms of noise
-      this.noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-      const data = this.noiseBuffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1;
-      }
-    }
-    return this.noiseBuffer;
-  }
-
   private playSynthStep(stepDuration: number): void {
     if (!this.ctx || !this.musicGain || this.isMuted || this.musicVolume <= 0) return;
 
@@ -312,55 +299,43 @@ export class AudioManager {
   }
 
   /**
-   * Minecraft-style grass footstep sound (organic grass rustle + subtle light ground contact)
+   * Soft, gentle footstep tap (warm low-passed sine wave with alternating left/right foot cadence)
    */
   public playFootstep(): void {
     if (!this.ctx || !this.sfxGain || this.isMuted || this.sfxVolume <= 0) return;
     const now = performance.now();
-    if (now - this.lastFootstepTime < 70) return;
+    if (now - this.lastFootstepTime < 180) return;
     this.lastFootstepTime = now;
 
     const audioNow = this.ctx.currentTime;
-    const noise = this.getNoiseBuffer();
+    this.footstepStep = (this.footstepStep + 1) % 2;
 
-    // 1. Organic grass crunch / rustle (bandpass filtered noise burst)
-    if (noise) {
-      const noiseSource = this.ctx.createBufferSource();
-      noiseSource.buffer = noise;
-      const offset = Math.random() * 0.18;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    const filter = this.ctx.createBiquadFilter();
 
-      const filter = this.ctx.createBiquadFilter();
-      filter.type = 'bandpass';
-      // Center frequency around 950 - 1450 Hz for natural grass blades rustle
-      filter.frequency.setValueAtTime(950 + Math.random() * 500, audioNow);
-      filter.Q.setValueAtTime(1.4, audioNow);
+    // Mellow sine wave with soft lowpass so it's warm and never harsh on the ears
+    osc.type = 'sine';
+    const isLeft = this.footstepStep === 0;
+    const baseFreq = isLeft ? 138 : 126;
+    const endFreq = isLeft ? 60 : 54;
 
-      const noiseGain = this.ctx.createGain();
-      noiseGain.gain.setValueAtTime(0.35, audioNow);
-      noiseGain.gain.exponentialRampToValueAtTime(0.001, audioNow + 0.048);
+    osc.frequency.setValueAtTime(baseFreq + (Math.random() * 6 - 3), audioNow);
+    osc.frequency.exponentialRampToValueAtTime(endFreq, audioNow + 0.042);
 
-      noiseSource.connect(filter);
-      filter.connect(noiseGain);
-      noiseGain.connect(this.sfxGain);
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(240, audioNow);
 
-      noiseSource.start(audioNow, offset, 0.052);
-    }
+    // Very gentle volume - soft, pleasant, organic foot tap
+    gain.gain.setValueAtTime(0.12, audioNow);
+    gain.gain.exponentialRampToValueAtTime(0.0005, audioNow + 0.045);
 
-    // 2. Subtle soft soil contact (light organic tap without heavy low-end thud)
-    const tapOsc = this.ctx.createOscillator();
-    const tapGain = this.ctx.createGain();
-    tapOsc.type = 'sine';
-    tapOsc.frequency.setValueAtTime(160 + Math.random() * 30, audioNow);
-    tapOsc.frequency.exponentialRampToValueAtTime(55, audioNow + 0.035);
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.sfxGain);
 
-    tapGain.gain.setValueAtTime(0.08, audioNow);
-    tapGain.gain.exponentialRampToValueAtTime(0.001, audioNow + 0.035);
-
-    tapOsc.connect(tapGain);
-    tapGain.connect(this.sfxGain);
-
-    tapOsc.start(audioNow);
-    tapOsc.stop(audioNow + 0.04);
+    osc.start(audioNow);
+    osc.stop(audioNow + 0.048);
   }
 
   public playDialogBlip(): void {

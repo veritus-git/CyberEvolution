@@ -35,9 +35,9 @@ export class PauseModal {
         <div class="pause-slider-row">
           <div class="pause-slider-label">
             <span>Muzyka (Synthwave)</span>
-            <span id="pause-music-val" class="pause-val-badge">5%</span>
+            <span id="pause-music-val" class="pause-val-badge">10%</span>
           </div>
-          <input type="range" id="pause-music-slider" min="0" max="100" value="5" class="pause-range-input" />
+          <input type="range" id="pause-music-slider" min="0" max="100" value="10" class="pause-range-input" />
         </div>
 
         <div class="pause-slider-row">
