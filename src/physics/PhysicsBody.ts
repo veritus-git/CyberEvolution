@@ -1,6 +1,7 @@
 import { AABB } from './AABB';
 import { CONFIG } from '../core/Constants';
 import { Ladder } from '../world/Level';
+import { sound } from '../core/Audio';
 
 export interface MovementInput {
   moveX: number; // -1 to 1 (analog or digital)
@@ -180,6 +181,7 @@ export class PhysicsBody {
     // 7. Void drop check
     const voidLine = CONFIG.PLAY_HEIGHT + CONFIG.VOID_MARGIN;
     if (this.y > voidLine && this.respawnState === 'normal') {
+      sound.playAbyssFall();
       this.respawnState = 'falling';
       this.respawnTimer = 0;
       this.isVisible = false;

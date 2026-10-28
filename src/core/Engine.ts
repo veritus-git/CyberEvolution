@@ -488,6 +488,9 @@ export class Engine {
         this.player.physics.onGround = false;
         this.lobbyDropinActive = true;
         this.lobbyDropinLockTimer = 0.85;
+        if (!this.startMenu.isOpen) {
+          sound.playLobbyDrop();
+        }
 
         if (isNewGameIntro) {
           this.pendingLobbyDialog = 'intro';
@@ -975,6 +978,7 @@ export class Engine {
       }
       if (this.player.physics.onGround && this.lobbyDropinLockTimer <= 0) {
         this.lobbyDropinActive = false;
+        sound.playLobbyLand();
         if (this.pendingLobbyDialog === 'intro') {
           setTimeout(() => this.playGameIntroDialog(), 250);
           this.pendingLobbyDialog = null;

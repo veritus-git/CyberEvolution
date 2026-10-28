@@ -535,6 +535,124 @@ export class AudioManager {
     osc.start(now);
     osc.stop(now + 0.46);
   }
+
+  /**
+   * Cyber high-tech descending whoosh when dropping into Lobby from above
+   */
+  public playLobbyDrop(): void {
+    if (!this.ctx || !this.sfxGain || this.isMuted || this.sfxVolume <= 0) return;
+    const now = this.ctx.currentTime;
+
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    const filter = this.ctx.createBiquadFilter();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(580, now);
+    osc.frequency.exponentialRampToValueAtTime(120, now + 0.60);
+
+    filter.type = 'bandpass';
+    filter.frequency.setValueAtTime(1200, now);
+    filter.frequency.exponentialRampToValueAtTime(260, now + 0.60);
+    filter.Q.setValueAtTime(2.5, now);
+
+    gain.gain.setValueAtTime(0.14, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.sfxGain);
+
+    osc.start(now);
+    osc.stop(now + 0.68);
+  }
+
+  /**
+   * Heavy, tactile cyber impact thud when hitting the Lobby floor
+   */
+  public playLobbyLand(): void {
+    if (!this.ctx || !this.sfxGain || this.isMuted || this.sfxVolume <= 0) return;
+    const now = this.ctx.currentTime;
+
+    // 1. Deep solid bass impact (95Hz down to 32Hz)
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(95, now);
+    osc.frequency.exponentialRampToValueAtTime(32, now + 0.16);
+
+    gain.gain.setValueAtTime(0.24, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+
+    osc.connect(gain);
+    gain.connect(this.sfxGain);
+    osc.start(now);
+    osc.stop(now + 0.20);
+
+    // 2. Mechanical click / boot-contact snap
+    const clickOsc = this.ctx.createOscillator();
+    const clickGain = this.ctx.createGain();
+    clickOsc.type = 'square';
+    clickOsc.frequency.setValueAtTime(300, now);
+    clickOsc.frequency.exponentialRampToValueAtTime(70, now + 0.05);
+
+    clickGain.gain.setValueAtTime(0.12, now);
+    clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+
+    clickOsc.connect(clickGain);
+    clickGain.connect(this.sfxGain);
+    clickOsc.start(now);
+    clickOsc.stop(now + 0.07);
+  }
+
+  /**
+   * Digitized descending pitch-drop & dematerialization glitch when falling into map abyss/holes
+   */
+  public playAbyssFall(): void {
+    if (!this.ctx || !this.sfxGain || this.isMuted || this.sfxVolume <= 0) return;
+    const now = this.ctx.currentTime;
+
+    // 1. Rapid descending tone slide (falling into the deep cyber void)
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    const filter = this.ctx.createBiquadFilter();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(540, now);
+    osc.frequency.exponentialRampToValueAtTime(45, now + 0.42);
+
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(1800, now);
+    filter.frequency.exponentialRampToValueAtTime(110, now + 0.42);
+
+    gain.gain.setValueAtTime(0.22, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.46);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.sfxGain);
+
+    osc.start(now);
+    osc.stop(now + 0.48);
+
+    // 2. Retro 8-bit digitized stepped glitch noise (digital loss of signal)
+    const glitchOsc = this.ctx.createOscillator();
+    const glitchGain = this.ctx.createGain();
+    glitchOsc.type = 'square';
+    glitchOsc.frequency.setValueAtTime(240, now + 0.06);
+    glitchOsc.frequency.setValueAtTime(160, now + 0.14);
+    glitchOsc.frequency.setValueAtTime(95, now + 0.22);
+    glitchOsc.frequency.setValueAtTime(50, now + 0.30);
+
+    glitchGain.gain.setValueAtTime(0.12, now + 0.06);
+    glitchGain.gain.exponentialRampToValueAtTime(0.001, now + 0.36);
+
+    glitchOsc.connect(glitchGain);
+    glitchGain.connect(this.sfxGain);
+
+    glitchOsc.start(now + 0.06);
+    glitchOsc.stop(now + 0.38);
+  }
 }
 
 export const sound = new AudioManager();
