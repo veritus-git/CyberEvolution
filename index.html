@@ -50,17 +50,31 @@
 
     <link rel="stylesheet" href="/src/style.css" />
     <script>
+      function shouldIgnoreError(msg) {
+        if (!msg) return true;
+        var s = String(msg).toLowerCase();
+        return s.indexOf('script error') !== -1 ||
+               s.indexOf('resizeobserver') !== -1 ||
+               s.indexOf('notsupportederror') !== -1 ||
+               s.indexOf('notallowederror') !== -1 ||
+               s.indexOf('fullscreen') !== -1 ||
+               s.indexOf('orientation') !== -1;
+      }
       window.addEventListener('error', function(e) {
+        var msg = e.message || e;
+        if (shouldIgnoreError(msg)) return;
         var b = document.getElementById('error-banner');
         if (b) {
-          b.textContent = 'Błąd: ' + (e.message || e);
+          b.textContent = 'Błąd: ' + msg;
           b.classList.remove('hidden');
         }
       });
       window.addEventListener('unhandledrejection', function(e) {
+        var msg = e.reason?.message || e.reason;
+        if (shouldIgnoreError(msg)) return;
         var b = document.getElementById('error-banner');
         if (b) {
-          b.textContent = 'Błąd Promise: ' + (e.reason?.message || e.reason);
+          b.textContent = 'Błąd: ' + msg;
           b.classList.remove('hidden');
         }
       });
@@ -77,7 +91,7 @@
           <button id="btn-help" class="hud-circle-btn" aria-label="Pomoc" title="Sterowanie i zasady gry (ESC)">❔</button>
         </div>
 
-        <!-- Developer Debug Toolbar (Accessible ONLY via F2 or ?debug=1) -->
+        <!-- Pasek narzędzi deweloperskich (widoczny tylko pod F2 / debug=1) -->
         <div id="mobile-top-bar" class="mobile-top-bar hidden">
           <button id="btn-switch-world" class="mobile-btn">Świat: Lobby</button>
           <button id="btn-toggle-debug" class="mobile-btn">F2: Hitboxy</button>
@@ -88,13 +102,13 @@
       </div>
     </div>
 
-    <!-- Mobile Device Orientation Lock Overlay (Landscape Required) -->
+    <!-- Nakładka blokująca orientację pionową na urządzeniach mobilnych -->
     <div id="rotate-device-overlay" class="rotate-device-overlay hidden">
       <div class="rotate-device-content">
         <div class="rotate-device-phone-animation">
           <div class="phone-screen"></div>
         </div>
-        <h2 class="rotate-device-title">OBRÓĆ EKRAN POZIOMO</h2>
+        <h2 class="rotate-device-title">OBRÓĆ TELEFON DO POZIOMU</h2>
         <p class="rotate-device-desc">CyberEvolution wymaga orientacji poziomej (Landscape) dla precyzyjnego parkouru.</p>
       </div>
     </div>

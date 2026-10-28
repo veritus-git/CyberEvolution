@@ -1,5 +1,5 @@
 BOSSNAME: Mirror Queen
-INTRO: Spójrz w moją lśniącą twarz-ekran! Widzisz tę chmarę serduszek, lajków i roześmianych masek krążących wokół moich skrzydeł? To ja jestem Mirror Queen — architektka waszej cyfrowej próżności. Sprawiam, że czujesz się nikim, dopóki tłum nie rzuci ci garści polubień. Uczysz się kłamać, filtrować swoje życie i gonić za sztuczną aprobatą. Kim jesteś, gdy zgasną powiadomienia na twoim ekranie? Zobaczmy, czy potrafisz zbić moje lustro pozorów!
+INTRO: Spójrz w moją lśniącą twarz-ekran! Widzisz tę chmarę serduszek, lajków i roześmianych masek krążących wokół moich skrzydeł? To ja jestem Mirror Queen - architektka waszej cyfrowej próżności. Sprawiam, że czujesz się nikim, dopóki tłum nie rzuci ci garści polubień. Uczysz się kłamać, filtrować swoje życie i gonić za sztuczną aprobatą. Kim jesteś, gdy zgasną powiadomienia na twoim ekranie? Zobaczmy, czy potrafisz zbić moje lustro pozorów!
 Q: Twój ulubiony streamer nagle zachwala stronę z „darmowymi skrzynkami z drogimi ubraniami”. O czym musisz pamiętać?
 A: Że twórcy biorą pieniądze za promowanie niepewnego hazardu.
 B: Że streamer osobiście sprawdził uczciwość każdego losowania.
@@ -14,7 +14,7 @@ CORRECT: B
 ---
 Q: Kolega z klasy pisze na czacie: „Podaj mi 6-cyfrowy kod, który zaraz przyjdzie do ciebie SMS-em, bo głosuję w konkursie”. Co robisz?
 A: Podaję kod z wiadomości, aby pomóc kumplowi w konkursie.
-B: Odmawiam i dzwonię do niego — to próba wyłudzenia konta.
+B: Odmawiam i dzwonię do niego - to próba wyłudzenia konta.
 C: Publikuję nadesłany kod w komentarzu pod jego zdjęciem.
 CORRECT: B
 ---
@@ -97,7 +97,7 @@ C: Usługą bezpiecznego wypożyczania sprzętu w internecie.
 CORRECT: B
 ---
 Q: Gdy wirtualny doradca lub chatbot w social mediach zadaje pytania o twoje hasła i problemy rodzinne:
-A: Odpowiadam szczerze na pytania — to neutralne AI.
+A: Odpowiadam szczerze na pytania - to neutralne AI.
 B: Odmawiam odpowiedzi, bo dane mogą zostać przejęte.
 C: Pytam bota o poradę w sprawach budżetu domowego.
 CORRECT: B

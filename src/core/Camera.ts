@@ -21,7 +21,7 @@ export class Camera {
   public update(targetCenterX: number, _targetCenterY: number, worldWidth: number, dt: number): void {
     const maxX = Math.max(0, worldWidth - this.viewportWidth);
     if (maxX <= 0) {
-      // World fits on screen (e.g. 1920px lobby) — camera locked at 0
+      // World fits on screen (e.g. 1920px lobby) - camera locked at 0
       this.x = 0;
       this.y = 0;
       return;

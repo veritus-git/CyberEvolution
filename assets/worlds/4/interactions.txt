@@ -1,11 +1,11 @@
 # world4_interactions.txt
-# Temat: Twierdza Kopii — Radykalizacja, bańki informacyjne, presja czasu, mowa nienawiści
+# Temat: Twierdza Kopii - Radykalizacja, bańki informacyjne, presja czasu, mowa nienawiści
 # Boss: Chronos Paniki
 
 AVATAR: fałszywy_naprawiacz
 CONTEXT: Mężczyzna w czapce i skórzanej kurtce stuka w klawiaturę laptopa:\n„Słuchaj uważnie, młody. Wszyscy wokół cię okłamują – szkoła, media, oficjalne źródła. Oni ukrywają prawdę!\nTylko na naszym prywatnym kanale na Telegramie dowiesz się, kto naprawdę rządzi. Wejdź przez ten link i zostań jednym z nas!”
 SAGE: Oto mechanizm wciągania w sekty internetowe i skrajne bańki. Budują syndrom oblężonej twierdzy i wmawiają wrogość całego świata, by odciąć cię od bliskich.
-A: Dołączam do grupy — chcę wreszcie poznać tajemnice, o których nikt głośno nie mówi!
+A: Dołączam do grupy - chcę wreszcie poznać tajemnice, o których nikt głośno nie mówi!
 B: Odrzucam zaproszenie. Wiem, jak działają teorie spiskowe i mechanizm manipulacji w zamkniętych grupach.
 GOOD: Świetnie! Nie dałeś się zamknąć w króliczej norze radykalizmu. Krytyczne myślenie ocaliło twój obiektywizm.
 BAD: Uważaj! Zrobiłeś krok ku radykalizacji. Zamknięte grupy niszczą zdolność samodzielnego myślenia. Cofnij się!
@@ -17,7 +17,7 @@ SPEED_FEEDBACK: 36
 AVATAR: kolega
 CONTEXT: Twój znajomy w niebieskiej bluzie ściska pendrive, trzęsąc się z wściekłości:\n„Musimy ich zniszczyć! Ludzie z innej szkoły wrzucili chamski post o naszej klasie.\nMam tu paczkę z ich prywatnymi numerami i zmontowanymi zdjęciami. Robimy zmasowany najazd na ich profile i niszczymy ich w komentarzach! Wchodzisz w to?!”
 SAGE: Zemsta i cyberprzemoc rówieśnicza. Złość zaślepia, ale dołączając do linczu i doxingu, popełniasz przestępstwo i nakręcasz spiralę nienawiści.
-A: Wchodzę w to — nikt nie będzie bezkarnie obrażał naszej ekipy!
+A: Wchodzę w to - nikt nie będzie bezkarnie obrażał naszej ekipy!
 B: Mówię 'nie'. Tłumaczę mu, że doxing i zmasowany hejt to przestępstwo, a zemsta tylko pogorszy sytuację.
 GOOD: Brawa za odwagę cywilną. Powstrzymanie fali agresji wymaga o wiele większej siły niż bezmyślny hejt w tłumie.
 BAD: Źle! Uległeś wściekłości. Cyberprzemoc i upublicznianie czyichś danych mogą skończyć się tragedią i sprawą w sądzie. Zatrzymaj tę machinę!
@@ -29,7 +29,7 @@ SPEED_FEEDBACK: 36
 AVATAR: system_restart
 CONTEXT: Monitor komputera rozświetla się wielkim czerwonym napisem ERROR:\n„OSTRZEŻENIE SYSTEMU FACT-CHECKINGU: Ten sensacyjny artykuł został zweryfikowany jako zmanipulowany fotomontaż.\nKliknij 'Wymuś odtworzenie', jeśli uważasz, że to cenzura niewygodnej prawdy.”
 SAGE: Manipulatorzy wmawiają, że rzetelna weryfikacja faktów to uciszanie wolności słowa. Czy zaufasz dowodom i nauce, czy spiskowej narracji?
-A: Klikam 'Wymuś odtworzenie' — skoro to blokują, na pewno to ukrywana prawda!
+A: Klikam 'Wymuś odtworzenie' - skoro to blokują, na pewno to ukrywana prawda!
 B: Czytam raport weryfikatorów i sprawdzam dowody, na których oparli sprostowanie.
 GOOD: Brawo. Fact-checking to fundament prawdy w cyfrowym szumie. Zrozumiałeś, że nie wszystko, co wywołuje oburzenie, jest prawdą.
 BAD: Porażka! Dałeś się złapać na mit 'zakazanej wiedzy'. Szanuj dowody i wiarygodne źródła, a nie spiskowe domysły!

@@ -1,8 +1,28 @@
 import './style.css';
 import { Engine } from './core/Engine';
 import { sound } from './core/Audio';
+import { isMobileDevice, isPortrait } from './core/Device';
+import { toggleGameFullscreen } from './fullscreen';
+import { gameStorage } from './storage';
+import { initPWA } from './pwa';
+
+function shouldIgnoreError(msg: unknown): boolean {
+  if (!msg) return true;
+  const s = String(msg).toLowerCase();
+  return (
+    s.includes('script error') ||
+    s.includes('resizeobserver') ||
+    s.includes('notsupportederror') ||
+    s.includes('notallowederror') ||
+    s.includes('fullscreen') ||
+    s.includes('orientation') ||
+    s.includes('failed') ||
+    s.includes('user denied')
+  );
+}
 
 function showError(msg: string) {
+  if (shouldIgnoreError(msg)) return;
   const banner = document.getElementById('error-banner');
   if (banner) {
     banner.textContent = msg;
@@ -13,19 +33,29 @@ function showError(msg: string) {
 }
 
 window.addEventListener('error', (e) => {
+  if (shouldIgnoreError(e.message || e)) return;
   showError(`Runtime error: ${e.message}`);
 });
 window.addEventListener('unhandledrejection', (e) => {
-  showError(`Async error: ${e.reason}`);
+  const reason = e.reason?.message || e.reason;
+  if (shouldIgnoreError(reason)) return;
+  showError(`Async error: ${reason}`);
 });
 
-function toggleFullscreen() {
-  const el = document.documentElement;
-  if (!document.fullscreenElement) {
-    el.requestFullscreen?.().catch(() => {});
-  } else {
-    document.exitFullscreen?.().catch(() => {});
-  }
+function setupOrientationWatcher() {
+  const overlay = document.getElementById('rotate-device-overlay');
+  const check = () => {
+    if (!overlay) return;
+    if (isMobileDevice() && isPortrait()) {
+      overlay.classList.remove('hidden');
+    } else {
+      overlay.classList.add('hidden');
+    }
+  };
+
+  window.addEventListener('resize', check);
+  window.addEventListener('orientationchange', check);
+  check();
 }
 
 async function bootstrap() {
@@ -37,33 +67,36 @@ async function bootstrap() {
   const helpBtn = document.getElementById('btn-help') as HTMLButtonElement;
   const debugBtn = document.getElementById('btn-toggle-debug') as HTMLButtonElement;
   const skinBtn = document.getElementById('btn-cycle-skin') as HTMLButtonElement;
-  const rotateOverlay = document.getElementById('rotate-device-overlay');
+  const worldBtn = document.getElementById('btn-switch-world') as HTMLButtonElement;
 
   if (!canvas || !uiContainer) {
     throw new Error('Canvas or UI container not found.');
   }
 
-  // Device orientation check for mobile portrait blocker
-  const checkOrientation = () => {
-    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-    if (isTouch && window.innerHeight > window.innerWidth) {
-      rotateOverlay?.classList.remove('hidden');
-    } else {
-      rotateOverlay?.classList.add('hidden');
-    }
-  };
-  window.addEventListener('resize', checkOrientation);
-  window.addEventListener('orientationchange', checkOrientation);
-  checkOrientation();
+  // Monitorowanie orientacji (blokada widoku pionowego na telefonach)
+  setupOrientationWatcher();
 
-  // Font loading with short timeout — never block on this
+  // Zabezpieczenie przed menu kontekstowym i lupą powiększającą na iOS
+  window.addEventListener('contextmenu', (e) => {
+    e.preventDefault();
+  }, { passive: false });
+
+  // Inicjalizacja modułu PWA i Service Workera (zgodna z HTTP i gotowa na HTTPS)
+  initPWA();
+
+  // Prośba o ochronę zapisu gry przed czyszczeniem pamięci (Persistent Storage API)
+  gameStorage.requestPersistentStorage().catch(() => {});
+
+  // Font loading with short timeout - never block on this
   try {
     await Promise.race([
       document.fonts?.load?.('16px "Jersey 10"') ?? Promise.resolve(),
       document.fonts?.ready ?? Promise.resolve(),
-      new Promise(r => setTimeout(r, 600)),
+      new Promise((r) => setTimeout(r, 600)),
     ]);
-  } catch { /* ignore font failures */ }
+  } catch {
+    /* ignore font failures */
+  }
 
   const params = new URLSearchParams(window.location.search);
   const initialWorld = params.get('world') || 'lobby';
@@ -72,11 +105,22 @@ async function bootstrap() {
   await engine.init(initialWorld);
 
   // Fullscreen controls
-  fullscreenBtn?.addEventListener('click', toggleFullscreen);
+  const toggleFs = async () => {
+    await toggleGameFullscreen('landscape');
+  };
+  fullscreenBtn?.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    await toggleFs();
+  });
+
+  // Skróty klawiszowe F11 i F dla komputerów (desktop)
   window.addEventListener('keydown', (e) => {
-    if (e.code === 'F11') { e.preventDefault(); toggleFullscreen(); }
-    if (e.code === 'KeyF' && !engine.dialog.isOpen && !engine.infoModal.isOpen && !engine.pauseModal.isOpen) {
-      toggleFullscreen();
+    if (e.code === 'F11') {
+      e.preventDefault();
+      toggleFs();
+    }
+    if (e.code === 'KeyF' && !engine.dialog.isOpen && !engine.startMenu.isOpen && !engine.isPaused && !engine.infoModal.isOpen) {
+      toggleFs();
     }
   });
 
@@ -93,20 +137,20 @@ async function bootstrap() {
     engine.infoModal.show();
   });
 
-  // World switching (debug feature)
-  const worldBtn = document.getElementById('btn-switch-world') as HTMLButtonElement;
+  // World switching (dev button)
   worldBtn?.addEventListener('click', () => {
     const nextKey = engine.level.key === 'lobby' ? 'world1' : 'lobby';
     engine.loadWorld(nextKey);
     if (worldBtn) worldBtn.textContent = nextKey === 'lobby' ? 'Świat: Lobby' : 'Świat: 1';
   });
 
-  // Skin cycling (debug feature)
-  let currentSkin = 1;
+  // Skin cycling (dev button)
+  let currentSkin = engine.player.skinId || 1;
   skinBtn?.addEventListener('click', () => {
     currentSkin = (currentSkin % 5) + 1;
     engine.player.setSkin(currentSkin);
     skinBtn.textContent = `Skin: ${currentSkin}`;
+    engine.saveGameProgress();
   });
 
   // Debug toggle (sync UI with F2 keyboard shortcut)

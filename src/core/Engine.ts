@@ -8,6 +8,7 @@ import { Renderer } from '../graphics/Renderer';
 import { VirtualJoystick } from '../ui/VirtualJoystick';
 import { InteractionDialog, ConversationLine } from '../ui/InteractionDialog';
 import { StartMenu } from '../ui/StartMenu';
+import { PauseMenu } from '../ui/PauseMenu';
 import { IntroSequence } from '../ui/IntroSequence';
 import { Bossfight } from '../world/Bossfight';
 import { AABB } from '../physics/AABB';
@@ -15,6 +16,9 @@ import { InteractionParser, QuizData } from '../world/InteractionParser';
 import { sound } from './Audio';
 import { GameInfoModal } from '../ui/GameInfoModal';
 import { PauseModal } from '../ui/PauseModal';
+import { gameStorage, GameSaveData } from '../storage';
+import { isFullscreenActive, exitGameFullscreen } from '../fullscreen';
+import { AudioManager } from '../audio/AudioManager';
 
 export class Engine {
   public canvas: HTMLCanvasElement;
@@ -25,15 +29,14 @@ export class Engine {
   public level: Level;
   public dialog: InteractionDialog;
   public startMenu: StartMenu;
+  public pauseMenu: PauseMenu;
   public introSequence: IntroSequence;
   public bossfight: Bossfight;
   public joystick: VirtualJoystick;
   public infoModal: GameInfoModal;
   public pauseModal: PauseModal;
+  public isPaused: boolean = false;
 
-  // Screen-space overlay canvas for touch controls
-  public overlayCanvas: HTMLCanvasElement;
-  private overlayCtx: CanvasRenderingContext2D;
 
   public isRunning: boolean = false;
   private lastTime: number = 0;
@@ -90,10 +93,16 @@ export class Engine {
     this.infoModal = new GameInfoModal(uiContainer);
     this.pauseModal = new PauseModal(uiContainer);
 
+    this.pauseModal.onResume = () => {
+      this.isPaused = false;
+      this.updateSoundControlVisibility();
+    };
     this.pauseModal.onOpenHelp = () => {
       this.infoModal.show();
     };
     this.pauseModal.onRestartLevel = () => {
+      this.isPaused = false;
+      this.updateSoundControlVisibility();
       const m = this.level.key.match(/^(?:world)?([1-5])(_arena)?$/);
       if (m) {
         const wn = parseInt(m[1], 10);
@@ -107,31 +116,49 @@ export class Engine {
       }
     };
     this.pauseModal.onReturnToLobby = () => {
+      this.isPaused = false;
+      this.updateSoundControlVisibility();
+      this.saveGameProgress();
       this.loadWorld('lobby');
     };
 
-    const hasSave = Boolean(localStorage.getItem('cyberevo_save'));
+    const hasSave = gameStorage.hasSave();
     this.startMenu = new StartMenu(uiContainer, hasSave);
-
-    // Overlay canvas for touch controls
-    this.overlayCanvas = document.createElement('canvas');
-    this.overlayCanvas.id = 'overlay-canvas';
-    this.overlayCanvas.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:5;';
-    uiContainer.appendChild(this.overlayCanvas);
-    const octx = this.overlayCanvas.getContext('2d', { alpha: true });
-    if (!octx) throw new Error('Could not create overlay 2D context');
-    this.overlayCtx = octx;
+    this.pauseMenu = new PauseMenu(uiContainer);
 
     this.joystick = new VirtualJoystick(canvas);
     this.input.setVirtualJoystick(this.joystick);
 
     this.setupWindowResize();
     this.setupStartMenu();
+    this.setupPauseMenu();
+
+    // Start background soundtrack manager
+    AudioManager.getInstance();
+
+    // Autozapis przy minimalizacji karty / blokadzie telefonu
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden' && !this.startMenu.isOpen && !this.isPaused) {
+        this.saveGameProgress();
+      }
+    });
+    window.addEventListener('pagehide', () => {
+      if (!this.startMenu.isOpen && !this.isPaused) {
+        this.saveGameProgress();
+      }
+    });
+
+    // Nasłuchiwanie na wyjście z trybu pełnoekranowego (np. przycisk ESC w przeglądarce)
+    document.addEventListener('fullscreenchange', () => {
+      if (!isFullscreenActive() && !this.startMenu.isOpen && !this.isPaused && !this.introSequence.isActive) {
+        this.togglePause();
+      }
+    });
 
     // Mouse cursor hiding during platforming; only show when UI needs selection
     document.body.classList.add('cursor-hidden');
     window.addEventListener('mousemove', () => {
-      if (this.startMenu.isOpen || this.dialog.isChoicesVisible || this.infoModal.isOpen || this.pauseModal.isOpen) {
+      if (this.startMenu.isOpen || this.dialog.isChoicesVisible || this.infoModal.isOpen || this.pauseModal.isOpen || this.pauseMenu.isOpen) {
         document.body.classList.remove('cursor-hidden');
       }
     });
@@ -143,15 +170,12 @@ export class Engine {
         }
         if (this.startMenu.isOpen || this.dialog.isOpen) return;
 
-        if (this.pauseModal.isOpen) {
-          this.pauseModal.hide();
-        } else {
-          this.pauseModal.show();
-        }
+        e.preventDefault();
+        this.togglePause();
         return;
       }
 
-      if (e.key === 'F11' || (!this.startMenu.isOpen && !this.dialog.isChoicesVisible && !this.infoModal.isOpen && !this.pauseModal.isOpen)) {
+      if (e.key === 'F11' || (!this.startMenu.isOpen && !this.dialog.isChoicesVisible && !this.infoModal.isOpen && !this.pauseModal.isOpen && !this.pauseMenu.isOpen)) {
         document.body.classList.add('cursor-hidden');
       }
     });
@@ -159,20 +183,58 @@ export class Engine {
 
   private setupWindowResize(): void {
     const onResize = () => {
-      this.overlayCanvas.width = window.innerWidth;
-      this.overlayCanvas.height = window.innerHeight;
       this.joystick.updateLayout(window.innerWidth, window.innerHeight);
     };
     window.addEventListener('resize', onResize);
     onResize();
   }
 
+  private setupPauseMenu(): void {
+    this.pauseMenu.onResume(() => {
+      this.isPaused = false;
+    });
+
+    this.pauseMenu.onExit(() => {
+      this.isPaused = false;
+      this.saveGameProgress();
+      this.startMenu.show();
+      this.renderer.suppressLetterbox = true;
+      this.loadWorld('lobby', false);
+    });
+  }
+
+  public togglePause(): void {
+    if (this.startMenu.isOpen) return;
+
+    if (this.pauseModal.isOpen || this.pauseMenu.isOpen || this.isPaused) {
+      this.pauseModal.hide();
+      this.pauseMenu.hide();
+      this.isPaused = false;
+    } else {
+      // Wyjście z trybu pełnoekranowego jeśli jest włączony (wymóg ESC)
+      if (isFullscreenActive()) {
+        exitGameFullscreen().catch(() => {});
+      }
+      this.pauseModal.show();
+      this.isPaused = true;
+    }
+    this.updateSoundControlVisibility();
+  }
+
+  public updateSoundControlVisibility(): void {
+    const isMenuOpen = (this.startMenu && this.startMenu.isOpen) || (this.pauseMenu && this.pauseMenu.isOpen) || (this.pauseModal && this.pauseModal.isOpen);
+    AudioManager.getInstance().setVisible(Boolean(isMenuOpen));
+  }
+
   private setupStartMenu(): void {
-    this.startMenu.onSelect((action) => {
-      if (action === 'new_game') {
+    this.startMenu.onSelect(async (action) => {
+      const hasSave = gameStorage.hasSave();
+
+      // Jeśli to pierwszy raz na danym urządzeniu (!hasSave), obie opcje (nowa gra/kontynuuj) startują od prologu!
+      if (action === 'new_game' || (action === 'continue' && !hasSave)) {
+        gameStorage.resetSave();
         this.completedWorlds.clear();
         this.player.setSkin(1);
-        this.saveGameProgress();
         this.startMenu.hide();
         this.renderer.suppressLetterbox = true;
 
@@ -180,10 +242,15 @@ export class Engine {
           this.loadWorld('lobby', true);
         });
       } else if (action === 'continue') {
-        this.loadGameProgress();
+        const save = this.loadGameProgress();
         this.startMenu.hide();
         this.renderer.suppressLetterbox = true;
-        this.loadWorld('lobby', false);
+        const targetWorld = save.currentWorld || 'lobby';
+        await this.loadWorld(targetWorld, false);
+        if (targetWorld !== 'lobby' && typeof save.playerX === 'number' && typeof save.playerY === 'number') {
+          this.player.physics.x = save.playerX;
+          this.player.physics.y = save.playerY;
+        }
       } else if (action === 'exit') {
         this.infoModal.show();
       }
@@ -191,31 +258,57 @@ export class Engine {
   }
 
   public saveGameProgress(): void {
+    // NIGDY nie nadpisujemy zapisu gry gdy otwarte jest Menu Startowe!
+    if (this.startMenu.isOpen) return;
+
     try {
-      const data = {
-        evo: this.player.skinId,
-        completed: Array.from(this.completedWorlds),
-      };
-      localStorage.setItem('cyberevo_save', JSON.stringify(data));
+      const currentSave = gameStorage.getState();
+      const unlocked = { ...(currentSave.unlockedGates || {}) };
+      const currentUnlocked: number[] = [];
+      for (const gate of this.level.gates) {
+        if (!gate.locked) {
+          currentUnlocked.push(gate.id);
+        }
+      }
+      if (currentUnlocked.length > 0) {
+        unlocked[this.level.key] = currentUnlocked;
+      }
+
+      const activated = { ...(currentSave.activatedTriggers || {}) };
+      const currentActivated: number[] = [];
+      for (const trig of this.level.triggers) {
+        if (trig.activated) {
+          currentActivated.push(trig.id);
+        }
+      }
+      if (currentActivated.length > 0) {
+        activated[this.level.key] = currentActivated;
+      }
+
+      gameStorage.save({
+        currentWorld: this.level.key,
+        playerSkin: this.player.skinId,
+        playerX: Math.round(this.player.physics.x),
+        playerY: Math.round(this.player.physics.y),
+        completedWorlds: Array.from(this.completedWorlds),
+        unlockedGates: unlocked,
+        activatedTriggers: activated,
+      });
       this.startMenu.setHasSave(true);
-    } catch {
-      // Ignore
+    } catch (e) {
+      console.warn('Save game error:', e);
     }
   }
 
-  public loadGameProgress(): void {
-    try {
-      const raw = localStorage.getItem('cyberevo_save');
-      if (raw) {
-        const data = JSON.parse(raw);
-        if (data.evo) this.player.setSkin(data.evo);
-        if (Array.isArray(data.completed)) {
-          this.completedWorlds = new Set(data.completed);
-        }
-      }
-    } catch {
-      // Ignore
+  public loadGameProgress(): GameSaveData {
+    const save = gameStorage.getState();
+    if (save.playerSkin) {
+      this.player.setSkin(save.playerSkin);
     }
+    if (Array.isArray(save.completedWorlds)) {
+      this.completedWorlds = new Set(save.completedWorlds);
+    }
+    return save;
   }
 
   public async init(initialWorld: string = 'lobby'): Promise<void> {
@@ -224,6 +317,9 @@ export class Engine {
     } catch (e) {
       console.warn('Skin preload failed:', e);
     }
+
+    // Preload all bosses in background so arena entry immediately shows the right boss without delay
+    Bossfight.preloadAllBosses().catch(() => {});
 
     const params = new URLSearchParams(window.location.search);
     if (!params.has('world')) {
@@ -234,6 +330,7 @@ export class Engine {
       this.startMenu.hide();
       await this.loadWorld(initialWorld, false);
     }
+    this.updateSoundControlVisibility();
   }
 
   /**
@@ -336,8 +433,23 @@ export class Engine {
       // Atomically swap the level and place player with zero flicker!
       this.level = newLevel;
 
+      // Restore unlocked gates and activated triggers from persistent storage
+      const savedGates = gameStorage.getState().unlockedGates[worldKey] || [];
+      for (const gId of savedGates) {
+        newLevel.openGate(gId);
+      }
+      const savedTrigs = gameStorage.getState().activatedTriggers[worldKey] || [];
+      for (const tId of savedTrigs) {
+        const trig = newLevel.triggers.find((t) => t.id === tId);
+        if (trig) trig.activated = true;
+      }
+
       // Spawn positioning
       if (isArena && currentWn !== null) {
+        // Pre-initialize and preload bossfight BEFORE starting run-in animation so boss is instantly visible!
+        await Bossfight.preloadBoss(currentWn);
+        await this.startBossfight(currentWn, this.arenaIntroSkipBossDialog);
+
         // Arena entrance intro: compute floor ground level so player's feet are exactly on ground
         this.placePlayerOnGround(defaultSpawnX);
         const groundY = this.player.physics.y;
@@ -354,7 +466,7 @@ export class Engine {
       } else if (worldKey === 'lobby') {
         // Always drop in from above on every return to lobby (1:1 with Python prototype)
         this.player.physics.x = CONFIG.LOGICAL_WIDTH / 2 - CONFIG.PLAYER_WIDTH / 2;
-        this.player.physics.y = 80;
+        this.player.physics.y = -CONFIG.PLAYER_HEIGHT - 64;
         this.player.physics.vx = 0;
         this.player.physics.vy = 0;
         this.player.physics.facing = 'left';
@@ -378,14 +490,15 @@ export class Engine {
       this.camera.reset(this.player.physics.bounds.centerX, effectiveWidth);
       this.solidsNeedRefresh = true;
 
-      // Handle Dialogs and Bossfight:
-      if (isArena && currentWn !== null) {
-        // Pre-initialize and start bossfight immediately so boss is visible as player runs in!
-        await this.startBossfight(currentWn, this.arenaIntroSkipBossDialog);
-      } else if (worldKey === 'lobby') {
+      // Handle Dialogs and World Intro:
+      if (worldKey === 'lobby') {
         // Lobby dialog will trigger smoothly upon landing from drop-in!
-      } else if (currentWn !== null) {
+      } else if (currentWn !== null && !isArena) {
         this.playWorldIntro(currentWn, worldName);
+      }
+
+      if (!isNewGameIntro && !this.startMenu.isOpen) {
+        this.saveGameProgress();
       }
     } catch (e) {
       console.error(`Failed to load world "${worldKey}":`, e);
@@ -418,6 +531,7 @@ export class Engine {
               bounds: new AABB(centerX, arenaFloor - portalH, portalW, portalH),
               targetWorld: 'lobby',
               label: 'POWRÓT DO LOBBY',
+              alpha: 0,
             });
             this.loadPortalsForLevel(this.level, 'lobby');
             this.pendingSummaryWorld = wn;
@@ -444,7 +558,7 @@ export class Engine {
         setTimeout(() => {
           const outroText =
             this.bossfight.bossData?.outro ||
-            'Udało ci się.\nZrozumiałeś, że bezpieczeństwo nie polega na strachu, ale na świadomości.\nKażdy świat był lekcją — o zaufaniu, prywatności, ochronie i odpowiedzialności.\nTeraz to ty jesteś strażnikiem swojego świata.\nCyberEwolucja nie kończy się tu… ona trwa w każdym twoim wyborze.';
+            'Udało ci się.\nZrozumiałeś, że bezpieczeństwo nie polega na strachu, ale na świadomości.\nKażdy świat był lekcją - o zaufaniu, prywatności, ochronie i odpowiedzialności.\nTeraz to ty jesteś strażnikiem swojego świata.\nCyberEwolucja nie kończy się tu… ona trwa w każdym twoim wyborze.';
           this.dialog.startBossIntro(
             'Mędrzec',
             outroText,
@@ -460,6 +574,7 @@ export class Engine {
               bounds: new AABB(centerX, arenaFloor - portalH, portalW, portalH),
               targetWorld: 'ending',
               label: 'WRÓĆ DO RZECZYWISTOŚCI',
+              alpha: 0,
             });
             this.loadPortalsForLevel(this.level, 'world5_arena');
           },
@@ -472,24 +587,26 @@ export class Engine {
 
   private retryBossfight(wn: number): void {
     this.arenaIntroSkipBossDialog = true;
-    this.placePlayerOnGround(250);
-    const groundY = this.player.physics.y;
-    this.player.physics.x = -150;
-    this.player.physics.y = groundY;
-    this.player.physics.vx = 260;
+    this.arenaIntroActive = false;
+    this.arenaIntroWn = null;
+
+    // Po przegraniu z bossem i kliknięciu "Walcz ponownie" gracz od razu staje na arenie bez ponownej animacji wejścia
+    this.placePlayerOnGround(300);
+    this.player.physics.vx = 0;
     this.player.physics.vy = 0;
     this.player.physics.facing = 'right';
     this.player.physics.onGround = true;
     this.player.animTimer = 0;
     this.player.runFrameIndex = 0;
-    this.arenaIntroActive = true;
-    this.arenaIntroWn = wn;
+
+    // Natychmiast restartujemy walkę (reset HP gracza i bossa oraz pytań bez żadnej animacji wchodzenia)
     this.startBossfight(wn, true /* skipIntro */);
   }
 
   private restartWorld(wn: number): void {
     this.arenaIntroSkipBossDialog = false;
     this.completedWorlds.delete(wn);
+    gameStorage.resetWorldProgress(`world${wn}`);
     this.triggerWorldTransition(`world${wn}`);
   }
 
@@ -714,7 +831,7 @@ export class Engine {
       }
     }
 
-    if (this.transitionState !== 'wipe_out' && !this.pauseModal.isOpen && !this.infoModal.isOpen) {
+    if (!this.isPaused && this.transitionState !== 'wipe_out' && !this.pauseModal.isOpen && !this.infoModal.isOpen) {
       const maxSubstep = 0.010;
       const substeps = Math.max(1, Math.ceil(rawDt / maxSubstep));
       const subDt = rawDt / substeps;
@@ -739,25 +856,35 @@ export class Engine {
       ? Math.min(1.0, this.worldIntroTimer / 0.6)
       : 0;
 
-    this.renderer.render(
-      this.level,
-      this.player,
-      this.camera,
-      rawDt,
-      this.fps,
-      this.activeHint,
-      this.bossfight,
-      this.worldIntroTitle,
-      introAlpha,
-      this.transitionState,
-      this.transitionTimer / this.transitionDuration
-    );
-
-    // Overlay touch controls
-    this.overlayCtx.clearRect(0, 0, this.overlayCanvas.width, this.overlayCanvas.height);
-    if (!this.startMenu.isOpen && !this.dialog.isOpen && !this.introSequence.isActive) {
-      this.joystick.renderOverlay(this.overlayCtx);
+    if (this.introSequence.isActive) {
+      // Pełny czarny ekran na canvasie podczas odtwarzania wstępu i zakończenia
+      const ctx = this.canvas.getContext('2d');
+      if (ctx) {
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      }
+    } else {
+      this.renderer.render(
+        this.level,
+        this.player,
+        this.camera,
+        rawDt,
+        this.fps,
+        this.activeHint,
+        this.bossfight,
+        this.worldIntroTitle,
+        introAlpha,
+        this.transitionState,
+        this.transitionTimer / this.transitionDuration
+      );
     }
+
+    // Ikonka regulacji głośności widoczna wyłącznie w menu głównym oraz w menu pauzy (ESC)
+    this.updateSoundControlVisibility();
+
+    // Mobile Touch Controls visibility
+    const showControls = !this.startMenu.isOpen && !this.dialog.isOpen && !this.introSequence.isActive && !this.pauseMenu.isOpen;
+    this.joystick.setVisible(showControls);
 
     requestAnimationFrame((t) => this.loop(t));
   }
@@ -882,6 +1009,21 @@ export class Engine {
 
     // Check interaction hints and triggers
     this.checkHintsAndInteractions(rawInput.interactPressed);
+
+    // Dynamic visibility and active interaction highlight on mobile touch controls
+    this.joystick.setInteractAvailable(this.activeHint !== null);
+
+    const shouldShowTouch =
+      !this.startMenu.isOpen &&
+      !this.pauseMenu.isOpen &&
+      !this.introSequence.isActive &&
+      !this.dialog.isOpen &&
+      !this.arenaIntroActive &&
+      this.transitionState === 'none' &&
+      (!this.bossfight.active || this.bossfight.bossDefeated) &&
+      !this.lobbyDropinActive;
+
+    this.joystick.setVisible(shouldShowTouch);
   }
 
   public triggerWorldTransition(targetWorld: string): void {
@@ -986,10 +1128,14 @@ export class Engine {
           goodFeedback: quiz.goodFeedback,
           badFeedback: quiz.badFeedback,
           onSuccess: () => {
+            sound.playGateUnlock();
             this.level.openGate(triggerId);
             this.solidsNeedRefresh = true;
             const trig = this.level.triggers.find((t) => t.id === triggerId);
             if (trig) trig.activated = true;
+            gameStorage.markGateUnlocked(this.level.key, triggerId);
+            gameStorage.markTriggerActivated(this.level.key, triggerId);
+            this.saveGameProgress();
           },
         },
         this.player.skinId,
@@ -1011,10 +1157,14 @@ export class Engine {
         goodFeedback: 'Znakomity wybór! Rozpoznałeś socjotechnikę i presję czasu. Twoje konto jest bezpieczne.',
         badFeedback: 'To pułapka phishingowa! Przekazanie hasła dałoby oszustom pełny dostęp do Twojego profilu.',
         onSuccess: () => {
+          sound.playGateUnlock();
           this.level.openGate(triggerId);
           this.solidsNeedRefresh = true;
           const trig = this.level.triggers.find((t) => t.id === triggerId);
           if (trig) trig.activated = true;
+          gameStorage.markGateUnlocked(this.level.key, triggerId);
+          gameStorage.markTriggerActivated(this.level.key, triggerId);
+          this.saveGameProgress();
         },
       },
       this.player.skinId,

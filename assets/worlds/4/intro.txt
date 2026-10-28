@@ -1,5 +1,5 @@
 WORLDNAME: Twierdza Kopii
-INTROTEXT: To Twierdza Kopii — mroczny bastion radykalizacji, wściekłości i internetowych baniek.
+INTROTEXT: To Twierdza Kopii - mroczny bastion radykalizacji, wściekłości i internetowych baniek.
 Tu każda skrajna opinia jest powielana tysiące razy, aż staje się jedyną dozwoloną 'prawdą'.
 Chronos Paniki odlicza sekundy, byś pod wpływem gniewu i strachu zatracił zdolność logicznego myślenia.
 Tylko ci, którzy potrafią zatrzymać spiralę nienawiści, przełamią mury tej twierdzy.

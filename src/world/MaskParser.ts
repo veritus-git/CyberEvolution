@@ -16,19 +16,26 @@ export type TileType =
   | 'GATE_3'
   | 'ARENA'
   | 'BOSS';
-
 export class MaskParser {
+  private static imageCache: Map<string, HTMLImageElement> = new Map();
+
   /**
-   * Helper to load an HTMLImageElement asynchronously with generous timeout.
+   * Helper to load an HTMLImageElement asynchronously with generous timeout and in-memory caching.
    */
   public static async loadImage(url: string): Promise<HTMLImageElement> {
+    const cached = this.imageCache.get(url);
+    if (cached && cached.complete && cached.naturalWidth > 0) {
+      return cached;
+    }
+
     return new Promise((resolve, reject) => {
       const img = new Image();
       const timer = setTimeout(() => {
         reject(new Error(`Timeout loading image: ${url}`));
-      }, 15000);
+      }, 20000);
       img.onload = () => {
         clearTimeout(timer);
+        MaskParser.imageCache.set(url, img);
         resolve(img);
       };
       img.onerror = () => {

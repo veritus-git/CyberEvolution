@@ -3,6 +3,7 @@ import { MaskParser } from './MaskParser';
 import { Player } from '../entities/Player';
 import { AABB } from '../physics/AABB';
 import { sound } from '../core/Audio';
+import { isMobileDevice } from '../core/Device';
 
 function shuffleArray<T>(arr: T[]): T[] {
   const result = [...arr];
@@ -29,6 +30,126 @@ export interface BossData {
 }
 
 export class Bossfight {
+  private static bossFramesCache: Map<number, [HTMLImageElement, HTMLImageElement]> = new Map();
+  private static bossDataCache: Map<number, BossData> = new Map();
+  private static scrollCache: Map<number, HTMLImageElement> = new Map();
+
+  public static async preloadBoss(worldNum: number): Promise<void> {
+    const promises: Promise<any>[] = [];
+
+    // Preload boss animation frames (boss1.png, boss2.png)
+    if (!Bossfight.bossFramesCache.has(worldNum)) {
+      promises.push(
+        Promise.all([
+          MaskParser.loadImage(`/assets/worlds/${worldNum}/boss/boss1.png`),
+          MaskParser.loadImage(`/assets/worlds/${worldNum}/boss/boss2.png`),
+        ]).then(([b1, b2]) => {
+          Bossfight.bossFramesCache.set(worldNum, [b1, b2]);
+        }).catch((e) => {
+          console.warn(`Boss frames preload failed for world ${worldNum}:`, e);
+        })
+      );
+    }
+
+    // Preload scroll image for worlds 1..4
+    if (worldNum < 5 && !Bossfight.scrollCache.has(worldNum)) {
+      promises.push(
+        MaskParser.loadImage(`/assets/worlds/${worldNum}/arena/zwoj.png`)
+          .then((img) => Bossfight.scrollCache.set(worldNum, img))
+          .catch(() => {})
+      );
+    }
+
+    // Preload boss avatar for dialogue
+    promises.push(
+      MaskParser.loadImage(`/assets/avatars/boss${worldNum}.png`).catch(() => {})
+    );
+
+    // Preload questions & dialogue text
+    if (!Bossfight.bossDataCache.has(worldNum)) {
+      promises.push(
+        fetch(`/assets/worlds/${worldNum}/bossfight.txt`)
+          .then((res) => {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.text();
+          })
+          .then((raw) => {
+            const data = Bossfight.parseBossfightData(raw);
+            Bossfight.bossDataCache.set(worldNum, data);
+          })
+          .catch((e) => {
+            console.warn(`Boss data preload failed for world ${worldNum}:`, e);
+          })
+      );
+    }
+
+    await Promise.all(promises);
+  }
+
+  public static async preloadAllBosses(): Promise<void> {
+    const worlds = [1, 2, 3, 4, 5];
+    await Promise.all(worlds.map((w) => Bossfight.preloadBoss(w)));
+  }
+
+  public static parseBossfightData(raw: string): BossData {
+    const lines = raw.split('\n');
+    let name = 'Boss';
+    let intro = '';
+    let outro = '';
+    const questions: BossQuestion[] = [];
+
+    let curQ = '';
+    let curA = '';
+    let curB = '';
+    let curC = '';
+    let curCorrect = 0;
+
+    const flushQ = () => {
+      if (curQ && curA && curB && curC) {
+        questions.push({
+          q: curQ,
+          a: curA,
+          b: curB,
+          c: curC,
+          correct: curCorrect,
+        });
+      }
+      curQ = '';
+      curA = '';
+      curB = '';
+      curC = '';
+      curCorrect = 0;
+    };
+
+    for (const rawLine of lines) {
+      const line = rawLine.trim();
+      if (!line || line.startsWith('#')) continue;
+
+      if (line.startsWith('BOSSNAME:')) {
+        name = line.replace('BOSSNAME:', '').trim();
+      } else if (line.startsWith('INTRO:')) {
+        intro = line.replace('INTRO:', '').trim();
+      } else if (line.startsWith('OUTRO:')) {
+        outro = line.replace('OUTRO:', '').trim().replace(/\\n/g, '\n');
+      } else if (line.startsWith('Q:')) {
+        flushQ();
+        curQ = line.replace('Q:', '').trim();
+      } else if (line.startsWith('A:')) {
+        curA = line.replace('A:', '').trim();
+      } else if (line.startsWith('B:')) {
+        curB = line.replace('B:', '').trim();
+      } else if (line.startsWith('C:')) {
+        curC = line.replace('C:', '').trim();
+      } else if (line.toUpperCase().startsWith('CORRECT:')) {
+        const letter = line.split(':')[1].trim().toUpperCase();
+        curCorrect = letter === 'B' ? 1 : letter === 'C' ? 2 : 0;
+      }
+    }
+    flushQ();
+
+    return { name, intro, outro, questions };
+  }
+
   public active: boolean = false;
   public worldNumber: number = 1;
   public bossData: BossData | null = null;
@@ -107,7 +228,17 @@ export class Bossfight {
   private onDefeatCallback?: () => void;
   private onWorld5DefeatedCallback?: () => void;
 
+  public choiceBounds: { x: number; y: number; width: number; height: number }[] = [];
+
+  // Mobile Bossfight UI
+  private mobileContainer: HTMLElement | null = null;
+  private mobileQuestionEl: HTMLElement | null = null;
+  private mobileChoiceBtns: HTMLButtonElement[] = [];
+  private mobileTitleEl: HTMLElement | null = null;
+
   constructor() {
+    this.createMobileUI();
+
     // Keyboard navigation
     window.addEventListener('keydown', (e) => {
       if (!this.active || this.bossDefeated || this.isIntroActive) return;
@@ -134,9 +265,157 @@ export class Bossfight {
         this.confirmSelection();
       }
     });
+
+    // Touch / Pointer navigation for mobile & mouse
+    window.addEventListener('pointerdown', (e) => {
+      if (!this.active || this.bossDefeated || this.isIntroActive) return;
+      if (this.animState !== 'visible' || this.inputCooldownTimer > 0) return;
+      if (this.state === 'feedback') return;
+
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === 'BUTTON' || target.closest('button') || target.closest('.retro-dialog-container') || target.closest('.death-menu-overlay') || target.closest('.mobile-bossfight-ui'))) {
+        return;
+      }
+
+      const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
+      if (!canvas) return;
+      const rect = canvas.getBoundingClientRect();
+      if (
+        e.clientX < rect.left ||
+        e.clientX > rect.right ||
+        e.clientY < rect.top ||
+        e.clientY > rect.bottom
+      ) {
+        return;
+      }
+
+      const scaleX = CONFIG.LOGICAL_WIDTH / rect.width;
+      const scaleY = CONFIG.LOGICAL_HEIGHT / rect.height;
+      const logicalX = (e.clientX - rect.left) * scaleX;
+      const logicalY = (e.clientY - rect.top) * scaleY;
+
+      for (let i = 0; i < this.choiceBounds.length; i++) {
+        const b = this.choiceBounds[i];
+        if (
+          b &&
+          logicalX >= b.x &&
+          logicalX <= b.x + b.width &&
+          logicalY >= b.y &&
+          logicalY <= b.y + b.height
+        ) {
+          e.preventDefault();
+          this.selection = i;
+          this.confirmSelection();
+          return;
+        }
+      }
+    }, { passive: false });
   }
 
-  public isIntroActive: boolean = false;
+  private createMobileUI(): void {
+    if (typeof document === 'undefined') return;
+    const existing = document.getElementById('mobile-bossfight-ui');
+    if (existing) existing.remove();
+
+    this.mobileContainer = document.createElement('div');
+    this.mobileContainer.id = 'mobile-bossfight-ui';
+    this.mobileContainer.className = 'mobile-bossfight-ui hidden';
+
+    this.mobileContainer.innerHTML = `
+      <div class="mobile-boss-card">
+        <div class="mobile-boss-header">
+          <span class="mobile-boss-title">Walka z Bossem</span>
+        </div>
+        <div class="mobile-boss-question"></div>
+        <div class="mobile-boss-choices">
+          <button class="mobile-boss-btn" data-choice="0">
+            <span class="badge">A</span>
+            <span class="choice-text"></span>
+          </button>
+          <button class="mobile-boss-btn" data-choice="1">
+            <span class="badge">B</span>
+            <span class="choice-text"></span>
+          </button>
+          <button class="mobile-boss-btn" data-choice="2">
+            <span class="badge">C</span>
+            <span class="choice-text"></span>
+          </button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(this.mobileContainer);
+
+    this.mobileTitleEl = this.mobileContainer.querySelector('.mobile-boss-title');
+    this.mobileQuestionEl = this.mobileContainer.querySelector('.mobile-boss-question');
+    const btns = this.mobileContainer.querySelectorAll('.mobile-boss-btn');
+    this.mobileChoiceBtns = Array.from(btns) as HTMLButtonElement[];
+
+    this.mobileChoiceBtns.forEach((btn, idx) => {
+      btn.addEventListener('pointerdown', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        this.chooseOption(idx);
+      });
+    });
+  }
+
+  public chooseOption(idx: number): void {
+    if (!this.active || this.bossDefeated || this.isIntroActive) return;
+    if (this.animState !== 'visible' || this.inputCooldownTimer > 0) return;
+    if (this.state === 'feedback') return;
+    this.selection = idx;
+    this.confirmSelection();
+  }
+
+  private updateMobileUI(): void {
+    if (!this.mobileContainer) return;
+
+    const shouldShow =
+      this.active &&
+      !this.bossDefeated &&
+      !this.isIntroActive &&
+      (this.animState === 'visible' || this.animState === 'enter') &&
+      Boolean(this.cur);
+
+    if (!shouldShow) {
+      this.mobileContainer.classList.add('hidden');
+      return;
+    }
+
+    this.mobileContainer.classList.remove('hidden');
+
+    if (this.mobileTitleEl && this.bossData) {
+      this.mobileTitleEl.textContent = this.bossData.name;
+    }
+
+    if (this.mobileQuestionEl && this.cur) {
+      this.mobileQuestionEl.textContent = this.cur.q;
+    }
+
+    this.mobileChoiceBtns.forEach((btn, idx) => {
+      const textSpan = btn.querySelector('.choice-text');
+      if (textSpan && this.optTexts[idx]) {
+        textSpan.textContent = this.optTexts[idx];
+      }
+
+      btn.classList.remove('selected', 'correct', 'wrong', 'reveal-correct');
+
+      if (this.state === 'feedback') {
+        const isGood = this.selection === this.correctIdxShuffled;
+        if (idx === this.selection) {
+          btn.classList.add(isGood ? 'correct' : 'wrong');
+        }
+        if (!isGood && idx === this.correctIdxShuffled) {
+          btn.classList.add('reveal-correct');
+        }
+      } else if (idx === this.selection) {
+        btn.classList.add('selected');
+      }
+    });
+  }
+
+  public isIntroActive: boolean = true;
 
   public async start(
     worldNum: number,
@@ -147,6 +426,8 @@ export class Bossfight {
     onWorld5Defeated?: () => void
   ): Promise<void> {
     this.worldNumber = worldNum;
+    this.isIntroActive = true;
+    this.animState = 'hidden';
     this.onVictoryCallback = onVictory;
     this.onDefeatCallback = onDefeat;
     this.onWorld5DefeatedCallback = onWorld5Defeated;
@@ -159,7 +440,11 @@ export class Bossfight {
     this.inputCooldownTimer = 0.5;
     this.scrollActive = false;
     this.bossSpawnRect = bossSpawn;
-    this.animState = 'hidden';
+
+    // Clear frames so old boss from another world NEVER renders
+    this.bossFrames = null;
+    this.scrollImg = null;
+    this.bossData = null;
 
     // HP map per world number (1:1 with Python _get_boss_hp_static)
     const hpMap: Record<number, number> = { 1: 500, 2: 600, 3: 700, 4: 800, 5: 1000 };
@@ -181,31 +466,19 @@ export class Bossfight {
       this.bossH = 608;
     }
 
-    // Load boss images independently of scroll
-    try {
-      const [b1, b2] = await Promise.all([
-        MaskParser.loadImage(`/assets/worlds/${worldNum}/boss/boss1.png`),
-        MaskParser.loadImage(`/assets/worlds/${worldNum}/boss/boss2.png`),
-      ]);
-      this.bossFrames = [b1, b2];
-    } catch (e) {
-      console.warn(`Boss frames load failed for world ${worldNum}:`, e);
-      this.bossFrames = null;
-    }
+    // Preload / retrieve preloaded boss assets immediately
+    await Bossfight.preloadBoss(worldNum);
 
-    // Only worlds 1..4 have a scroll (world 5 has no scroll)
-    if (worldNum < 5) {
-      try {
-        this.scrollImg = await MaskParser.loadImage(`/assets/worlds/${worldNum}/arena/zwoj.png`);
-      } catch {
-        this.scrollImg = null;
-      }
+    this.bossFrames = Bossfight.bossFramesCache.get(worldNum) || null;
+    this.scrollImg = Bossfight.scrollCache.get(worldNum) || null;
+    const bData = Bossfight.bossDataCache.get(worldNum);
+    if (bData) {
+      this.bossData = bData;
+      this.questionsAll = [...bData.questions];
+      this.questions = shuffleArray([...this.questionsAll]);
     } else {
-      this.scrollImg = null;
+      await this.loadBossData(worldNum);
     }
-
-    // Load boss questions
-    await this.loadBossData(worldNum);
 
     if (skipIntro) {
       this.isIntroActive = false;
@@ -363,6 +636,7 @@ export class Bossfight {
     this.bossDefeated = true;
     this.bossBlinkActive = false;
     this.animState = 'hidden';
+    this.updateMobileUI();
     // Slower, dramatic death blinking (1.6s total) before bursting into pixel explosion!
     this.bossDeathTimer = 1.6;
     this.bossShakeTimer = 1.6;
@@ -391,6 +665,7 @@ export class Bossfight {
 
   public triggerPlayerDefeat(): void {
     this.animState = 'hidden';
+    this.updateMobileUI();
     if (this.onDefeatCallback) {
       this.onDefeatCallback();
     }
@@ -499,6 +774,7 @@ export class Bossfight {
         }
       }
     }
+    this.updateMobileUI();
   }
 
   /**
@@ -512,8 +788,8 @@ export class Bossfight {
   public render(ctx: CanvasRenderingContext2D, cameraX: number, player: Player): void {
     if (!this.active) return;
 
-    // 1. Draw Boss Quiz Card (Canvas rendered, 1:1 with Python BossQuizRuntime)
-    if (!this.bossDefeated && this.animState !== 'hidden') {
+    // 1. Draw Boss Quiz Card (Canvas rendered on desktop, 1:1 with Python BossQuizRuntime)
+    if (!this.bossDefeated && this.animState !== 'hidden' && !isMobileDevice()) {
       this.drawQuizCard(ctx);
     }
 
@@ -539,8 +815,8 @@ export class Bossfight {
       this.drawDeathParticles(ctx, cameraX);
     }
 
-    // 4. Draw HP Bars above heads (1:1 with Python _draw_hp_bars) - ONLY when not in intro and not defeated!
-    if (!this.bossDefeated && !this.isIntroActive) {
+    // 4. Draw HP Bars above heads (1:1 with Python _draw_hp_bars) - ONLY when not in intro and quiz card active!
+    if (!this.bossDefeated && !this.isIntroActive && (this.animState === 'visible' || this.animState === 'enter')) {
       this.drawHpBars(ctx, cameraX, player);
     }
 
@@ -610,11 +886,22 @@ export class Bossfight {
     curY += 6;
 
     // Choices (shuffled)
+    this.choiceBounds = [];
     ctx.font = "22px 'Jersey 10', 'VT323', monospace";
     for (let i = 0; i < this.optTexts.length; i++) {
       const isSel = i === this.selection;
       const tag = ['A', 'B', 'C'][i];
       const optStr = `${tag}. ${this.optTexts[i]}`;
+
+      const boxW = panelW - 32;
+      const boxH = 30;
+      const boxY = curY - 4;
+      this.choiceBounds.push({
+        x: cardX + 16,
+        y: boxY,
+        width: boxW,
+        height: boxH,
+      });
 
       let textColor = '#dcdcdc';
       let bgColor: string | null = null;
@@ -647,7 +934,7 @@ export class Bossfight {
       const textMetrics = ctx.measureText(optStr);
       if (bgColor) {
         ctx.fillStyle = bgColor;
-        ctx.fillRect(cardX + 16, curY - 3, Math.min(panelW - 32, textMetrics.width + 16), 28);
+        ctx.fillRect(cardX + 16, boxY, Math.min(boxW, textMetrics.width + 16), boxH);
       }
 
       ctx.fillStyle = textColor;
@@ -657,8 +944,12 @@ export class Bossfight {
 
     // Bottom-left mini help instruction
     ctx.font = "16px 'Jersey 10', 'VT323', monospace";
-    ctx.fillStyle = '#646464';
-    ctx.fillText('Wybór: strzałki ↑/↓ lub 1–3, zatwierdź Enter', cardX + 18, cardY + panelH - 24);
+    ctx.fillStyle = '#8c8c8c';
+    const isTouch = typeof window !== 'undefined' && (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
+    const hintMsg = isTouch
+      ? 'Dotknij wybranej odpowiedzi A, B lub C, aby zatwierdzić'
+      : 'Wybór: strzałki ↑/↓ lub 1–3, zatwierdź Enter';
+    ctx.fillText(hintMsg, cardX + 18, cardY + panelH - 24);
 
     ctx.restore();
   }

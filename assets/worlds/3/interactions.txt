@@ -1,11 +1,11 @@
 # world3_interactions.txt
-# Temat: Maskarada Luster — Influencerzy, ukryte reklamy, wyłudzenia SMS w konkursach, chatboty AI
+# Temat: Maskarada Luster - Influencerzy, ukryte reklamy, wyłudzenia SMS w konkursach, chatboty AI
 # Boss: Mirror Queen
 
 AVATAR: influencerka
 CONTEXT: Dziewczyna w różowych okularach uśmiecha się szeroko do obiektywu smartfona:\n„Cześć kochani! Pytacie mnie, skąd mam kasę na te wszystkie podróże.\nOdkryłam genialną platformę inwestycyjną! Wpłacasz 100 zł i po 24h masz 1000 zł bez żadnego ryzyka! Link w bio!”
 SAGE: Brak oznaczenia '#reklama', obietnica gigantycznego zysku bez ryzyka i żerowanie na sympatii fanów. To typowy scam finansowy promowany przez nieetycznych twórców.
-A: Wpłacam 100 zł — skoro moja ulubiona influencerka to poleca, to na pewno działa!
+A: Wpłacam 100 zł - skoro moja ulubiona influencerka to poleca, to na pewno działa!
 B: Odrzucam ofertę. Nie ma 'zysku bez ryzyka', a brak oznaczenia współpracy budzi ogromne podejrzenia.
 GOOD: Brawo! Prawdziwy internauta myśli krytycznie. Influencerzy nie są nieomylni, a wielu promuje pułapki wyłącznie dla prowizji.
 BAD: Niestety… Dałeś się uwieść fałszywemu autorytetowi. Twoje pieniądze przepadły bezpowrotnie. Wróć i przemyśl to!
@@ -16,11 +16,11 @@ SPEED_FEEDBACK: 36
 ---
 AVATAR: znajomy_2
 CONTEXT: Chłopak z piegami pokazuje ci telefon z wielkim napisem KONKURS:\n„Siemanko! Biorę udział w finale konkursu na festiwal marzeń! Brakuje mi jednego głosu.\nWysłałem ci SMS-em 6-cyfrowy kod, przepisz mi go szybko tutaj, błagam!”
-SAGE: Uważaj! Ten kod z SMS-a to prawdopodobnie autoryzacja przelewu, rejestracja drogiej subskrypcji lub kod do przejęcia twojego profilu. Zanim cokolwiek podasz — zweryfikuj tożsamość.
-A: Podaję mu kod od razu — kumplowi w potrzebie się nie odmawia!
+SAGE: Uważaj! Ten kod z SMS-a to prawdopodobnie autoryzacja przelewu, rejestracja drogiej subskrypcji lub kod do przejęcia twojego profilu. Zanim cokolwiek podasz - zweryfikuj tożsamość.
+A: Podaję mu kod od razu - kumplowi w potrzebie się nie odmawia!
 B: Nie podaję kodu. Dzwonię do niego zwykłym telefonem, by upewnić się, czy ktoś nie przejął jego konta.
-GOOD: Idealna reakcja! Telefon wyjaśnił wszystko — konto kumpla zostało skradzione. Chroniąc swój kod, obroniłeś się przed włamaniem.
-BAD: Fatalna decyzja! Ten kod nie był do konkursu — właśnie autoryzowałeś przejęcie własnego konta. Nigdy nie podawaj nikomu kodów z SMS-ów!
+GOOD: Idealna reakcja! Telefon wyjaśnił wszystko - konto kumpla zostało skradzione. Chroniąc swój kod, obroniłeś się przed włamaniem.
+BAD: Fatalna decyzja! Ten kod nie był do konkursu - właśnie autoryzowałeś przejęcie własnego konta. Nigdy nie podawaj nikomu kodów z SMS-ów!
 CORRECT: B
 SPEED_CONTEXT: 38
 SPEED_SAGE: 32
@@ -29,7 +29,7 @@ SPEED_FEEDBACK: 36
 AVATAR: chatbot
 CONTEXT: Holograficzna postać o błękitnych włosach przechyla głowę z czułym uśmiechem:\n„Cześć! Widzę po twoich postach, że czujesz się samotny i niezrozumiany.\nMożesz mi powiedzieć absolutnie wszystko. Z kim z klasy masz konflikt? Czego najbardziej się wstydzisz? Zostanie to między nami…”
 SAGE: Syntetyczna empatia potrafi być zwodnicza. Boty i profile AI gromadzą twoje najgłębsze sekrety, by budować profil psychologiczny lub wykorzystać je przeciwko tobie.
-A: Otwieram się i opisuję swoje sekrety — wreszcie ktoś mnie naprawdę słucha.
+A: Otwieram się i opisuję swoje sekrety - wreszcie ktoś mnie naprawdę słucha.
 B: Zachowuję dystans. Nie zwierzam się sztucznej inteligencji ani obcym profilom z intymnych spraw.
 GOOD: Doskonale. Prawdziwe relacje buduje się z ludźmi w realnym świecie, a algorytmy karmią się twoimi słabościami.
 BAD: Zły wybór! Twoje sekrety zostały zapisane na obcym serwerze i mogą posłużyć do szantażu lub manipulacji. Zachowaj prywatność dla siebie!

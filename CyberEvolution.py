@@ -1,9 +1,9 @@
-"""CyberEvolution — refactor pass 1 (formatting & hygiene only).
+"""CyberEvolution - refactor pass 1 (formatting & hygiene only).
 - Preserves gameplay and behavior 1:1
 - No logic changes; only whitespace cleanup and section headers kept intact
 - Ready as clean baseline for future functional refactors
 """
-# (NOTE: PixelFont cache untouched)\n# === CyberEvolution — CEv5.0.py ===
+# (NOTE: PixelFont cache untouched)\n# === CyberEvolution - CEv5.0.py ===
 # Clean, structured single-file build preserving gameplay & behavior from last checkpoint.
 # See section headers for quick navigation; each block is compact and commented.
 # This file is intentionally self-contained for easy portability to a new engine.
@@ -12,7 +12,7 @@
 # world intros, dynamic lobby portal by evo level, skin switching (1..5), debug overlay.
 #
 # Controls:
-#   A/D or ←/→ — ruch,  SPACE/W/↑ — skok,  E — portal/wspinaczka,  1..5 — skiny,  F2 — debug,  F11 — fullscreen,  B — dev-jump
+#   A/D or ←/→ - ruch,  SPACE/W/↑ - skok,  E - portal/wspinaczka,  1..5 - skiny,  F2 - debug,  F11 - fullscreen,  B - dev-jump
 #
 # -----------------------------
 # 0) Imports & setup
@@ -21,7 +21,7 @@
 # =============================================================================
 # LAYOUT & EXT MARKERS (READ FIRST)
 # -----------------------------------------------------------------------------
-# Gameplay 1:1 — tylko struktura pod bezpieczne modyfikacje.
+# Gameplay 1:1 - tylko struktura pod bezpieczne modyfikacje.
 # =============================================================================
 import os, sys, math, random, re
 from collections import defaultdict
@@ -62,7 +62,7 @@ def parse_world_scripts(wn: int):
                     optA=d.get('A','Opcja A'),
                     optB=d.get('B','Opcja B'),
                     good=d.get('GOOD','Poprawna odpowiedź.'),
-                    bad=d.get('BAD','Niepoprawna — spróbuj ponownie.'),
+                    bad=d.get('BAD','Niepoprawna - spróbuj ponownie.'),
                     speed_context=float(d.get('SPEED_CONTEXT',38.0) or 38.0),
                     speed_sage=float(d.get('SPEED_SAGE',32.0) or 32.0),
                     speed_feedback=float(d.get('SPEED_FEEDBACK',36.0) or 36.0),
@@ -272,16 +272,16 @@ def default_interaction_scripts():
             sage="Nie loguj się przez link w mailu. Użyj aplikacji lub wpisz adres samodzielnie.",
             optA="Klikam link i loguję się.",
             optB="Uruchamiam aplikację banku lub wpisuję adres ręcznie.",
-            good="Świetnie — to bezpieczne.",
+            good="Świetnie - to bezpieczne.",
             bad="Ryzyko przejęcia danych logowania.",
             correct_letter="B"
         ),
         ScriptedInteraction(
             context="Znajomy: 'Wyślij BLIK, oddam jutro.'",
-            sage="Zweryfikuj tożsamość — konto mogło zostać przejęte.",
+            sage="Zweryfikuj tożsamość - konto mogło zostać przejęte.",
             optA="Wysyłam od razu.",
             optB="Dzwonię i potwierdzam tożsamość.",
-            good="Tak jest — zawsze weryfikuj.",
+            good="Tak jest - zawsze weryfikuj.",
             bad="Błąd. To może być oszustwo.",
             correct_letter="B"
         )
@@ -1180,7 +1180,7 @@ def load_game_intro_dialog():
         items = [
             {"speaker":"medrzec","text":"Witaj w CyberEwolucji. Tu nauczysz się rozpoznawać oszustwa w sieci."},
             {"speaker":"player","text":"Jak się poruszać i co mam robić?"},
-            {"speaker":"medrzec","text":"Sterowanie: A/D lub ←/→ — ruch; SPACE/W/↑ — skok; E — portal i wspinaczka; F11 — pełny ekran."},
+            {"speaker":"medrzec","text":"Sterowanie: A/D lub ←/→ - ruch; SPACE/W/↑ - skok; E - portal i wspinaczka; F11 - pełny ekran."},
             {"speaker":"medrzec","text":"Szukaj postaci i sytuacji, ucz się i zdobywaj punkty świadomości. Na końcu czeka boss."},
         ]
     return items
@@ -1706,7 +1706,7 @@ class Game:
                         frames.append(img)
                     except Exception:
                         pass
-            # Jeśli wczytano PNG — ustal tempo animacji (domyślnie 0.35 sekundy na klatkę)
+            # Jeśli wczytano PNG - ustal tempo animacji (domyślnie 0.35 sekundy na klatkę)
             self.boss_frame_durs = [0.8 for _ in frames]
 
         # Final fallback: simple placeholder X (duplicated)
@@ -2875,7 +2875,7 @@ class Game:
                         txt = f.read()
                 except Exception:
                     txt = ("Zamykasz oczy i czujesz, jak świat gry powoli gaśnie.\n"
-                           "Wdech. Wydech. Wracasz do siebie — bogatszy o wiedzę i czujność.\n\n"
+                           "Wdech. Wydech. Wracasz do siebie - bogatszy o wiedzę i czujność.\n\n"
                            "To dopiero początek Twojej świadomości w sieci. Dziękujemy za grę.")
                 self.ending_text = txt
                 # Use the global project default 40 cps (matches boss intro)
@@ -3243,7 +3243,7 @@ class Game:
                         box=pygame.Surface((panel_w-32,34), pygame.SRCALPHA); box.fill((60,90,140,110)); panel.blit(box,(16,y-2))
                     col=(255,255,255) if sel else (210,210,210)
                     txt=self.UI_FONT.render(f"{tag}. {text}", col); panel.blit(txt,(24,y)); y+=38
-                hint=self.UI_FONT.render("↑/↓ lub 1/2 — wybór, Enter/Spacja/E — zatwierdź",(180,180,200))
+                hint=self.UI_FONT.render("↑/↓ lub 1/2 - wybór, Enter/Spacja/E - zatwierdź",(180,180,200))
                 panel.blit(hint,(16, panel_h-hint.get_height()-10))
             s.blit(avatar_box,(unit_x,unit_y)); s.blit(panel,(unit_x+avatar_size+gap, unit_y))
 
@@ -3279,7 +3279,7 @@ class Game:
                     unit_x=(LOGICAL_W-panel_w)//2; unit_y=(PLAY_RECT.top+PLAY_H-panel_h)//2
                     panel=pygame.Surface((panel_w,panel_h), pygame.SRCALPHA); panel.fill((16,18,24,218))
                     pygame.draw.rect(panel,(185,185,220,255), panel.get_rect(), 2, border_radius=10)
-                    t_surf=self.UI_FONT.render(f"{self.world_display_name} — Wstęp",(255,255,0)); panel.blit(t_surf,(12,10)); y=10+t_surf.get_height()+8
+                    t_surf=self.UI_FONT.render(f"{self.world_display_name} - Wstęp",(255,255,0)); panel.blit(t_surf,(12,10)); y=10+t_surf.get_height()+8
                     if self.intro_text_tw: self.intro_text_tw.update(self.dt)
                     cur=self.intro_text_tw.get_text() if self.intro_text_tw else ""
                     y=wrap_draw_multiline(panel, self.UI_FONT, cur, 16, y, panel_w-32, 28, (250,235,210))
@@ -3299,7 +3299,7 @@ class Game:
                     ax=(avatar_size-scaled.get_width())//2; ay=(avatar_size-scaled.get_height())//2; avatar_box.blit(scaled,(ax,ay))
                     panel=pygame.Surface((panel_w,panel_h), pygame.SRCALPHA); panel.fill((16,18,24,218))
                     pygame.draw.rect(panel,(185,185,220,255), panel.get_rect(), 2, border_radius=10)
-                    t_surf=self.UI_FONT.render(f"{self.world_display_name} — Wstęp",(255,255,0)); panel.blit(t_surf,(12,10)); y=10+t_surf.get_height()+8
+                    t_surf=self.UI_FONT.render(f"{self.world_display_name} - Wstęp",(255,255,0)); panel.blit(t_surf,(12,10)); y=10+t_surf.get_height()+8
                     if self.intro_text_tw: self.intro_text_tw.update(self.dt)
                     cur=self.intro_text_tw.get_text() if self.intro_text_tw else ""
                     y=wrap_draw_multiline(panel, self.UI_FONT, cur, 16, y, panel_w-32, 28, (250,235,210))
@@ -3329,7 +3329,7 @@ class Game:
             if hasattr(self,'boss_spawns'):
                 for r in self.boss_spawns:
                     pygame.draw.rect(s, DBG_BOSS, pygame.Rect(r.x-int(self.camera_x), r.y, r.w, r.h), 2)
-            # NPC placeholders — per-world map
+            # NPC placeholders - per-world map
             if (not str(self.current_key).endswith('_arena')) and str(self.current_key).startswith('world'):
                 if hasattr(self,'npc1_spawns'):
                     for r in self.npc1_spawns:
@@ -3851,7 +3851,7 @@ def _ce_patch_ending():
                         txt = f.read()
                 except Exception:
                     txt = ("Zamykasz oczy i czujesz, jak świat gry powoli gaśnie.\n"
-                           "Wdech. Wydech. Wracasz do siebie — bogatszy o wiedzę i czujność.\n\n"
+                           "Wdech. Wydech. Wracasz do siebie - bogatszy o wiedzę i czujność.\n\n"
                            "To dopiero początek Twojej świadomości w sieci. Dziękujemy za grę.")
                 self.ending_text = txt
                 # 40 cps to match project default
@@ -4124,7 +4124,7 @@ def _cev54_install():
                     txt = f.read()
             except Exception:
                 txt = ("Zamykasz oczy i czujesz, jak świat gry powoli gaśnie.\n"
-                       "Wdech. Wydech. Wracasz do siebie — bogatszy o wiedzę i czujność.\n\n"
+                       "Wdech. Wydech. Wracasz do siebie - bogatszy o wiedzę i czujność.\n\n"
                        "To dopiero początek Twojej świadomości w sieci. Dziękujemy za grę.")
             self.ending_pages = _split_pages(txt)
             self.ending_page_idx = 0

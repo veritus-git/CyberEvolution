@@ -14,6 +14,7 @@ export class IntroSequence {
   private speed: number = 42; // characters per second (matching Python 40 cps)
   private animFrame: number | null = null;
   private lastTime: number = 0;
+  private lastAdvanceTime: number = 0;
   private onFinishedCallback?: () => void;
 
   constructor(container: HTMLElement) {
@@ -116,6 +117,7 @@ export class IntroSequence {
     this.isDone = false;
     this.hintElement.textContent = '';
     this.lastTime = performance.now();
+    this.lastAdvanceTime = performance.now();
 
     if (this.animFrame) cancelAnimationFrame(this.animFrame);
     const tick = (now: number) => {
@@ -137,24 +139,36 @@ export class IntroSequence {
   }
 
   private updateHint(): void {
+    const isTouch = typeof window !== 'undefined' && (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
     const isLast = this.currentPageIndex >= this.pages.length - 1;
-    this.hintElement.textContent = isLast
-      ? 'Kliknij dowolny klawisz, aby rozpocząć'
-      : 'Kliknij Enter aby przejść dalej';
+    if (isTouch) {
+      this.hintElement.textContent = isLast
+        ? 'Dotknij ekranu, aby rozpocząć'
+        : 'Dotknij ekranu, aby przejść dalej';
+    } else {
+      this.hintElement.textContent = isLast
+        ? 'Kliknij dowolny klawisz, aby rozpocząć'
+        : 'Kliknij Enter aby przejść dalej';
+    }
   }
 
   private advance(): void {
+    const now = performance.now();
+    if (now - this.lastAdvanceTime < 240) return;
+
     if (!this.isDone) {
-      // Instant finish of current slide typewriter
+      // 1st click: Instant finish of current slide typewriter (show full text)
       if (this.animFrame) cancelAnimationFrame(this.animFrame);
       this.currentChars = this.fullText.length;
       this.textElement.textContent = this.fullText;
       this.isDone = true;
       this.updateHint();
+      this.lastAdvanceTime = now;
       return;
     }
 
-    // Go to next slide
+    // 2nd click: advance to next slide
+    this.lastAdvanceTime = now;
     this.currentPageIndex++;
     if (this.currentPageIndex < this.pages.length) {
       this.showPage(this.currentPageIndex);

@@ -1,4 +1,8 @@
 import { GameInfoModal } from './GameInfoModal';
+import { gameStorage } from '../storage';
+import { promptPWAInstall } from '../pwa';
+
+export type StartMenuAction = 'new_game' | 'continue' | 'install' | 'exit';
 
 export class StartMenu {
   public isOpen: boolean = true;
@@ -29,9 +33,10 @@ export class StartMenu {
     this.subtitleElement.textContent = 'Ścieżka Świadomości';
     this.menuBox.appendChild(this.subtitleElement);
 
-    const labels: Array<{ label: string; action: 'new_game' | 'continue' | 'exit' }> = [
+    const labels: Array<{ label: string; action: StartMenuAction }> = [
       { label: 'Nowa gra', action: 'new_game' },
-      { label: hasSave ? 'Kontynuuj' : 'Kontynuuj (brak zapisu)', action: 'continue' },
+      { label: this.getContinueLabel(hasSave), action: 'continue' },
+      { label: 'Zainstaluj grę', action: 'install' },
       { label: 'Informacje o grze i sterowaniu', action: 'exit' },
     ];
 
@@ -74,15 +79,35 @@ export class StartMenu {
         this.updateSelection();
       } else if (e.code === 'Enter' || e.code === 'Space' || e.code === 'KeyE') {
         e.preventDefault();
-        const actions: Array<'new_game' | 'continue' | 'exit'> = ['new_game', 'continue', 'exit'];
+        const actions: StartMenuAction[] = ['new_game', 'continue', 'install', 'exit'];
         this.triggerAction(actions[this.selectedIndex]);
       }
     });
   }
 
+  private getContinueLabel(hasSave: boolean): string {
+    if (!hasSave) return 'Kontynuuj (brak zapisu)';
+    const save = gameStorage.getState();
+    const worldNames: Record<string, string> = {
+      lobby: 'Lobby',
+      world1: 'Świat 1',
+      world1_arena: 'Arena 1',
+      world2: 'Świat 2',
+      world2_arena: 'Arena 2',
+      world3: 'Świat 3',
+      world3_arena: 'Arena 3',
+      world4: 'Świat 4',
+      world4_arena: 'Arena 4',
+      world5: 'Świat 5',
+      world5_arena: 'Arena 5',
+    };
+    const w = worldNames[save.currentWorld] || save.currentWorld;
+    return `Kontynuuj (${w}, Ewolucja ${save.playerSkin || 1})`;
+  }
+
   public setHasSave(hasSave: boolean): void {
     if (this.options[1]) {
-      this.options[1].textContent = hasSave ? 'Kontynuuj' : 'Kontynuuj (brak zapisu)';
+      this.options[1].textContent = this.getContinueLabel(hasSave);
     }
   }
 
@@ -100,7 +125,15 @@ export class StartMenu {
     this.infoModal.show(tabName);
   }
 
-  private triggerAction(action: 'new_game' | 'continue' | 'exit'): void {
+  public get isInfoModalOpen(): boolean {
+    return this.infoModal.isOpen;
+  }
+
+  private triggerAction(action: StartMenuAction): void {
+    if (action === 'install') {
+      promptPWAInstall().catch(() => {});
+      return;
+    }
     if (action === 'exit') {
       this.openInfoModal();
       return;
@@ -114,6 +147,7 @@ export class StartMenu {
     this.isOpen = true;
     this.overlayElement.classList.remove('hidden');
     this.selectedIndex = 0;
+    this.setHasSave(gameStorage.hasSave());
     this.updateSelection();
   }
 

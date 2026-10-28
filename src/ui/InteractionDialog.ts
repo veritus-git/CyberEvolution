@@ -70,6 +70,7 @@ export class InteractionDialog {
   private deathMenuSelection: number = 0;
   private onRetryBossCallback?: () => void;
   private onRestartWorldCallback?: () => void;
+  private lastAdvanceTime: number = 0;
 
   constructor(container: HTMLElement) {
     this.overlayElement = document.createElement('div');
@@ -125,7 +126,9 @@ export class InteractionDialog {
     this.hintElement = document.createElement('div');
     this.hintElement.className = 'retro-dialog-hint';
 
-    this.panelElement.appendChild(this.titleElement);
+    // Yellow event titles like "wstep" / "Świat 1: Miasto iluzji" removed per requirements
+    this.titleElement.style.display = 'none';
+
     this.panelElement.appendChild(this.speakerElement);
     this.panelElement.appendChild(this.bodyElement);
     this.panelElement.appendChild(this.choicesContainer);
@@ -151,6 +154,10 @@ export class InteractionDialog {
     this.deathMenuOpt0 = document.createElement('div');
     this.deathMenuOpt0.className = 'death-menu-option selected';
     this.deathMenuOpt0.textContent = 'Walcz ponownie';
+    this.deathMenuOpt0.onmouseenter = () => {
+      this.deathMenuSelection = 0;
+      this.renderDeathMenu();
+    };
     this.deathMenuOpt0.onclick = (e) => {
       e.stopPropagation();
       this.confirmDeathMenu(0);
@@ -159,6 +166,10 @@ export class InteractionDialog {
     this.deathMenuOpt1 = document.createElement('div');
     this.deathMenuOpt1.className = 'death-menu-option';
     this.deathMenuOpt1.textContent = 'Przejdź świat jeszcze raz';
+    this.deathMenuOpt1.onmouseenter = () => {
+      this.deathMenuSelection = 1;
+      this.renderDeathMenu();
+    };
     this.deathMenuOpt1.onclick = (e) => {
       e.stopPropagation();
       this.confirmDeathMenu(1);
@@ -172,11 +183,23 @@ export class InteractionDialog {
     container.appendChild(this.overlayElement);
     container.appendChild(this.deathMenuOverlay);
 
-    // Click / touch to advance
-    this.overlayElement.addEventListener('click', () => {
+    // Unified single tap/click listener anywhere on screen to advance dialogue
+    window.addEventListener('pointerup', (e) => {
       if (!this.isOpen) return;
       if (this.isDeathMenuActive) return;
       if (this.mode === 'quiz' && this.quizStage === 'choices') return;
+
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.closest('.retro-choice-btn') ||
+          target.closest('.death-menu-option') ||
+          target.closest('#btn-fullscreen') ||
+          target.closest('#sound-control-wrapper') ||
+          target.closest('.sound-popup'))
+      ) {
+        return;
+      }
       this.advance();
     });
 
@@ -185,11 +208,11 @@ export class InteractionDialog {
       if (!this.isOpen) return;
 
       if (this.isDeathMenuActive) {
-        if (e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'Digit1') {
+        if (e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'ArrowLeft' || e.code === 'Digit1') {
           e.preventDefault();
           this.deathMenuSelection = 0;
           this.renderDeathMenu();
-        } else if (e.code === 'ArrowDown' || e.code === 'KeyS' || e.code === 'Digit2') {
+        } else if (e.code === 'ArrowDown' || e.code === 'KeyS' || e.code === 'ArrowRight' || e.code === 'Digit2') {
           e.preventDefault();
           this.deathMenuSelection = 1;
           this.renderDeathMenu();
@@ -219,6 +242,19 @@ export class InteractionDialog {
   }
 
   private swapChoices: boolean = false;
+
+  private hideChoices(): void {
+    this.choicesContainer.classList.add('hidden');
+    this.choicesContainer.style.setProperty('display', 'none', 'important');
+    this.choiceA.textContent = '';
+    this.choiceB.textContent = '';
+  }
+
+  private showChoices(): void {
+    this.choicesContainer.classList.remove('hidden');
+    this.choicesContainer.style.setProperty('display', 'flex', 'important');
+    this.renderChoices();
+  }
 
   public setPlayerEvo(evo: number): void {
     this.playerEvoLevel = Math.max(1, Math.min(5, evo));
@@ -279,7 +315,7 @@ export class InteractionDialog {
     this.playerEvoLevel = evo;
     this.onCompleteCallback = onComplete;
     this.isOpen = true;
-    this.choicesContainer.classList.add('hidden');
+    this.hideChoices();
     this.overlayElement.classList.remove('hidden');
 
     this.showConversationLine(0);
@@ -293,7 +329,7 @@ export class InteractionDialog {
     this.containerElement.style.display = '';
     this.overlayElement.style.display = '';
     this.mode = 'conversation';
-    this.titleElement.textContent = `${title} — Wstęp`;
+    this.titleElement.textContent = `${title} - Wstęp`;
     this.speakerElement.textContent = '';
     
     // Worlds 1-4 show Sage avatar; World 5 has no avatar (empty)
@@ -318,7 +354,7 @@ export class InteractionDialog {
     };
 
     this.isOpen = true;
-    this.choicesContainer.classList.add('hidden');
+    this.hideChoices();
     this.overlayElement.classList.remove('hidden');
 
     this.startTypewriter(text);
@@ -332,7 +368,7 @@ export class InteractionDialog {
     this.containerElement.style.display = '';
     this.overlayElement.style.display = '';
     this.mode = 'conversation';
-    this.titleElement.textContent = stageTitle ? `${bossName} — ${stageTitle}` : `${bossName} — Wstęp`;
+    this.titleElement.textContent = stageTitle ? `${bossName} - ${stageTitle}` : `${bossName} - Wstęp`;
     this.speakerElement.textContent = `${bossName}:`;
     this.speakerElement.style.color = '#ff9999';
     this.avatarBox.style.display = '';
@@ -354,7 +390,7 @@ export class InteractionDialog {
     };
 
     this.isOpen = true;
-    this.choicesContainer.classList.add('hidden');
+    this.hideChoices();
     this.overlayElement.classList.remove('hidden');
 
     this.startTypewriter(introText);
@@ -413,7 +449,7 @@ export class InteractionDialog {
     this.quizStage = stage;
 
     if (stage === 'context') {
-      this.choicesContainer.classList.add('hidden');
+      this.hideChoices();
       const avName = (this.quizData.avatar || 'mail').toLowerCase().trim();
       const safeAvatar = encodeURIComponent(avName).replace(/%2F/g, '/');
       this.avatarImg.src = `/assets/avatars/${safeAvatar}.png`;
@@ -425,7 +461,7 @@ export class InteractionDialog {
       this.adjustBodyFontSize(this.quizData.context, false);
       this.startTypewriter(this.quizData.context);
     } else if (stage === 'sage') {
-      this.choicesContainer.classList.add('hidden');
+      this.hideChoices();
       this.avatarImg.src = '/assets/avatars/medrzec.png';
       this.speakerElement.textContent = 'Wskazówka Mędrca:';
       this.speakerElement.style.color = '#ffe6b4';
@@ -441,18 +477,23 @@ export class InteractionDialog {
         this.adjustBodyFontSize(this.quizData.context, true);
         this.bodyElement.textContent = this.quizData.context;
       }
-      this.choicesContainer.classList.remove('hidden');
-      this.renderChoices();
-      this.hintElement.textContent = '↑/↓ lub 1/2 — wybór, Enter/Spacja/E — zatwierdź';
+      this.showChoices();
+      const isTouch = typeof window !== 'undefined' && (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
+      this.hintElement.textContent = isTouch ? 'Dotknij wybranej opcji' : '↑/↓ lub 1/2 - wybór, Enter/Spacja/E - zatwierdź';
       this.isDoneTyping = true;
       document.body.classList.remove('cursor-hidden');
     } else if (stage === 'feedback') {
-      this.choicesContainer.classList.add('hidden');
+      this.hideChoices();
       const isGood = feedbackText === this.quizData.goodFeedback;
       this.avatarImg.src = '/assets/avatars/medrzec.png';
       this.speakerElement.textContent = isGood ? '✓ Poprawny wybór:' : '✗ Błędna decyzja:';
       this.speakerElement.style.color = isGood ? '#4ade80' : '#f87171';
-      this.hintElement.textContent = isGood ? 'ENTER aby przejść dalej' : 'ENTER aby spróbować ponownie';
+      const isTouch = typeof window !== 'undefined' && (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
+      if (isGood) {
+        this.hintElement.textContent = isTouch ? 'Dotknij ekranu, aby przejść dalej' : 'ENTER aby przejść dalej';
+      } else {
+        this.hintElement.textContent = isTouch ? 'Dotknij ekranu, aby spróbować ponownie' : 'ENTER aby spróbować ponownie';
+      }
       const fb = feedbackText || '';
       this.adjustBodyFontSize(fb, false);
       this.startTypewriter(fb);
@@ -493,11 +534,21 @@ export class InteractionDialog {
   }
 
   public advance(): void {
-    // If typewriter is still typing, finish instantly (force done)
-    if (!this.isDoneTyping) {
-      this.forceFinishTyping();
+    const now = performance.now();
+    // Debounce to prevent synthetic or double-tap accidental skipping
+    if (now - this.lastAdvanceTime < 240) {
       return;
     }
+
+    // 1st click/tap: If typewriter is still typing, finish instantly (show full text) and wait for next click!
+    if (!this.isDoneTyping) {
+      this.forceFinishTyping();
+      this.lastAdvanceTime = now;
+      return;
+    }
+
+    // 2nd click/tap: actually advance to next page or next dialogue line
+    this.lastAdvanceTime = now;
 
     // If there is another page in the current text block, go to next page
     if (this.currentPageIndex < this.currentPages.length - 1) {
@@ -550,6 +601,7 @@ export class InteractionDialog {
     this.isDoneTyping = false;
     this.hintElement.textContent = '';
     this.lastTimestamp = performance.now();
+    this.lastAdvanceTime = performance.now();
 
     if (this.animFrameId) cancelAnimationFrame(this.animFrameId);
     const tick = (now: number) => {
@@ -563,7 +615,8 @@ export class InteractionDialog {
         this.typedChars = page.length;
         this.bodyElement.textContent = page;
         this.isDoneTyping = true;
-        this.hintElement.textContent = 'ENTER aby przejść dalej';
+        const isTouch = typeof window !== 'undefined' && (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
+        this.hintElement.textContent = isTouch ? 'Dotknij ekranu, aby przejść dalej' : 'ENTER aby przejść dalej';
       } else {
         this.bodyElement.textContent = page.substring(0, Math.floor(this.typedChars));
         this.animFrameId = requestAnimationFrame(tick);
@@ -578,7 +631,9 @@ export class InteractionDialog {
     this.typedChars = page.length;
     this.bodyElement.textContent = page;
     this.isDoneTyping = true;
-    this.hintElement.textContent = 'ENTER aby przejść dalej';
+    this.lastAdvanceTime = performance.now();
+    const isTouch = typeof window !== 'undefined' && (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
+    this.hintElement.textContent = isTouch ? 'Dotknij ekranu, aby przejść dalej' : 'ENTER aby przejść dalej';
   }
 
   private resetDeathMenu(): void {
@@ -633,7 +688,7 @@ export class InteractionDialog {
     this.containerElement.classList.remove('position-center');
     this.containerElement.style.display = '';
 
-    this.choicesContainer.classList.add('hidden');
+    this.hideChoices();
     this.avatarBox.style.display = '';
     this.bodyElement.textContent = '';
     this.bodyElement.classList.remove('font-xlarge', 'font-compact', 'font-dense');

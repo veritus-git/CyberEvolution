@@ -1,3 +1,11 @@
+/**
+ * src/ui/VirtualJoystick.ts
+ * Mobile-Native dotykowy D-Pad (wyłącznie Lewo / Prawo) i przyciski akcji (Skok / Interakcja E)
+ * z obsługą multi-touch, haptic feedback, podświetlaniem przycisku akcji oraz dynamicznym ukrywaniem.
+ */
+
+import { isMobileDevice } from '../core/Device';
+
 export interface TouchState {
   moveX: number;
   moveY: number;
@@ -7,239 +15,200 @@ export interface TouchState {
 }
 
 export class VirtualJoystick {
-  private baseRadius = 60;
-  private knobRadius = 28;
-
-  // Joystick position (screen pixels, CSS coordinates)
-  private centerX = 0;
-  private centerY = 0;
-  private knobX = 0;
-  private knobY = 0;
-
-  private joystickActive = false;
-  private joystickPointerId: number | null = null;
-
-  // Buttons (Jump and Interact)
-  private jumpActive = false;
-  private jumpPointerId: number | null = null;
-  private jumpJustPressed = false;
-
-  private interactActive = false;
-  private interactPointerId: number | null = null;
-  private interactJustPressed = false;
-
-  // Button positions & sizes (CSS coordinates)
-  private jumpBtnX = 0;
-  private jumpBtnY = 0;
-  private jumpBtnRadius = 45;
-
-  private interactBtnX = 0;
-  private interactBtnY = 0;
-  private interactBtnRadius = 40;
-
-  // Device detection & debug mode
   public isTouchDevice: boolean = false;
   public forceDebugVisible: boolean = false;
 
+  private container: HTMLElement | null = null;
+  private btnLeft: HTMLElement | null = null;
+  private btnRight: HTMLElement | null = null;
+  private btnJump: HTMLElement | null = null;
+  private btnInteract: HTMLElement | null = null;
+
+  // Cyfrowy stan kierunków (tylko poziomo)
+  private leftHeld = false;
+  private rightHeld = false;
+
+  // Akcje
+  private jumpHeld = false;
+  private jumpJustPressed = false;
+  private interactJustPressed = false;
+
   constructor(_listenTarget?: HTMLElement) {
-    this.isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
-    this.setupListeners();
+    this.isTouchDevice = isMobileDevice();
+    this.createControls();
   }
 
   get isInteractive(): boolean {
     return this.isTouchDevice || this.forceDebugVisible;
   }
 
-  public updateLayout(screenWidth: number, screenHeight: number): void {
-    this.centerX = Math.max(90, screenWidth * 0.12);
-    this.centerY = screenHeight - Math.max(90, screenHeight * 0.22);
-    if (!this.joystickActive) {
-      this.knobX = this.centerX;
-      this.knobY = this.centerY;
-    }
-    this.jumpBtnX = screenWidth - Math.max(80, screenWidth * 0.1);
-    this.jumpBtnY = screenHeight - Math.max(100, screenHeight * 0.22);
-    this.interactBtnX = this.jumpBtnX - 95;
-    this.interactBtnY = this.jumpBtnY - 35;
+  private createControls(): void {
+    if (typeof document === 'undefined') return;
+
+    // Usuwamy ewentualny stary kontener
+    const existing = document.getElementById('touch-controls');
+    if (existing) existing.remove();
+
+    this.container = document.createElement('div');
+    this.container.id = 'touch-controls';
+    this.container.className = `touch-controls ${this.isInteractive ? '' : 'hidden'}`;
+
+    this.container.innerHTML = `
+      <div class="touch-dpad touch-horizontal-only">
+        <button class="touch-btn touch-btn-left" data-dir="left" aria-label="W lewo">◀</button>
+        <button class="touch-btn touch-btn-right" data-dir="right" aria-label="W prawo">▶</button>
+      </div>
+
+      <div class="touch-actions">
+        <button class="touch-action-btn touch-btn-interact" data-action="interact" aria-label="Interakcja E">
+          <span class="touch-btn-key">E</span>
+          <span class="touch-btn-sub">AKCJA</span>
+        </button>
+        <button class="touch-action-btn touch-btn-jump" data-action="jump" aria-label="Skok">
+          <span class="touch-btn-icon">▲</span>
+          <span class="touch-btn-label">SKOK</span>
+        </button>
+      </div>
+    `;
+
+    document.body.appendChild(this.container);
+
+    this.btnLeft = this.container.querySelector('.touch-btn-left');
+    this.btnRight = this.container.querySelector('.touch-btn-right');
+    this.btnJump = this.container.querySelector('.touch-btn-jump');
+    this.btnInteract = this.container.querySelector('.touch-btn-interact');
+
+    this.bindDirection(this.btnLeft, 'left');
+    this.bindDirection(this.btnRight, 'right');
+
+    this.bindAction(this.btnJump, 'jump');
+    this.bindAction(this.btnInteract, 'interact');
   }
 
-  private setupListeners(): void {
-    // Listen on window for all pointer events so touch and mouse clicks work anywhere on screen
-    window.addEventListener('pointerdown', (e) => this.onPointerDown(e), { passive: false });
-    window.addEventListener('pointermove', (e) => this.onPointerMove(e), { passive: false });
-    window.addEventListener('pointerup', (e) => this.onPointerUp(e), { passive: false });
-    window.addEventListener('pointercancel', (e) => this.onPointerUp(e), { passive: false });
-  }
-
-  private onPointerDown(e: PointerEvent): void {
-    if (!this.isInteractive) return;
-
-    // Do not intercept clicks on buttons or inside dialogs
-    const target = e.target as HTMLElement | null;
-    if (target && (target.tagName === 'BUTTON' || target.closest('button') || target.closest('.dialog-card'))) {
-      return;
-    }
-
-    // Use CSS-pixel coordinates relative to viewport
-    const px = e.clientX;
-    const py = e.clientY;
-
-    // Check Jump button
-    const distJump = Math.hypot(px - this.jumpBtnX, py - this.jumpBtnY);
-    if (distJump <= this.jumpBtnRadius + 15) {
-      this.jumpActive = true;
-      this.jumpJustPressed = true;
-      this.jumpPointerId = e.pointerId;
-      e.preventDefault();
-      return;
-    }
-
-    // Check Interact button
-    const distInteract = Math.hypot(px - this.interactBtnX, py - this.interactBtnY);
-    if (distInteract <= this.interactBtnRadius + 15) {
-      this.interactActive = true;
-      this.interactJustPressed = true;
-      this.interactPointerId = e.pointerId;
-      e.preventDefault();
-      return;
-    }
-
-    // Left half of screen: start joystick
-    if (px < window.innerWidth * 0.55 && !this.joystickActive) {
-      this.joystickActive = true;
-      this.joystickPointerId = e.pointerId;
-      // Dynamic reposition if tapped in lower half
-      if (py > window.innerHeight * 0.4) {
-        this.centerX = px;
-        this.centerY = py;
+  private triggerHaptic(): void {
+    try {
+      if (typeof navigator !== 'undefined' && navigator.vibrate) {
+        navigator.vibrate(10);
       }
-      this.updateKnobPosition(px, py);
+    } catch {}
+  }
+
+  private bindDirection(el: HTMLElement | null, dir: 'left' | 'right'): void {
+    if (!el) return;
+
+    const onStart = (e: PointerEvent) => {
       e.preventDefault();
-    }
+      e.stopPropagation();
+      try { el.setPointerCapture(e.pointerId); } catch {}
+      el.classList.add('active');
+      this.triggerHaptic();
+
+      if (dir === 'left') this.leftHeld = true;
+      if (dir === 'right') this.rightHeld = true;
+    };
+
+    const onEnd = (e: PointerEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      try { el.releasePointerCapture(e.pointerId); } catch {}
+      el.classList.remove('active');
+
+      if (dir === 'left') this.leftHeld = false;
+      if (dir === 'right') this.rightHeld = false;
+    };
+
+    el.addEventListener('pointerdown', onStart);
+    el.addEventListener('pointerup', onEnd);
+    el.addEventListener('pointercancel', onEnd);
+    el.addEventListener('pointerleave', onEnd);
   }
 
-  private onPointerMove(e: PointerEvent): void {
-    if (!this.joystickActive || e.pointerId !== this.joystickPointerId) return;
-    this.updateKnobPosition(e.clientX, e.clientY);
-    e.preventDefault();
+  private bindAction(el: HTMLElement | null, action: 'jump' | 'interact'): void {
+    if (!el) return;
+
+    const onStart = (e: PointerEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      try { el.setPointerCapture(e.pointerId); } catch {}
+      el.classList.add('active');
+      this.triggerHaptic();
+
+      if (action === 'jump') {
+        this.jumpHeld = true;
+        this.jumpJustPressed = true;
+      } else if (action === 'interact') {
+        this.interactJustPressed = true;
+      }
+    };
+
+    const onEnd = (e: PointerEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      try { el.releasePointerCapture(e.pointerId); } catch {}
+      el.classList.remove('active');
+
+      if (action === 'jump') {
+        this.jumpHeld = false;
+      }
+    };
+
+    el.addEventListener('pointerdown', onStart);
+    el.addEventListener('pointerup', onEnd);
+    el.addEventListener('pointercancel', onEnd);
+    el.addEventListener('pointerleave', onEnd);
   }
 
-  private onPointerUp(e: PointerEvent): void {
-    if (e.pointerId === this.joystickPointerId) {
-      this.joystickActive = false;
-      this.joystickPointerId = null;
-      this.knobX = this.centerX;
-      this.knobY = this.centerY;
-    }
-    if (e.pointerId === this.jumpPointerId) {
-      this.jumpActive = false;
-      this.jumpPointerId = null;
-    }
-    if (e.pointerId === this.interactPointerId) {
-      this.interactActive = false;
-      this.interactPointerId = null;
-    }
+  public setInteractAvailable(available: boolean): void {
+    if (!this.btnInteract) return;
+    this.btnInteract.classList.toggle('active-hint', available);
   }
 
-  private updateKnobPosition(px: number, py: number): void {
-    const dx = px - this.centerX;
-    const dy = py - this.centerY;
-    const dist = Math.hypot(dx, dy);
-    if (dist <= this.baseRadius) {
-      this.knobX = px;
-      this.knobY = py;
+  public setVisible(visible: boolean): void {
+    if (!this.container) return;
+    if (visible && this.isInteractive) {
+      this.container.classList.remove('hidden');
     } else {
-      const angle = Math.atan2(dy, dx);
-      this.knobX = this.centerX + Math.cos(angle) * this.baseRadius;
-      this.knobY = this.centerY + Math.sin(angle) * this.baseRadius;
+      this.container.classList.add('hidden');
+      this.resetState();
     }
+  }
+
+  public resetState(): void {
+    this.leftHeld = false;
+    this.rightHeld = false;
+    this.jumpHeld = false;
+    this.jumpJustPressed = false;
+    this.interactJustPressed = false;
+
+    this.btnLeft?.classList.remove('active');
+    this.btnRight?.classList.remove('active');
+    this.btnJump?.classList.remove('active');
+    this.btnInteract?.classList.remove('active');
+  }
+
+  public updateLayout(_screenWidth: number, _screenHeight: number): void {
+    // Układ jest w 100% responsywny w CSS dzięki env(safe-area-inset-*)
+  }
+
+  public renderOverlay(_overlayCtx: CanvasRenderingContext2D): void {
+    // Przyciski są renderowane natywnie w DOM
   }
 
   public getTouchState(): TouchState {
     let moveX = 0;
-    let moveY = 0;
-
-    if (this.joystickActive) {
-      const dx = this.knobX - this.centerX;
-      const dy = this.knobY - this.centerY;
-      const dist = Math.hypot(dx, dy);
-      if (dist > 10) {
-        const norm = Math.min(1.0, dist / this.baseRadius);
-        const angle = Math.atan2(dy, dx);
-        moveX = Math.cos(angle) * norm;
-        moveY = Math.sin(angle) * norm;
-      }
-    }
+    if (this.leftHeld) moveX -= 1;
+    if (this.rightHeld) moveX += 1;
 
     const state: TouchState = {
       moveX,
-      moveY,
+      moveY: 0,
       jumpPressed: this.jumpJustPressed,
-      jumpHeld: this.jumpActive,
+      jumpHeld: this.jumpHeld,
       interactPressed: this.interactJustPressed,
     };
 
     this.jumpJustPressed = false;
     this.interactJustPressed = false;
     return state;
-  }
-
-  /**
-   * Render on a SCREEN-SPACE overlay canvas (not the game canvas).
-   * This avoids coordinate system confusion between game-logical and CSS pixels.
-   */
-  public renderOverlay(overlayCtx: CanvasRenderingContext2D): void {
-    if (!this.isInteractive) return;
-
-    const ctx = overlayCtx;
-    ctx.save();
-
-    // Joystick base
-    ctx.beginPath();
-    ctx.arc(this.centerX, this.centerY, this.baseRadius, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(15,23,42,0.45)';
-    ctx.fill();
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = this.joystickActive ? 'rgba(0,229,255,0.7)' : 'rgba(255,255,255,0.2)';
-    ctx.stroke();
-
-    // Knob
-    ctx.beginPath();
-    ctx.arc(this.knobX, this.knobY, this.knobRadius, 0, Math.PI * 2);
-    ctx.fillStyle = this.joystickActive ? 'rgba(0,229,255,0.7)' : 'rgba(0,242,254,0.5)';
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(255,255,255,0.6)';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-
-    // Jump button
-    ctx.beginPath();
-    ctx.arc(this.jumpBtnX, this.jumpBtnY, this.jumpBtnRadius, 0, Math.PI * 2);
-    ctx.fillStyle = this.jumpActive ? 'rgba(0,229,255,0.7)' : 'rgba(15,23,42,0.5)';
-    ctx.fill();
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = 'rgba(0,229,255,0.8)';
-    ctx.stroke();
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 18px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('SKOK', this.jumpBtnX, this.jumpBtnY);
-
-    // Interact button
-    ctx.beginPath();
-    ctx.arc(this.interactBtnX, this.interactBtnY, this.interactBtnRadius, 0, Math.PI * 2);
-    ctx.fillStyle = this.interactActive ? 'rgba(255,171,0,0.7)' : 'rgba(15,23,42,0.5)';
-    ctx.fill();
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = 'rgba(255,171,0,0.8)';
-    ctx.stroke();
-    ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 15px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.fillText('AKCJA', this.interactBtnX, this.interactBtnY);
-
-    ctx.restore();
   }
 }

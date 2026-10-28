@@ -1,5 +1,5 @@
 WORLDNAME: Miasto Iluzji
-INTROTEXT: To Miasto Iluzji — świat pozorów, clickbaitu i viralowych fałszywek.
+INTROTEXT: To Miasto Iluzji - świat pozorów, clickbaitu i viralowych fałszywek.
 Tutaj każdy krzykliwy nagłówek walczy o twoją uwagę, a każdy trend może być pułapką.
 Patrz uważnie i nie wierz wszystkiemu, co wywołuje w tobie nagły szok lub gniew.
 Tylko krytyczny dystans ochroni cię przed tymi, którzy chcą sterować twoim umysłem.

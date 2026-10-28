@@ -9,6 +9,7 @@ export interface Portal {
   frames?: [HTMLImageElement, HTMLImageElement] | null;
   frameIndex?: number;
   animTimer?: number;
+  alpha?: number;
 }
 
 export interface Ladder {
@@ -123,6 +124,9 @@ export class Level {
       if (p.animTimer >= 0.80) {
         p.animTimer = 0;
         p.frameIndex = p.frameIndex === 1 ? 0 : 1;
+      }
+      if (p.alpha !== undefined && p.alpha < 1) {
+        p.alpha = Math.min(1, p.alpha + dt * 1.25);
       }
     }
 
