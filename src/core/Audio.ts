@@ -10,17 +10,18 @@ export interface AudioSettings {
   isMuted: boolean;
 }
 
-const SETTINGS_KEY = 'cyberevo_audio_settings_v2';
+const SETTINGS_KEY = 'cyberevo_audio_settings_v3';
 
 export class AudioManager {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
   private musicGain: GainNode | null = null;
   private sfxGain: GainNode | null = null;
+  private noiseBuffer: AudioBuffer | null = null;
 
   public isMuted: boolean = false;
   public masterVolume: number = 0.7;
-  public musicVolume: number = 0.22;
+  public musicVolume: number = 0.05;
   public sfxVolume: number = 0.45;
 
   private isMusicPlaying: boolean = false;
@@ -181,6 +182,19 @@ export class AudioManager {
     }
   }
 
+  private getNoiseBuffer(): AudioBuffer | null {
+    if (!this.ctx) return null;
+    if (!this.noiseBuffer) {
+      const bufferSize = Math.floor(this.ctx.sampleRate * 0.35); // 350ms of noise
+      this.noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+      const data = this.noiseBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+      }
+    }
+    return this.noiseBuffer;
+  }
+
   private playSynthStep(stepDuration: number): void {
     if (!this.ctx || !this.musicGain || this.isMuted || this.musicVolume <= 0) return;
 
@@ -189,7 +203,7 @@ export class AudioManager {
     const subStep = this.stepIndex % 16;
     const now = this.ctx.currentTime;
 
-    // 1. Synthwave Bass Pulse (on eighth notes)
+    // 1. Synthwave Bass Pulse (on eighth notes) - subtle warm background
     if (subStep % 2 === 0) {
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
@@ -199,11 +213,11 @@ export class AudioManager {
       osc.frequency.setValueAtTime(chord.bass, now);
 
       filter.type = 'lowpass';
-      filter.frequency.setValueAtTime(380, now);
-      filter.frequency.exponentialRampToValueAtTime(120, now + stepDuration * 1.8);
+      filter.frequency.setValueAtTime(320, now);
+      filter.frequency.exponentialRampToValueAtTime(100, now + stepDuration * 1.8);
 
-      gain.gain.setValueAtTime(0.18, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + stepDuration * 1.8);
+      gain.gain.setValueAtTime(0.04, now);
+      gain.gain.exponentialRampToValueAtTime(0.0005, now + stepDuration * 1.8);
 
       osc.connect(filter);
       filter.connect(gain);
@@ -213,7 +227,7 @@ export class AudioManager {
       osc.stop(now + stepDuration * 1.8);
     }
 
-    // 2. Arpeggiator Melody
+    // 2. Arpeggiator Melody - soft ambient synth
     const arpNotes = chord.arp;
     const noteFreq = arpNotes[subStep % arpNotes.length];
 
@@ -224,8 +238,8 @@ export class AudioManager {
       osc.type = 'square';
       osc.frequency.setValueAtTime(noteFreq, now);
 
-      gain.gain.setValueAtTime(0.045, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + stepDuration * 0.9);
+      gain.gain.setValueAtTime(0.012, now);
+      gain.gain.exponentialRampToValueAtTime(0.0005, now + stepDuration * 0.9);
 
       osc.connect(gain);
       gain.connect(this.musicGain);
@@ -234,41 +248,41 @@ export class AudioManager {
       osc.stop(now + stepDuration * 0.95);
     }
 
-    // 3. Cyber Kick & Snare Percussion
+    // 3. Cyber Kick & Snare Percussion - gentle rhythmic pulse
     if (subStep === 0 || subStep === 8) {
-      // Synth Kick
+      // Gentle Synth Kick
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
 
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(135, now);
-      osc.frequency.exponentialRampToValueAtTime(38, now + 0.12);
+      osc.frequency.setValueAtTime(110, now);
+      osc.frequency.exponentialRampToValueAtTime(35, now + 0.10);
 
-      gain.gain.setValueAtTime(0.24, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.13);
+      gain.gain.setValueAtTime(0.05, now);
+      gain.gain.exponentialRampToValueAtTime(0.0005, now + 0.11);
 
       osc.connect(gain);
       gain.connect(this.musicGain);
 
       osc.start(now);
-      osc.stop(now + 0.14);
+      osc.stop(now + 0.12);
     } else if (subStep === 4 || subStep === 12) {
-      // Synth Snare
+      // Gentle Synth Snare
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
 
       osc.type = 'triangle';
-      osc.frequency.setValueAtTime(190, now);
-      osc.frequency.exponentialRampToValueAtTime(80, now + 0.08);
+      osc.frequency.setValueAtTime(160, now);
+      osc.frequency.exponentialRampToValueAtTime(70, now + 0.07);
 
-      gain.gain.setValueAtTime(0.14, now);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+      gain.gain.setValueAtTime(0.025, now);
+      gain.gain.exponentialRampToValueAtTime(0.0005, now + 0.08);
 
       osc.connect(gain);
       gain.connect(this.musicGain);
 
       osc.start(now);
-      osc.stop(now + 0.1);
+      osc.stop(now + 0.09);
     }
 
     this.stepIndex++;
@@ -297,28 +311,56 @@ export class AudioManager {
     osc.stop(now + 0.14);
   }
 
+  /**
+   * Minecraft-style grass footstep sound (organic grass rustle + subtle light ground contact)
+   */
   public playFootstep(): void {
     if (!this.ctx || !this.sfxGain || this.isMuted || this.sfxVolume <= 0) return;
     const now = performance.now();
-    if (now - this.lastFootstepTime < 160) return;
+    if (now - this.lastFootstepTime < 70) return;
     this.lastFootstepTime = now;
 
     const audioNow = this.ctx.currentTime;
-    const osc = this.ctx.createOscillator();
-    const gain = this.ctx.createGain();
+    const noise = this.getNoiseBuffer();
 
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(115 + Math.random() * 25, audioNow);
-    osc.frequency.exponentialRampToValueAtTime(45, audioNow + 0.055);
+    // 1. Organic grass crunch / rustle (bandpass filtered noise burst)
+    if (noise) {
+      const noiseSource = this.ctx.createBufferSource();
+      noiseSource.buffer = noise;
+      const offset = Math.random() * 0.18;
 
-    gain.gain.setValueAtTime(0.28, audioNow);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioNow + 0.06);
+      const filter = this.ctx.createBiquadFilter();
+      filter.type = 'bandpass';
+      // Center frequency around 950 - 1450 Hz for natural grass blades rustle
+      filter.frequency.setValueAtTime(950 + Math.random() * 500, audioNow);
+      filter.Q.setValueAtTime(1.4, audioNow);
 
-    osc.connect(gain);
-    gain.connect(this.sfxGain);
+      const noiseGain = this.ctx.createGain();
+      noiseGain.gain.setValueAtTime(0.35, audioNow);
+      noiseGain.gain.exponentialRampToValueAtTime(0.001, audioNow + 0.048);
 
-    osc.start(audioNow);
-    osc.stop(audioNow + 0.065);
+      noiseSource.connect(filter);
+      filter.connect(noiseGain);
+      noiseGain.connect(this.sfxGain);
+
+      noiseSource.start(audioNow, offset, 0.052);
+    }
+
+    // 2. Subtle soft soil contact (light organic tap without heavy low-end thud)
+    const tapOsc = this.ctx.createOscillator();
+    const tapGain = this.ctx.createGain();
+    tapOsc.type = 'sine';
+    tapOsc.frequency.setValueAtTime(160 + Math.random() * 30, audioNow);
+    tapOsc.frequency.exponentialRampToValueAtTime(55, audioNow + 0.035);
+
+    tapGain.gain.setValueAtTime(0.08, audioNow);
+    tapGain.gain.exponentialRampToValueAtTime(0.001, audioNow + 0.035);
+
+    tapOsc.connect(tapGain);
+    tapGain.connect(this.sfxGain);
+
+    tapOsc.start(audioNow);
+    tapOsc.stop(audioNow + 0.04);
   }
 
   public playDialogBlip(): void {

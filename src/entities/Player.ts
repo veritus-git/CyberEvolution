@@ -20,6 +20,8 @@ export class Player {
   public animTimer: number = 0;
   public runFrameIndex: number = 0;
   public climbFrameIndex: number = 0;
+  private footstepTimer: number = 0;
+  private isRunningPrev: boolean = false;
 
   // Evolution animation sequence
   public evoBlinkActive: boolean = false;
@@ -218,20 +220,38 @@ export class Player {
     // Update animation timers
     this.animTimer += dt;
 
+    const isRunning = this.physics.onGround && Math.abs(this.physics.vx) > 30;
+
     if (this.physics.isClimbing || this.physics.climbStepout > 0) {
-      if (this.animTimer >= 0.30) {
+      if (this.animTimer >= 0.28) {
         this.climbFrameIndex = (this.climbFrameIndex + 1) % 2;
         this.animTimer = 0;
       }
-    } else if (this.physics.onGround && Math.abs(this.physics.vx) > 30) {
-      if (this.animTimer >= 0.28) {
+      this.isRunningPrev = false;
+    } else if (isRunning) {
+      // Faster, responsive running animation: 130ms per frame
+      if (this.animTimer >= 0.13) {
         this.runFrameIndex = (this.runFrameIndex + 1) % 2;
         this.animTimer = 0;
-        sound.playFootstep();
       }
+
+      // Footstep sound: immediate first step upon moving, then frequent steps every 130ms
+      if (!this.isRunningPrev) {
+        this.footstepTimer = 0;
+        sound.playFootstep();
+      } else {
+        this.footstepTimer += dt;
+        if (this.footstepTimer >= 0.13) {
+          this.footstepTimer = 0;
+          sound.playFootstep();
+        }
+      }
+      this.isRunningPrev = true;
     } else {
       this.animTimer = 0;
       this.runFrameIndex = 0;
+      this.footstepTimer = 0;
+      this.isRunningPrev = false;
     }
   }
   /**

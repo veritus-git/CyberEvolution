@@ -35,17 +35,17 @@ export class PauseModal {
         <div class="pause-slider-row">
           <div class="pause-slider-label">
             <span>Muzyka (Synthwave)</span>
-            <span id="pause-music-val" class="pause-val-badge">45%</span>
+            <span id="pause-music-val" class="pause-val-badge">5%</span>
           </div>
-          <input type="range" id="pause-music-slider" min="0" max="100" value="45" class="pause-range-input" />
+          <input type="range" id="pause-music-slider" min="0" max="100" value="5" class="pause-range-input" />
         </div>
 
         <div class="pause-slider-row">
           <div class="pause-slider-label">
             <span>Efekty dźwiękowe (SFX)</span>
-            <span id="pause-sfx-val" class="pause-val-badge">35%</span>
+            <span id="pause-sfx-val" class="pause-val-badge">45%</span>
           </div>
-          <input type="range" id="pause-sfx-slider" min="0" max="100" value="35" class="pause-range-input" />
+          <input type="range" id="pause-sfx-slider" min="0" max="100" value="45" class="pause-range-input" />
         </div>
 
         <div class="pause-mute-row">
