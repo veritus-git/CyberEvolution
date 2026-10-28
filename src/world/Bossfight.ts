@@ -644,6 +644,7 @@ export class Bossfight {
   }
 
   private spawnBossDeathExplosion(): void {
+    sound.playBossExplosion();
     const cx = this.bossX + this.bossW / 2;
     const cy = this.bossY + this.bossH / 2;
     const colors = ['#00e5ff', '#ff007f', '#ffe600', '#ffffff', '#8a2be2', '#39ff14'];

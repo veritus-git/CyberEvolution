@@ -17,8 +17,7 @@ import { sound } from './Audio';
 import { GameInfoModal } from '../ui/GameInfoModal';
 import { PauseModal } from '../ui/PauseModal';
 import { gameStorage, GameSaveData } from '../storage';
-import { isFullscreenActive, exitGameFullscreen } from '../fullscreen';
-import { AudioManager } from '../audio/AudioManager';
+import { isFullscreenActive } from '../fullscreen';
 
 export class Engine {
   public canvas: HTMLCanvasElement;
@@ -133,9 +132,6 @@ export class Engine {
     this.setupStartMenu();
     this.setupPauseMenu();
 
-    // Start background soundtrack manager
-    AudioManager.getInstance();
-
     // Autozapis przy minimalizacji karty / blokadzie telefonu
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'hidden' && !this.startMenu.isOpen && !this.isPaused) {
@@ -162,23 +158,40 @@ export class Engine {
         document.body.classList.remove('cursor-hidden');
       }
     });
-    window.addEventListener('keydown', (e) => {
-      if (e.code === 'Escape') {
-        if (this.infoModal.isOpen) {
-          this.infoModal.hide();
-          return;
+
+    // ESC key listener with capture=true to guarantee it fires reliably in windowed and fullscreen modes
+    window.addEventListener(
+      'keydown',
+      (e) => {
+        if (e.code === 'Escape' || e.key === 'Escape') {
+          if (this.infoModal.isOpen) {
+            this.infoModal.hide();
+            return;
+          }
+          if (this.pauseModal.isOpen) {
+            this.togglePause();
+            return;
+          }
+          if (!this.startMenu.isOpen) {
+            e.preventDefault();
+            this.togglePause();
+            return;
+          }
         }
-        if (this.startMenu.isOpen || this.dialog.isOpen) return;
 
-        e.preventDefault();
-        this.togglePause();
-        return;
-      }
-
-      if (e.key === 'F11' || (!this.startMenu.isOpen && !this.dialog.isChoicesVisible && !this.infoModal.isOpen && !this.pauseModal.isOpen && !this.pauseMenu.isOpen)) {
-        document.body.classList.add('cursor-hidden');
-      }
-    });
+        if (
+          e.key === 'F11' ||
+          (!this.startMenu.isOpen &&
+            !this.dialog.isChoicesVisible &&
+            !this.infoModal.isOpen &&
+            !this.pauseModal.isOpen &&
+            !this.pauseMenu.isOpen)
+        ) {
+          document.body.classList.add('cursor-hidden');
+        }
+      },
+      true
+    );
   }
 
   private setupWindowResize(): void {
@@ -211,10 +224,6 @@ export class Engine {
       this.pauseMenu.hide();
       this.isPaused = false;
     } else {
-      // Wyjście z trybu pełnoekranowego jeśli jest włączony (wymóg ESC)
-      if (isFullscreenActive()) {
-        exitGameFullscreen().catch(() => {});
-      }
       this.pauseModal.show();
       this.isPaused = true;
     }
@@ -222,8 +231,9 @@ export class Engine {
   }
 
   public updateSoundControlVisibility(): void {
-    const isMenuOpen = (this.startMenu && this.startMenu.isOpen) || (this.pauseMenu && this.pauseMenu.isOpen) || (this.pauseModal && this.pauseModal.isOpen);
-    AudioManager.getInstance().setVisible(Boolean(isMenuOpen));
+    if (this.pauseModal.isOpen) {
+      this.pauseModal.syncAudioUI();
+    }
   }
 
   private setupStartMenu(): void {

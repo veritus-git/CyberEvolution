@@ -2,7 +2,7 @@ import './style.css';
 import { Engine } from './core/Engine';
 import { sound } from './core/Audio';
 import { isMobileDevice, isPortrait } from './core/Device';
-import { toggleGameFullscreen } from './fullscreen';
+import { toggleGameFullscreen, isFullscreenActive } from './fullscreen';
 import { gameStorage } from './storage';
 import { initPWA } from './pwa';
 
@@ -104,9 +104,42 @@ async function bootstrap() {
   const engine = new Engine(canvas, uiContainer);
   await engine.init(initialWorld);
 
+  // Fullscreen and Audio UI Sync helpers
+  const updateFsIcon = (isFs: boolean) => {
+    const expand = document.getElementById('icon-fs-expand');
+    const collapse = document.getElementById('icon-fs-collapse');
+    if (expand && collapse) {
+      expand.classList.toggle('hidden', isFs);
+      collapse.classList.toggle('hidden', !isFs);
+    }
+    if (fullscreenBtn) {
+      fullscreenBtn.title = isFs ? 'Wyłącz pełny ekran (F11)' : 'Włącz pełny ekran (F11)';
+    }
+  };
+
+  const updateAudioIcon = (isMuted: boolean) => {
+    const iconOn = document.getElementById('icon-audio-on');
+    const iconOff = document.getElementById('icon-audio-off');
+    if (iconOn && iconOff) {
+      iconOn.classList.toggle('hidden', isMuted);
+      iconOff.classList.toggle('hidden', !isMuted);
+    }
+    if (audioBtn) {
+      audioBtn.title = isMuted ? 'Włącz dźwięk' : 'Wycisz dźwięk';
+    }
+  };
+
+  // Sync initial state
+  document.addEventListener('fullscreenchange', () => {
+    updateFsIcon(isFullscreenActive());
+  });
+  updateFsIcon(isFullscreenActive());
+  updateAudioIcon(sound.isMuted);
+
   // Fullscreen controls
   const toggleFs = async () => {
     await toggleGameFullscreen('landscape');
+    setTimeout(() => updateFsIcon(isFullscreenActive()), 60);
   };
   fullscreenBtn?.addEventListener('click', async (e) => {
     e.stopPropagation();
@@ -127,8 +160,7 @@ async function bootstrap() {
   // Audio mute toggle
   audioBtn?.addEventListener('click', () => {
     const isMuted = sound.toggleMute();
-    audioBtn.textContent = isMuted ? '🔇' : '🔊';
-    audioBtn.title = isMuted ? 'Włącz dźwięk' : 'Wycisz dźwięk';
+    updateAudioIcon(isMuted);
     engine.pauseModal.updateSoundLabel(isMuted);
   });
 

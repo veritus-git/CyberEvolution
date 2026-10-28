@@ -227,6 +227,7 @@ export class Player {
       if (this.animTimer >= 0.28) {
         this.runFrameIndex = (this.runFrameIndex + 1) % 2;
         this.animTimer = 0;
+        sound.playFootstep();
       }
     } else {
       this.animTimer = 0;

@@ -4,7 +4,12 @@ export class PauseModal {
   public isOpen: boolean = false;
   private overlayElement: HTMLElement;
   private cardElement: HTMLElement;
-  private soundBtn: HTMLButtonElement | null = null;
+
+  private musicSlider!: HTMLInputElement;
+  private musicValText!: HTMLElement;
+  private sfxSlider!: HTMLInputElement;
+  private sfxValText!: HTMLElement;
+  private muteBtn!: HTMLButtonElement;
 
   public onResume?: () => void;
   public onRestartLevel?: () => void;
@@ -19,12 +24,40 @@ export class PauseModal {
     this.cardElement.className = 'pause-menu-card';
 
     this.cardElement.innerHTML = `
-      <h2 class="pause-menu-title">PAUZA</h2>
-      <div class="pause-menu-subtitle">CyberEvolution: Ścieżka Świadomości</div>
+      <div class="pause-menu-header">
+        <h2 class="pause-menu-title">PAUZA</h2>
+        <div class="pause-menu-subtitle">CyberEvolution: Ścieżka Świadomości</div>
+      </div>
+
+      <div class="pause-settings-box">
+        <div class="pause-settings-title">USTAWIENIA DŹWIĘKU</div>
+        
+        <div class="pause-slider-row">
+          <div class="pause-slider-label">
+            <span>Muzyka (Synthwave)</span>
+            <span id="pause-music-val" class="pause-val-badge">45%</span>
+          </div>
+          <input type="range" id="pause-music-slider" min="0" max="100" value="45" class="pause-range-input" />
+        </div>
+
+        <div class="pause-slider-row">
+          <div class="pause-slider-label">
+            <span>Efekty dźwiękowe (SFX)</span>
+            <span id="pause-sfx-val" class="pause-val-badge">35%</span>
+          </div>
+          <input type="range" id="pause-sfx-slider" min="0" max="100" value="35" class="pause-range-input" />
+        </div>
+
+        <div class="pause-mute-row">
+          <button id="pause-mute-toggle" class="pause-btn-subtle">
+            <span id="pause-mute-icon">🔊</span>
+            <span id="pause-mute-text">Dźwięk: Włączony</span>
+          </button>
+        </div>
+      </div>
 
       <div class="pause-menu-buttons">
-        <button class="pause-btn" id="pause-resume">▶ Wznów grę</button>
-        <button class="pause-btn" id="pause-sound">🔊 Dźwięk: WŁ</button>
+        <button class="pause-btn primary" id="pause-resume">▶ Wznów grę</button>
         <button class="pause-btn" id="pause-help">❔ Sterowanie i pomoc</button>
         <button class="pause-btn" id="pause-restart">↺ Zrestartuj poziom</button>
         <button class="pause-btn danger" id="pause-lobby">⮌ Powrót do Lobby</button>
@@ -39,19 +72,47 @@ export class PauseModal {
 
   private setupListeners(): void {
     const resumeBtn = this.cardElement.querySelector('#pause-resume');
-    this.soundBtn = this.cardElement.querySelector('#pause-sound') as HTMLButtonElement;
     const helpBtn = this.cardElement.querySelector('#pause-help');
     const restartBtn = this.cardElement.querySelector('#pause-restart');
     const lobbyBtn = this.cardElement.querySelector('#pause-lobby');
 
+    this.musicSlider = this.cardElement.querySelector('#pause-music-slider') as HTMLInputElement;
+    this.musicValText = this.cardElement.querySelector('#pause-music-val') as HTMLElement;
+    this.sfxSlider = this.cardElement.querySelector('#pause-sfx-slider') as HTMLInputElement;
+    this.sfxValText = this.cardElement.querySelector('#pause-sfx-val') as HTMLElement;
+    this.muteBtn = this.cardElement.querySelector('#pause-mute-toggle') as HTMLButtonElement;
+
+    // Music Volume
+    this.musicSlider.addEventListener('input', () => {
+      const val = parseInt(this.musicSlider.value, 10);
+      this.musicValText.textContent = `${val}%`;
+      sound.setMusicVolume(val / 100);
+      if (sound.isMuted && val > 0) {
+        sound.setMuted(false);
+        this.syncAudioUI();
+      }
+    });
+
+    // SFX Volume
+    this.sfxSlider.addEventListener('input', () => {
+      const val = parseInt(this.sfxSlider.value, 10);
+      this.sfxValText.textContent = `${val}%`;
+      sound.setSfxVolume(val / 100);
+      if (sound.isMuted && val > 0) {
+        sound.setMuted(false);
+        this.syncAudioUI();
+      }
+    });
+
+    // Mute Toggle
+    this.muteBtn.addEventListener('click', () => {
+      sound.toggleMute();
+      this.syncAudioUI();
+    });
+
     resumeBtn?.addEventListener('click', () => {
       this.hide();
       this.onResume?.();
-    });
-
-    this.soundBtn?.addEventListener('click', () => {
-      const isMuted = sound.toggleMute();
-      this.updateSoundLabel(isMuted);
     });
 
     helpBtn?.addEventListener('click', () => {
@@ -67,22 +128,56 @@ export class PauseModal {
       this.hide();
       this.onReturnToLobby?.();
     });
+
+    // Close on overlay backdrop click
+    this.overlayElement.addEventListener('click', (e) => {
+      if (e.target === this.overlayElement) {
+        this.hide();
+        this.onResume?.();
+      }
+    });
   }
 
-  public updateSoundLabel(isMuted: boolean): void {
-    if (this.soundBtn) {
-      this.soundBtn.textContent = isMuted ? '🔇 Dźwięk: WYŁ' : '🔊 Dźwięk: WŁ';
+  public syncAudioUI(): void {
+    const musicPct = Math.round(sound.musicVolume * 100);
+    const sfxPct = Math.round(sound.sfxVolume * 100);
+
+    if (this.musicSlider) this.musicSlider.value = String(musicPct);
+    if (this.musicValText) this.musicValText.textContent = `${musicPct}%`;
+
+    if (this.sfxSlider) this.sfxSlider.value = String(sfxPct);
+    if (this.sfxValText) this.sfxValText.textContent = `${sfxPct}%`;
+
+    const iconSpan = this.cardElement.querySelector('#pause-mute-icon');
+    const textSpan = this.cardElement.querySelector('#pause-mute-text');
+
+    if (iconSpan && textSpan) {
+      if (sound.isMuted) {
+        iconSpan.textContent = '🔇';
+        textSpan.textContent = 'Dźwięk: Wyciszony';
+        this.muteBtn.classList.add('is-muted');
+      } else {
+        iconSpan.textContent = '🔊';
+        textSpan.textContent = 'Dźwięk: Włączony';
+        this.muteBtn.classList.remove('is-muted');
+      }
     }
+  }
+
+  public updateSoundLabel(_isMuted?: boolean): void {
+    this.syncAudioUI();
   }
 
   public show(): void {
     this.isOpen = true;
-    this.updateSoundLabel(sound.isMuted);
+    this.syncAudioUI();
     this.overlayElement.classList.remove('hidden');
+    document.body.classList.remove('cursor-hidden');
   }
 
   public hide(): void {
     this.isOpen = false;
     this.overlayElement.classList.add('hidden');
+    document.body.classList.add('cursor-hidden');
   }
 }

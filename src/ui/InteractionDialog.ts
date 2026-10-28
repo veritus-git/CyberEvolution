@@ -609,7 +609,16 @@ export class InteractionDialog {
       this.lastTimestamp = now;
 
       const page = this.currentPages[this.currentPageIndex] || '';
+      const prevChars = Math.floor(this.typedChars);
       this.typedChars += this.typingSpeed * dt;
+      const nextChars = Math.floor(this.typedChars);
+
+      if (nextChars > prevChars) {
+        const char = page[nextChars - 1];
+        if (char && char.trim() !== '' && nextChars % 2 === 0) {
+          sound.playDialogBlip();
+        }
+      }
 
       if (this.typedChars >= page.length) {
         this.typedChars = page.length;
