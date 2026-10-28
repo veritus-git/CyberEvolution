@@ -482,21 +482,24 @@ export class Bossfight {
 
     if (skipIntro) {
       this.isIntroActive = false;
-      this.animState = 'enter';
+      this.animState = 'visible'; // Instantly visible on retry (no slide-in animation!)
       this.animTimer = 0.0;
       this.pickNext();
+      this.updateMobileUI();
     } else {
       this.isIntroActive = true;
       this.animState = 'hidden';
+      this.updateMobileUI();
     }
   }
 
   public finishIntro(): void {
     this.isIntroActive = false;
     this.inputCooldownTimer = 0.45; // Strict debounce after closing dialog!
-    this.animState = 'enter';
+    this.animState = 'enter'; // Smooth slide-in of card and HP bars!
     this.animTimer = 0.0;
     this.pickNext();
+    this.updateMobileUI();
   }
 
   private async loadBossData(wn: number): Promise<void> {
@@ -1003,9 +1006,23 @@ export class Bossfight {
     const w = 300;
     const h = 21;
 
+    let yOff = 0;
+    let alpha = 1.0;
+    if (this.animState === 'enter') {
+      const p = Math.max(0, Math.min(1, this.animTimer / this.animDur));
+      const easeOut = 1.0 - Math.pow(1.0 - p, 3);
+      yOff = Math.round(-60 * (1.0 - easeOut)); // Glides down smoothly together with the card!
+      alpha = easeOut;
+    }
+
+    ctx.save();
+    if (alpha < 1.0) {
+      ctx.globalAlpha = alpha;
+    }
+
     // 1. Player HP Bar (above player head)
     const px = Math.round(player.physics.x - cameraX + player.physics.width / 2 - w / 2);
-    const py = Math.round(player.physics.y - 34);
+    const py = Math.round(player.physics.y - 34 + yOff);
     const pRatio = Math.max(0, Math.min(1, this.playerHp / this.playerHpMax));
     const pFillW = Math.round(w * pRatio);
 
@@ -1028,7 +1045,7 @@ export class Bossfight {
 
     // 2. Boss HP Bar (above boss head)
     const bx = Math.round(this.bossX - cameraX + this.bossW / 2 - w / 2);
-    const by = Math.round(this.bossY - 34);
+    const by = Math.round(this.bossY - 34 + yOff);
     const bRatio = Math.max(0, Math.min(1, this.bossHp / this.bossHpMax));
     const bFillW = Math.round(w * bRatio);
 
@@ -1045,6 +1062,8 @@ export class Bossfight {
     // Centered label inside bar
     ctx.fillStyle = '#ffffff';
     ctx.fillText(`${this.bossHp}/${this.bossHpMax}`, bx + w / 2, by + h / 2);
+
+    ctx.restore();
   }
 
   private drawScrollItem(ctx: CanvasRenderingContext2D, cameraX: number): void {
@@ -1080,5 +1099,8 @@ export class Bossfight {
 
   public end(): void {
     this.active = false;
+    this.isIntroActive = true;
+    this.animState = 'hidden';
+    this.updateMobileUI();
   }
 }

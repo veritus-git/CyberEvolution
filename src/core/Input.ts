@@ -33,9 +33,6 @@ export class InputManager {
       if (e.code === 'F2') {
         this.debugToggleTriggered = true;
       }
-      if (['Digit1', 'Digit2', 'Digit3', 'Digit4', 'Digit5'].includes(e.code)) {
-        this.selectedSkin = parseInt(e.code.replace('Digit', ''), 10);
-      }
     });
 
     window.addEventListener('keyup', (e) => {

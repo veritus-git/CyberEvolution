@@ -288,7 +288,7 @@ export class AudioManager {
     osc.frequency.setValueAtTime(150, now);
     osc.frequency.exponentialRampToValueAtTime(440, now + 0.12);
 
-    gain.gain.setValueAtTime(0.18, now);
+    gain.gain.setValueAtTime(0.08, now);
     gain.gain.exponentialRampToValueAtTime(0.001, now + 0.13);
 
     osc.connect(gain);

@@ -459,9 +459,9 @@ export class Engine {
 
       // Spawn positioning
       if (isArena && currentWn !== null) {
-        // Pre-initialize and preload bossfight BEFORE starting run-in animation so boss is instantly visible!
-        await Bossfight.preloadBoss(currentWn);
-        await this.startBossfight(currentWn, this.arenaIntroSkipBossDialog);
+        this.arenaIntroSkipBossDialog = false; // Always fresh entrance for new arena!
+        this.arenaIntroActive = true;
+        this.arenaIntroWn = currentWn;
 
         // Arena entrance intro: compute floor ground level so player's feet are exactly on ground
         this.placePlayerOnGround(defaultSpawnX);
@@ -474,8 +474,10 @@ export class Engine {
         this.player.physics.onGround = true;
         this.player.animTimer = 0.12;
         this.player.runFrameIndex = 0;
-        this.arenaIntroActive = true;
-        this.arenaIntroWn = currentWn;
+
+        // Pre-initialize and preload bossfight BEFORE starting run-in animation so boss is instantly visible!
+        await Bossfight.preloadBoss(currentWn);
+        await this.startBossfight(currentWn, false);
       } else if (worldKey === 'lobby') {
         // Always drop in from above on every return to lobby (1:1 with Python prototype)
         this.player.physics.x = CONFIG.LOGICAL_WIDTH / 2 - CONFIG.PLAYER_WIDTH / 2;
@@ -599,7 +601,7 @@ export class Engine {
   }
 
   private retryBossfight(wn: number): void {
-    this.arenaIntroSkipBossDialog = true;
+    this.arenaIntroSkipBossDialog = false;
     this.arenaIntroActive = false;
     this.arenaIntroWn = null;
 
@@ -959,24 +961,11 @@ export class Engine {
       return;
     }
 
-    // 3. Update Bossfight
-    if (this.bossfight.active) {
-      this.bossfight.update(dt, this.player);
-    }
-
     // Debug toggle
     if (this.input.debugToggleTriggered) {
       this.renderer.showDebug = !this.renderer.showDebug;
       this.joystick.forceDebugVisible = this.renderer.showDebug;
       this.input.debugToggleTriggered = false;
-    }
-
-    if (this.input.selectedSkin !== null) {
-      this.player.setSkin(this.input.selectedSkin);
-      if (this.level.key === 'lobby') {
-        this.loadPortalsForLevel(this.level, 'lobby');
-      }
-      this.input.selectedSkin = null;
     }
 
     // Lobby drop-in landing check (1:1 with Python: player falls in from top, lock input until landing)
