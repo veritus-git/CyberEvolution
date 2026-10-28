@@ -38,19 +38,31 @@ export class AudioManager {
     { bass: 98, arp: [196, 246.94, 293.66, 392, 293.66, 246.94] }, // G2 / G
   ];
 
+  private silentAudio: HTMLAudioElement | null = null;
+  public isAudioUnlocked: boolean = false;
+
   constructor() {
     this.loadSettings();
 
-    // Audio context will be resumed/created upon first user gesture
-    const startAudioOnInteraction = () => {
-      this.initContext();
-      window.removeEventListener('pointerdown', startAudioOnInteraction);
-      window.removeEventListener('keydown', startAudioOnInteraction);
-      window.removeEventListener('touchstart', startAudioOnInteraction);
+    // Universal iOS Web Audio & Silent Mode unlock
+    const unlockHandler = () => {
+      this.unlock();
     };
-    window.addEventListener('pointerdown', startAudioOnInteraction, { once: true });
-    window.addEventListener('keydown', startAudioOnInteraction, { once: true });
-    window.addEventListener('touchstart', startAudioOnInteraction, { once: true });
+
+    if (typeof window !== 'undefined') {
+      const events = ['touchstart', 'touchend', 'pointerdown', 'pointerup', 'click', 'keydown'];
+      events.forEach((evt) => {
+        // capture: true ensures this handler fires even if child elements call stopPropagation()
+        window.addEventListener(evt, unlockHandler, { capture: true, passive: true });
+      });
+
+      // Resume context if suspended when returning from background / tab switch on iOS
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible' && this.ctx && (this.ctx.state === 'suspended' || (this.ctx.state as any) === 'interrupted') && !this.isMuted) {
+          this.ctx.resume().catch(() => {});
+        }
+      });
+    }
   }
 
   private loadSettings(): void {
@@ -82,9 +94,63 @@ export class AudioManager {
     }
   }
 
+  /**
+   * Unlock Web Audio & iOS hardware silent switch on user interaction
+   */
+  public unlock(): void {
+    this.initContext();
+
+    if (this.ctx) {
+      if (this.ctx.state === 'suspended' || (this.ctx.state as any) === 'interrupted') {
+        this.ctx.resume().catch(() => {});
+      }
+      // Play 1-frame silent buffer through destination to unlock Web Audio on iOS Safari
+      try {
+        const buffer = this.ctx.createBuffer(1, 1, 22050);
+        const source = this.ctx.createBufferSource();
+        source.buffer = buffer;
+        source.connect(this.ctx.destination);
+        source.start(0);
+      } catch {
+        // ignore
+      }
+    }
+
+    // Play tiny silent HTML5 audio element to wake up iOS hardware audio session (bypasses silent switch)
+    if (!this.silentAudio && typeof Audio !== 'undefined') {
+      try {
+        this.silentAudio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA');
+        this.silentAudio.setAttribute('playsinline', 'true');
+        this.silentAudio.setAttribute('preload', 'auto');
+      } catch {
+        // ignore
+      }
+    }
+    if (this.silentAudio) {
+      this.silentAudio.play().then(() => {
+        this.isAudioUnlocked = true;
+      }).catch(() => {});
+    }
+
+    if (this.ctx && this.ctx.state === 'running' && !this.isMusicPlaying && !this.isMuted) {
+      this.startMusic();
+    }
+  }
+
+  private ensureSfxReady(): boolean {
+    if (this.isMuted || this.sfxVolume <= 0) return false;
+    if (!this.ctx) {
+      this.initContext();
+    }
+    if (this.ctx && (this.ctx.state === 'suspended' || (this.ctx.state as any) === 'interrupted')) {
+      this.ctx.resume().catch(() => {});
+    }
+    return Boolean(this.ctx && this.sfxGain);
+  }
+
   public initContext(): void {
     if (this.ctx) {
-      if (this.ctx.state === 'suspended') {
+      if (this.ctx.state === 'suspended' || (this.ctx.state as any) === 'interrupted') {
         this.ctx.resume().catch(() => {});
       }
       return;
@@ -278,7 +344,7 @@ export class AudioManager {
   // ==================== SOUND EFFECTS (SFX) ====================
 
   public playJump(): void {
-    if (!this.ctx || !this.sfxGain || this.isMuted || this.sfxVolume <= 0) return;
+    if (!this.ensureSfxReady() || !this.ctx || !this.sfxGain) return;
     const now = this.ctx.currentTime;
 
     const osc = this.ctx.createOscillator();
@@ -302,7 +368,7 @@ export class AudioManager {
    * Crisp, dry shoe-to-ground tap (mid-range frequencies with highpass filter - no hollow wooden floorboard resonance!)
    */
   public playFootstep(): void {
-    if (!this.ctx || !this.sfxGain || this.isMuted || this.sfxVolume <= 0) return;
+    if (!this.ensureSfxReady() || !this.ctx || !this.sfxGain) return;
     const now = performance.now();
     if (now - this.lastFootstepTime < 130) return;
     this.lastFootstepTime = now;
@@ -340,7 +406,7 @@ export class AudioManager {
   }
 
   public playDialogBlip(): void {
-    if (!this.ctx || !this.sfxGain || this.isMuted || this.sfxVolume <= 0) return;
+    if (!this.ensureSfxReady() || !this.ctx || !this.sfxGain) return;
     const now = performance.now();
     if (now - this.lastBlipTime < 45) return;
     this.lastBlipTime = now;
@@ -366,7 +432,7 @@ export class AudioManager {
   }
 
   public playBossExplosion(): void {
-    if (!this.ctx || !this.sfxGain || this.isMuted || this.sfxVolume <= 0) return;
+    if (!this.ensureSfxReady() || !this.ctx || !this.sfxGain) return;
     const now = this.ctx.currentTime;
 
     // 1. Low frequency booming sweep
@@ -419,7 +485,7 @@ export class AudioManager {
   }
 
   public playGateUnlock(): void {
-    if (!this.ctx || !this.sfxGain || this.isMuted || this.sfxVolume <= 0) return;
+    if (!this.ensureSfxReady() || !this.ctx || !this.sfxGain) return;
     const now = this.ctx.currentTime;
 
     [440, 554.37, 659.25, 880].forEach((freq, idx) => {
@@ -442,7 +508,7 @@ export class AudioManager {
   }
 
   public playQuizCorrect(): void {
-    if (!this.ctx || !this.sfxGain || this.isMuted || this.sfxVolume <= 0) return;
+    if (!this.ensureSfxReady() || !this.ctx || !this.sfxGain) return;
     const now = this.ctx.currentTime;
 
     [523.25, 659.25, 783.99, 1046.5].forEach((freq, idx) => {
@@ -465,7 +531,7 @@ export class AudioManager {
   }
 
   public playQuizWrong(): void {
-    if (!this.ctx || !this.sfxGain || this.isMuted || this.sfxVolume <= 0) return;
+    if (!this.ensureSfxReady() || !this.ctx || !this.sfxGain) return;
     const now = this.ctx.currentTime;
 
     const osc = this.ctx.createOscillator();
@@ -486,7 +552,7 @@ export class AudioManager {
   }
 
   public playEvolution(): void {
-    if (!this.ctx || !this.sfxGain || this.isMuted || this.sfxVolume <= 0) return;
+    if (!this.ensureSfxReady() || !this.ctx || !this.sfxGain) return;
     const now = this.ctx.currentTime;
 
     const notes = [261.63, 329.63, 392, 523.25, 659.25, 783.99, 1046.5];
@@ -510,7 +576,7 @@ export class AudioManager {
   }
 
   public playPortal(): void {
-    if (!this.ctx || !this.sfxGain || this.isMuted || this.sfxVolume <= 0) return;
+    if (!this.ensureSfxReady() || !this.ctx || !this.sfxGain) return;
     const now = this.ctx.currentTime;
 
     const osc = this.ctx.createOscillator();
@@ -540,7 +606,7 @@ export class AudioManager {
    * Cyber high-tech descending whoosh when dropping into Lobby from above
    */
   public playLobbyDrop(): void {
-    if (!this.ctx || !this.sfxGain || this.isMuted || this.sfxVolume <= 0) return;
+    if (!this.ensureSfxReady() || !this.ctx || !this.sfxGain) return;
     const now = this.ctx.currentTime;
 
     const osc = this.ctx.createOscillator();
@@ -571,7 +637,7 @@ export class AudioManager {
    * Heavy, tactile cyber impact thud when hitting the Lobby floor
    */
   public playLobbyLand(): void {
-    if (!this.ctx || !this.sfxGain || this.isMuted || this.sfxVolume <= 0) return;
+    if (!this.ensureSfxReady() || !this.ctx || !this.sfxGain) return;
     const now = this.ctx.currentTime;
 
     // 1. Deep solid bass impact (95Hz down to 32Hz)
@@ -609,7 +675,7 @@ export class AudioManager {
    * Digitized descending pitch-drop & dematerialization glitch when falling into map abyss/holes
    */
   public playAbyssFall(): void {
-    if (!this.ctx || !this.sfxGain || this.isMuted || this.sfxVolume <= 0) return;
+    if (!this.ensureSfxReady() || !this.ctx || !this.sfxGain) return;
     const now = this.ctx.currentTime;
 
     // 1. Rapid descending tone slide (falling into the deep cyber void)

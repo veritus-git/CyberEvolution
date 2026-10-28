@@ -350,6 +350,7 @@ export class Engine {
    * Seamlessly load and switch worlds (Lobby, World 1..5, World 1..5 Arena)
    */
   public async loadWorld(worldKey: string, isNewGameIntro: boolean = false): Promise<void> {
+    this.activeHint = null;
     if (this.isTransitioning) return;
     this.isTransitioning = true;
 
@@ -898,13 +899,22 @@ export class Engine {
         ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
       }
     } else {
+      const shouldShowHint = Boolean(
+        this.activeHint &&
+        this.transitionState === 'none' &&
+        !this.isTransitioning &&
+        !this.arenaIntroActive &&
+        !this.lobbyDropinActive &&
+        !isGamePaused
+      );
+
       this.renderer.render(
         this.level,
         this.player,
         this.camera,
         isGamePaused ? 0 : rawDt,
         this.fps,
-        this.activeHint,
+        shouldShowHint ? this.activeHint : null,
         this.bossfight,
         this.worldIntroTitle,
         introAlpha,
@@ -1051,6 +1061,7 @@ export class Engine {
 
   public triggerWorldTransition(targetWorld: string): void {
     if (this.transitionState !== 'none') return;
+    this.activeHint = null;
     sound.playPortal();
     this.transitionState = 'wipe_out';
     this.transitionTimer = 0;
@@ -1059,6 +1070,12 @@ export class Engine {
 
   private checkHintsAndInteractions(interactPressed: boolean): void {
     this.activeHint = null;
+
+    // Never show hint bubbles during transitions, cutscenes, arena intro, or lobby drop-in!
+    if (this.transitionState !== 'none' || this.isTransitioning || this.arenaIntroActive || this.lobbyDropinActive) {
+      return;
+    }
+
     const playerBounds = this.player.bounds;
     const isGrounded = this.player.physics.onGround;
 
@@ -1078,6 +1095,7 @@ export class Engine {
             const m = this.level.key.match(/^(?:world)?([1-5])$/);
             const wn = m ? m[1] : '1';
             // Immediate arena load without curtain wipe!
+            this.activeHint = null;
             this.loadWorld(`world${wn}_arena`);
             return;
           }
@@ -1097,23 +1115,13 @@ export class Engine {
           this.activeHint = 'E: powrót do lobby';
         } else if (isArena) {
           this.activeHint = 'E: wejdź do areny';
-        } else if (portal.targetWorld === 'dynamic_world') {
-          const maxCompleted = this.completedWorlds.size > 0 ? Math.max(...Array.from(this.completedWorlds)) : 0;
-          const targetWn = Math.min(5, Math.max(this.player.skinId, maxCompleted + 1));
-          const worldNames: Record<number, string> = {
-            1: 'Miasta Iluzji',
-            2: 'Krypt Kluczy',
-            3: 'Maskarady Luster',
-            4: 'Twierdzy Kopii',
-            5: '???',
-          };
-          const wTarget = worldNames[targetWn] || `Świata ${targetWn}`;
-          this.activeHint = `E: wejdź do ${wTarget}`;
         } else {
+          // Zawsze "E: wejdź do świata", bez zdradzania nazwy świata przed wejściem!
           this.activeHint = 'E: wejdź do świata';
         }
 
         if (interactPressed) {
+          this.activeHint = null;
           let target = portal.targetWorld;
           if (target === 'ending') {
             this.triggerWorldTransition('ending');

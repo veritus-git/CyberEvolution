@@ -5,6 +5,7 @@
  */
 
 import { isMobileDevice } from '../core/Device';
+import { sound } from '../core/Audio';
 
 export interface TouchState {
   moveX: number;
@@ -99,6 +100,7 @@ export class VirtualJoystick {
     const onStart = (e: PointerEvent) => {
       e.preventDefault();
       e.stopPropagation();
+      sound.unlock();
       try { el.setPointerCapture(e.pointerId); } catch {}
       el.classList.add('active');
       this.triggerHaptic();
@@ -129,6 +131,7 @@ export class VirtualJoystick {
     const onStart = (e: PointerEvent) => {
       e.preventDefault();
       e.stopPropagation();
+      sound.unlock();
       try { el.setPointerCapture(e.pointerId); } catch {}
       el.classList.add('active');
       this.triggerHaptic();

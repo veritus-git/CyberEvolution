@@ -1,6 +1,7 @@
 import { GameInfoModal } from './GameInfoModal';
 import { gameStorage } from '../storage';
 import { promptPWAInstall } from '../pwa';
+import { sound } from '../core/Audio';
 
 export type StartMenuAction = 'new_game' | 'continue' | 'install' | 'exit';
 
@@ -52,6 +53,7 @@ export class StartMenu {
         this.updateSelection();
       };
       btn.onclick = (e) => {
+        sound.unlock();
         e.stopPropagation();
         this.triggerAction(opt.action);
       };

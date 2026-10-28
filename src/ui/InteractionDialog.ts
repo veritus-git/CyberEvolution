@@ -186,6 +186,7 @@ export class InteractionDialog {
 
     // Unified single tap/click listener anywhere on screen to advance dialogue
     window.addEventListener('pointerup', (e) => {
+      sound.unlock();
       if (!this.isOpen) return;
       if (this.isPaused) return;
       if (this.isDeathMenuActive) return;
