@@ -498,7 +498,14 @@ export class Engine {
           this.pendingLobbyDialog = this.pendingSummaryWorld;
           this.pendingSummaryWorld = null;
         } else {
-          this.pendingLobbyDialog = null;
+          // If returning or continuing into lobby without in-memory flag,
+          // check if there is an unshown summary for the latest completed world (1..4)!
+          const maxCompleted = this.completedWorlds.size > 0 ? Math.max(...Array.from(this.completedWorlds)) : 0;
+          if (maxCompleted >= 1 && maxCompleted <= 4 && !gameStorage.isSummaryShown(maxCompleted)) {
+            this.pendingLobbyDialog = maxCompleted;
+          } else {
+            this.pendingLobbyDialog = null;
+          }
         }
       } else {
         this.placePlayerOnGround(defaultSpawnX);
@@ -716,7 +723,13 @@ export class Engine {
       const raw = await res.text();
       const lines = this.parseConversationLines(raw);
 
-      this.dialog.startConversation(`Podsumowanie: Świat ${wn}`, lines, this.player.skinId, this.player.physics.y, () => {
+      // Trwale oznaczamy podsumowanie jako wyświetlone
+      gameStorage.markSummaryShown(wn);
+      this.saveGameProgress();
+
+      // Po świecie 4 Mędrzec zniknął z lobby, bohater mówi sam do siebie w pustce
+      const title = wn === 4 ? 'Gdzie jest Mędrzec?!' : `Podsumowanie: Świat ${wn}`;
+      this.dialog.startConversation(title, lines, this.player.skinId, this.player.physics.y, () => {
         if (wn === 5) {
           setTimeout(() => {
             this.introSequence.playEnding(() => {

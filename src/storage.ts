@@ -12,6 +12,7 @@ export interface GameSaveData {
   playerX?: number;
   playerY?: number;
   completedWorlds: number[];
+  shownSummaries?: number[];
   unlockedGates: Record<string, number[]>;
   activatedTriggers: Record<string, number[]>;
   hasSeenIntro: boolean;
@@ -29,6 +30,7 @@ const DEFAULT_SAVE_DATA: GameSaveData = {
   currentWorld: 'lobby',
   playerSkin: 1,
   completedWorlds: [],
+  shownSummaries: [],
   unlockedGates: {},
   activatedTriggers: {},
   hasSeenIntro: false,
@@ -113,6 +115,10 @@ export class GameStorageManager {
         ? parsed.currentWorld
         : DEFAULT_SAVE_DATA.currentWorld;
 
+      const shownSummaries = Array.isArray(parsed.shownSummaries)
+        ? parsed.shownSummaries
+        : [];
+
       this.currentState = {
         version: parsed.version || 1,
         currentWorld,
@@ -120,6 +126,7 @@ export class GameStorageManager {
         playerX: typeof parsed.playerX === 'number' ? parsed.playerX : undefined,
         playerY: typeof parsed.playerY === 'number' ? parsed.playerY : undefined,
         completedWorlds: completed,
+        shownSummaries,
         unlockedGates: parsed.unlockedGates && typeof parsed.unlockedGates === 'object' ? parsed.unlockedGates : {},
         activatedTriggers: parsed.activatedTriggers && typeof parsed.activatedTriggers === 'object' ? parsed.activatedTriggers : {},
         hasSeenIntro: Boolean(parsed.hasSeenIntro),
@@ -189,6 +196,26 @@ export class GameStorageManager {
     if (!list.includes(triggerId)) {
       list.push(triggerId);
       this.currentState.activatedTriggers[worldKey] = list;
+      this.save();
+    }
+  }
+
+  /**
+   * Sprawdza, czy dialog podsumowania dla danego świata był już wyświetlony.
+   */
+  public isSummaryShown(worldNum: number): boolean {
+    const list = this.currentState.shownSummaries || [];
+    return list.includes(worldNum);
+  }
+
+  /**
+   * Oznacza dialog podsumowania danego świata jako wyświetlony i zapisuje stan.
+   */
+  public markSummaryShown(worldNum: number): void {
+    const list = this.currentState.shownSummaries || [];
+    if (!list.includes(worldNum)) {
+      list.push(worldNum);
+      this.currentState.shownSummaries = list;
       this.save();
     }
   }
