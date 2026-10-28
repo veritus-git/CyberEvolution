@@ -60,6 +60,8 @@
   -webkit-touch-callout: none !important;
   -webkit-user-select: none !important;
   user-select: none !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
 }
 
 html, body {
@@ -71,9 +73,9 @@ html, body {
   font-size: 18px;
   color: #ffffff;
   touch-action: none;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  text-rendering: geometricPrecision !important;
 }
 
 #app {
@@ -301,6 +303,9 @@ html, body {
   -webkit-user-select: none !important;
   caret-color: transparent !important;
   outline: none !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  text-rendering: geometricPrecision !important;
 }
 
 .intro-overlay.hidden {
@@ -312,6 +317,9 @@ html, body {
   -webkit-user-select: none !important;
   caret-color: transparent !important;
   outline: none !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  text-rendering: geometricPrecision !important;
 }
 
 .intro-content-box {
@@ -323,26 +331,53 @@ html, body {
   user-select: none !important;
   -webkit-user-select: none !important;
   caret-color: transparent !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
 }
 
 .intro-text {
-  font-size: clamp(16px, 2vw, 24px);
-  line-height: 1.8;
+  font-size: 24px;
+  line-height: 1.7;
   color: #e6e6e6;
   white-space: pre-wrap;
   user-select: none !important;
   -webkit-user-select: none !important;
   caret-color: transparent !important;
   outline: none !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+  text-rendering: geometricPrecision !important;
+}
+
+@media (max-width: 900px) {
+  .intro-text {
+    font-size: 20px;
+    line-height: 1.6;
+  }
+}
+
+@media (max-width: 600px) {
+  .intro-text {
+    font-size: 17px;
+    line-height: 1.5;
+  }
 }
 
 .intro-hint {
-  font-size: clamp(12px, 1.5vw, 16px);
+  font-size: 16px;
   color: #969696;
   text-align: right;
   user-select: none !important;
   -webkit-user-select: none !important;
   caret-color: transparent !important;
+  -webkit-font-smoothing: antialiased !important;
+  -moz-osx-font-smoothing: grayscale !important;
+}
+
+@media (max-width: 600px) {
+  .intro-hint {
+    font-size: 13px;
+  }
 }
 
 /* Cursor visibility control */

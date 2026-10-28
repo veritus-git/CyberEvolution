@@ -275,6 +275,9 @@ export class Engine {
       console.warn('Skin preload failed:', e);
     }
 
+    // Preload all bosses in background so arena entry immediately shows the right boss without delay
+    Bossfight.preloadAllBosses().catch(() => {});
+
     const params = new URLSearchParams(window.location.search);
     if (!params.has('world')) {
       this.startMenu.show();
@@ -393,6 +396,10 @@ export class Engine {
 
       // Spawn positioning
       if (isArena && currentWn !== null) {
+        // Pre-initialize and preload bossfight BEFORE starting run-in animation so boss is instantly visible!
+        await Bossfight.preloadBoss(currentWn);
+        await this.startBossfight(currentWn, this.arenaIntroSkipBossDialog);
+
         // Arena entrance intro: compute floor ground level so player's feet are exactly on ground
         this.placePlayerOnGround(defaultSpawnX);
         const groundY = this.player.physics.y;
@@ -433,13 +440,10 @@ export class Engine {
       this.camera.reset(this.player.physics.bounds.centerX, effectiveWidth);
       this.solidsNeedRefresh = true;
 
-      // Handle Dialogs and Bossfight:
-      if (isArena && currentWn !== null) {
-        // Pre-initialize and start bossfight immediately so boss is visible as player runs in!
-        await this.startBossfight(currentWn, this.arenaIntroSkipBossDialog);
-      } else if (worldKey === 'lobby') {
+      // Handle Dialogs and World Intro:
+      if (worldKey === 'lobby') {
         // Lobby dialog will trigger smoothly upon landing from drop-in!
-      } else if (currentWn !== null) {
+      } else if (currentWn !== null && !isArena) {
         this.playWorldIntro(currentWn, worldName);
       }
 

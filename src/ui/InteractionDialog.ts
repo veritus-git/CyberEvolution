@@ -68,6 +68,7 @@ export class InteractionDialog {
   private deathMenuSelection: number = 0;
   private onRetryBossCallback?: () => void;
   private onRestartWorldCallback?: () => void;
+  private lastAdvanceTime: number = 0;
 
   constructor(container: HTMLElement) {
     this.overlayElement = document.createElement('div');
@@ -180,22 +181,21 @@ export class InteractionDialog {
     container.appendChild(this.overlayElement);
     container.appendChild(this.deathMenuOverlay);
 
-    // Click / touch to advance
-    this.overlayElement.addEventListener('click', () => {
-      if (!this.isOpen) return;
-      if (this.isDeathMenuActive) return;
-      if (this.mode === 'quiz' && this.quizStage === 'choices') return;
-      this.advance();
-    });
-
-    // Global tap/click anywhere on screen to advance dialogue
-    window.addEventListener('pointerdown', (e) => {
+    // Unified single tap/click listener anywhere on screen to advance dialogue
+    window.addEventListener('pointerup', (e) => {
       if (!this.isOpen) return;
       if (this.isDeathMenuActive) return;
       if (this.mode === 'quiz' && this.quizStage === 'choices') return;
 
       const target = e.target as HTMLElement | null;
-      if (target && (target.closest('.retro-choice-btn') || target.closest('.death-menu-option') || target.closest('#btn-fullscreen') || target.closest('#sound-control-wrapper') || target.closest('.sound-popup'))) {
+      if (
+        target &&
+        (target.closest('.retro-choice-btn') ||
+          target.closest('.death-menu-option') ||
+          target.closest('#btn-fullscreen') ||
+          target.closest('#sound-control-wrapper') ||
+          target.closest('.sound-popup'))
+      ) {
         return;
       }
       this.advance();
@@ -527,11 +527,21 @@ export class InteractionDialog {
   }
 
   public advance(): void {
-    // If typewriter is still typing, finish instantly (force done)
-    if (!this.isDoneTyping) {
-      this.forceFinishTyping();
+    const now = performance.now();
+    // Debounce to prevent synthetic or double-tap accidental skipping
+    if (now - this.lastAdvanceTime < 240) {
       return;
     }
+
+    // 1st click/tap: If typewriter is still typing, finish instantly (show full text) and wait for next click!
+    if (!this.isDoneTyping) {
+      this.forceFinishTyping();
+      this.lastAdvanceTime = now;
+      return;
+    }
+
+    // 2nd click/tap: actually advance to next page or next dialogue line
+    this.lastAdvanceTime = now;
 
     // If there is another page in the current text block, go to next page
     if (this.currentPageIndex < this.currentPages.length - 1) {
@@ -584,6 +594,7 @@ export class InteractionDialog {
     this.isDoneTyping = false;
     this.hintElement.textContent = '';
     this.lastTimestamp = performance.now();
+    this.lastAdvanceTime = performance.now();
 
     if (this.animFrameId) cancelAnimationFrame(this.animFrameId);
     const tick = (now: number) => {
@@ -613,6 +624,7 @@ export class InteractionDialog {
     this.typedChars = page.length;
     this.bodyElement.textContent = page;
     this.isDoneTyping = true;
+    this.lastAdvanceTime = performance.now();
     const isTouch = typeof window !== 'undefined' && (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
     this.hintElement.textContent = isTouch ? 'Dotknij ekranu, aby przejść dalej' : 'ENTER aby przejść dalej';
   }

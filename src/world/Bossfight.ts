@@ -29,6 +29,126 @@ export interface BossData {
 }
 
 export class Bossfight {
+  private static bossFramesCache: Map<number, [HTMLImageElement, HTMLImageElement]> = new Map();
+  private static bossDataCache: Map<number, BossData> = new Map();
+  private static scrollCache: Map<number, HTMLImageElement> = new Map();
+
+  public static async preloadBoss(worldNum: number): Promise<void> {
+    const promises: Promise<any>[] = [];
+
+    // Preload boss animation frames (boss1.png, boss2.png)
+    if (!Bossfight.bossFramesCache.has(worldNum)) {
+      promises.push(
+        Promise.all([
+          MaskParser.loadImage(`/assets/worlds/${worldNum}/boss/boss1.png`),
+          MaskParser.loadImage(`/assets/worlds/${worldNum}/boss/boss2.png`),
+        ]).then(([b1, b2]) => {
+          Bossfight.bossFramesCache.set(worldNum, [b1, b2]);
+        }).catch((e) => {
+          console.warn(`Boss frames preload failed for world ${worldNum}:`, e);
+        })
+      );
+    }
+
+    // Preload scroll image for worlds 1..4
+    if (worldNum < 5 && !Bossfight.scrollCache.has(worldNum)) {
+      promises.push(
+        MaskParser.loadImage(`/assets/worlds/${worldNum}/arena/zwoj.png`)
+          .then((img) => Bossfight.scrollCache.set(worldNum, img))
+          .catch(() => {})
+      );
+    }
+
+    // Preload boss avatar for dialogue
+    promises.push(
+      MaskParser.loadImage(`/assets/avatars/boss${worldNum}.png`).catch(() => {})
+    );
+
+    // Preload questions & dialogue text
+    if (!Bossfight.bossDataCache.has(worldNum)) {
+      promises.push(
+        fetch(`/assets/worlds/${worldNum}/bossfight.txt`)
+          .then((res) => {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.text();
+          })
+          .then((raw) => {
+            const data = Bossfight.parseBossfightData(raw);
+            Bossfight.bossDataCache.set(worldNum, data);
+          })
+          .catch((e) => {
+            console.warn(`Boss data preload failed for world ${worldNum}:`, e);
+          })
+      );
+    }
+
+    await Promise.all(promises);
+  }
+
+  public static async preloadAllBosses(): Promise<void> {
+    const worlds = [1, 2, 3, 4, 5];
+    await Promise.all(worlds.map((w) => Bossfight.preloadBoss(w)));
+  }
+
+  public static parseBossfightData(raw: string): BossData {
+    const lines = raw.split('\n');
+    let name = 'Boss';
+    let intro = '';
+    let outro = '';
+    const questions: BossQuestion[] = [];
+
+    let curQ = '';
+    let curA = '';
+    let curB = '';
+    let curC = '';
+    let curCorrect = 0;
+
+    const flushQ = () => {
+      if (curQ && curA && curB && curC) {
+        questions.push({
+          q: curQ,
+          a: curA,
+          b: curB,
+          c: curC,
+          correct: curCorrect,
+        });
+      }
+      curQ = '';
+      curA = '';
+      curB = '';
+      curC = '';
+      curCorrect = 0;
+    };
+
+    for (const rawLine of lines) {
+      const line = rawLine.trim();
+      if (!line || line.startsWith('#')) continue;
+
+      if (line.startsWith('BOSSNAME:')) {
+        name = line.replace('BOSSNAME:', '').trim();
+      } else if (line.startsWith('INTRO:')) {
+        intro = line.replace('INTRO:', '').trim();
+      } else if (line.startsWith('OUTRO:')) {
+        outro = line.replace('OUTRO:', '').trim().replace(/\\n/g, '\n');
+      } else if (line.startsWith('Q:')) {
+        flushQ();
+        curQ = line.replace('Q:', '').trim();
+      } else if (line.startsWith('A:')) {
+        curA = line.replace('A:', '').trim();
+      } else if (line.startsWith('B:')) {
+        curB = line.replace('B:', '').trim();
+      } else if (line.startsWith('C:')) {
+        curC = line.replace('C:', '').trim();
+      } else if (line.toUpperCase().startsWith('CORRECT:')) {
+        const letter = line.split(':')[1].trim().toUpperCase();
+        curCorrect = letter === 'B' ? 1 : letter === 'C' ? 2 : 0;
+      }
+    }
+    flushQ();
+
+    return { name, intro, outro, questions };
+  }
+
   public active: boolean = false;
   public worldNumber: number = 1;
   public bossData: BossData | null = null;
@@ -320,6 +440,11 @@ export class Bossfight {
     this.scrollActive = false;
     this.bossSpawnRect = bossSpawn;
 
+    // Clear frames so old boss from another world NEVER renders
+    this.bossFrames = null;
+    this.scrollImg = null;
+    this.bossData = null;
+
     // HP map per world number (1:1 with Python _get_boss_hp_static)
     const hpMap: Record<number, number> = { 1: 500, 2: 600, 3: 700, 4: 800, 5: 1000 };
     this.bossHpMax = hpMap[worldNum] || 500;
@@ -340,31 +465,19 @@ export class Bossfight {
       this.bossH = 608;
     }
 
-    // Load boss images independently of scroll
-    try {
-      const [b1, b2] = await Promise.all([
-        MaskParser.loadImage(`/assets/worlds/${worldNum}/boss/boss1.png`),
-        MaskParser.loadImage(`/assets/worlds/${worldNum}/boss/boss2.png`),
-      ]);
-      this.bossFrames = [b1, b2];
-    } catch (e) {
-      console.warn(`Boss frames load failed for world ${worldNum}:`, e);
-      this.bossFrames = null;
-    }
+    // Preload / retrieve preloaded boss assets immediately
+    await Bossfight.preloadBoss(worldNum);
 
-    // Only worlds 1..4 have a scroll (world 5 has no scroll)
-    if (worldNum < 5) {
-      try {
-        this.scrollImg = await MaskParser.loadImage(`/assets/worlds/${worldNum}/arena/zwoj.png`);
-      } catch {
-        this.scrollImg = null;
-      }
+    this.bossFrames = Bossfight.bossFramesCache.get(worldNum) || null;
+    this.scrollImg = Bossfight.scrollCache.get(worldNum) || null;
+    const bData = Bossfight.bossDataCache.get(worldNum);
+    if (bData) {
+      this.bossData = bData;
+      this.questionsAll = [...bData.questions];
+      this.questions = shuffleArray([...this.questionsAll]);
     } else {
-      this.scrollImg = null;
+      await this.loadBossData(worldNum);
     }
-
-    // Load boss questions
-    await this.loadBossData(worldNum);
 
     if (skipIntro) {
       this.isIntroActive = false;
