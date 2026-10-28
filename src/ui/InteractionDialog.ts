@@ -310,8 +310,6 @@ export class InteractionDialog {
   ): void {
     if (!lines || lines.length === 0) return;
     this.resetDeathMenu();
-    this.containerElement.style.display = '';
-    this.overlayElement.style.display = '';
     this.avatarBox.style.display = '';
     this.containerElement.classList.remove('position-bottom', 'position-center');
     this.containerElement.classList.add('position-top');
@@ -323,11 +321,60 @@ export class InteractionDialog {
     this.conversationIndex = 0;
     this.playerEvoLevel = evo;
     this.onCompleteCallback = onComplete;
-    this.isOpen = true;
     this.hideChoices();
-    this.overlayElement.classList.remove('hidden');
 
+    // Prepare initial conversation line before revealing overlay to eliminate any avatar flicker
     this.showConversationLine(0);
+
+    this.isOpen = true;
+    this.containerElement.style.display = '';
+    this.overlayElement.style.display = '';
+    this.overlayElement.classList.remove('hidden');
+  }
+
+  /**
+   * Helper to safely set avatar source and prevent flashing previous avatar image.
+   */
+  private setAvatarSrc(src: string, fallbackSrc?: string): void {
+    if (this.avatarImg.getAttribute('src') === src && this.avatarImg.complete && this.avatarImg.naturalWidth > 0) {
+      this.avatarImg.style.visibility = 'visible';
+      return;
+    }
+
+    this.avatarImg.style.visibility = 'hidden';
+
+    this.avatarImg.onload = () => {
+      this.avatarImg.onload = null;
+      this.avatarImg.onerror = null;
+      this.avatarImg.style.visibility = 'visible';
+    };
+
+    this.avatarImg.onerror = () => {
+      this.avatarImg.onload = null;
+      this.avatarImg.onerror = null;
+      if (fallbackSrc && this.avatarImg.getAttribute('src') !== fallbackSrc) {
+        this.avatarImg.src = fallbackSrc;
+        if (this.avatarImg.complete && this.avatarImg.naturalWidth > 0) {
+          this.avatarImg.style.visibility = 'visible';
+        } else {
+          this.avatarImg.onload = () => {
+            this.avatarImg.onload = null;
+            this.avatarImg.onerror = null;
+            this.avatarImg.style.visibility = 'visible';
+          };
+        }
+      } else {
+        this.avatarImg.style.visibility = 'visible';
+      }
+    };
+
+    this.avatarImg.src = src;
+
+    if (this.avatarImg.complete && this.avatarImg.naturalWidth > 0) {
+      this.avatarImg.onload = null;
+      this.avatarImg.onerror = null;
+      this.avatarImg.style.visibility = 'visible';
+    }
   }
 
   /**
@@ -344,9 +391,10 @@ export class InteractionDialog {
     // Worlds 1-4 show Sage avatar; World 5 has no avatar (empty)
     if (wn === 5) {
       this.avatarBox.style.display = 'none';
+      this.avatarImg.style.visibility = 'hidden';
     } else {
       this.avatarBox.style.display = '';
-      this.avatarImg.src = '/assets/avatars/medrzec.png';
+      this.setAvatarSrc('/assets/avatars/medrzec.png');
     }
 
     this.containerElement.classList.remove('position-top', 'position-bottom');
@@ -381,10 +429,7 @@ export class InteractionDialog {
     this.speakerElement.textContent = `${bossName}:`;
     this.speakerElement.style.color = '#ff9999';
     this.avatarBox.style.display = '';
-    this.avatarImg.src = `/assets/avatars/boss${wn}.png`;
-    this.avatarImg.onerror = () => {
-      this.avatarImg.src = `/assets/avatars/boss1.png`;
-    };
+    this.setAvatarSrc(`/assets/avatars/boss${wn}.png`, '/assets/avatars/boss1.png');
 
     this.containerElement.classList.remove('position-top', 'position-bottom');
     this.containerElement.classList.add('position-center');
@@ -422,9 +467,9 @@ export class InteractionDialog {
 
     // Set avatar
     if (isPlayer) {
-      this.avatarImg.src = `/assets/avatars/player${this.playerEvoLevel}.png`;
+      this.setAvatarSrc(`/assets/avatars/player${this.playerEvoLevel}.png`);
     } else {
-      this.avatarImg.src = '/assets/avatars/medrzec.png';
+      this.setAvatarSrc('/assets/avatars/medrzec.png');
     }
 
     this.adjustBodyFontSize(cur.text, false);
@@ -436,21 +481,23 @@ export class InteractionDialog {
    */
   public startQuiz(data: QuizInteractionData, evo: number = 1, playerY: number = 600): void {
     this.resetDeathMenu();
-    this.containerElement.style.display = '';
-    this.overlayElement.style.display = '';
-    this.updatePosition(playerY);
     this.mode = 'quiz';
     this.quizData = data;
     this.quizStage = 'context';
     this.selectedChoice = 'A';
     this.playerEvoLevel = evo;
     this.swapChoices = Math.random() < 0.5; // True 50/50 randomize choice positions!
-    this.isOpen = true;
     this.titleElement.textContent = data.title;
+    this.updatePosition(playerY);
+
+    // Prepare quiz stage (avatar, speaker, body) BEFORE showing overlay to eliminate flicker
+    this.showQuizStage('context');
+
+    this.isOpen = true;
+    this.containerElement.style.display = '';
+    this.overlayElement.style.display = '';
     this.overlayElement.classList.remove('hidden');
     this.overlayElement.classList.remove('dark-backdrop');
-
-    this.showQuizStage('context');
   }
 
   private showQuizStage(stage: 'context' | 'sage' | 'choices' | 'feedback', feedbackText?: string): void {
@@ -459,26 +506,26 @@ export class InteractionDialog {
 
     if (stage === 'context') {
       this.hideChoices();
+      this.avatarBox.style.display = '';
       const avName = (this.quizData.avatar || 'mail').toLowerCase().trim();
       const safeAvatar = encodeURIComponent(avName).replace(/%2F/g, '/');
-      this.avatarImg.src = `/assets/avatars/${safeAvatar}.png`;
-      this.avatarImg.onerror = () => {
-        this.avatarImg.src = `/assets/avatars/player${this.playerEvoLevel}.png`;
-      };
+      this.setAvatarSrc(`/assets/avatars/${safeAvatar}.png`, `/assets/avatars/player${this.playerEvoLevel}.png`);
       this.speakerElement.textContent = 'Zdarzenie:';
       this.speakerElement.style.color = '#b4d2ff';
       this.adjustBodyFontSize(this.quizData.context, false);
       this.startTypewriter(this.quizData.context);
     } else if (stage === 'sage') {
       this.hideChoices();
-      this.avatarImg.src = '/assets/avatars/medrzec.png';
+      this.avatarBox.style.display = '';
+      this.setAvatarSrc('/assets/avatars/medrzec.png');
       this.speakerElement.textContent = 'Wskazówka Mędrca:';
       this.speakerElement.style.color = '#ffe6b4';
       const sageMsg = this.quizData.sageMessage || 'Zachowaj czujność.';
       this.adjustBodyFontSize(sageMsg, false);
       this.startTypewriter(sageMsg);
     } else if (stage === 'choices') {
-      this.avatarImg.src = `/assets/avatars/player${this.playerEvoLevel}.png`;
+      this.avatarBox.style.display = '';
+      this.setAvatarSrc(`/assets/avatars/player${this.playerEvoLevel}.png`);
       this.speakerElement.textContent = 'Wybierz reakcję:';
       this.speakerElement.style.color = '#b4d2ff';
       // In Python original: The story context/question remains visible above the choices!
@@ -493,8 +540,9 @@ export class InteractionDialog {
       document.body.classList.remove('cursor-hidden');
     } else if (stage === 'feedback') {
       this.hideChoices();
+      this.avatarBox.style.display = '';
       const isGood = feedbackText === this.quizData.goodFeedback;
-      this.avatarImg.src = '/assets/avatars/medrzec.png';
+      this.setAvatarSrc('/assets/avatars/medrzec.png');
       this.speakerElement.textContent = isGood ? '✓ Poprawny wybór:' : '✗ Błędna decyzja:';
       this.speakerElement.style.color = isGood ? '#4ade80' : '#f87171';
       const isTouch = typeof window !== 'undefined' && (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
@@ -708,6 +756,8 @@ export class InteractionDialog {
 
     this.hideChoices();
     this.avatarBox.style.display = '';
+    this.avatarImg.removeAttribute('src');
+    this.avatarImg.style.visibility = 'hidden';
     this.bodyElement.textContent = '';
     this.bodyElement.classList.remove('font-xlarge', 'font-compact', 'font-dense');
     this.hintElement.textContent = '';

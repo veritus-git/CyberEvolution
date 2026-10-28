@@ -98,8 +98,8 @@ export class StartMenu {
       world3_arena: 'Arena 3',
       world4: 'Świat 4',
       world4_arena: 'Arena 4',
-      world5: 'Świat 5',
-      world5_arena: 'Arena 5',
+      world5: 'Świat 5 (???)',
+      world5_arena: 'Arena 5 (???)',
     };
     const w = worldNames[save.currentWorld] || save.currentWorld;
     return `Kontynuuj (${w}, Ewolucja ${save.playerSkin || 1})`;

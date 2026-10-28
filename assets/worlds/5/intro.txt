@@ -1,5 +1,6 @@
-WORLDNAME: Sanktuarium Rozumu
-INTROTEXT: Dotarłeś do Sanktuarium Cyfrowej Odporności.
-Tu nie ma już iluzji, fałszywych kluczy, zwodniczych luster ani tykających zegarów nienawiści.
-Czeka cię ostateczna próba przed samym Mędrcem.
-Udowodnij, że potrafisz myśleć samodzielnie i jesteś gotów obronić się w necie.
+WORLDNAME: ???
+INTROTEXT: Dotarłeś w nieznane, tajemnicze miejsce...
+Wokół panuje absolutna, niepokojąca cisza. Nie ma tu iluzji, fałszywych kluczy ani luster.
+Mędrzec zniknął bez śladu, a w powietrzu unosi się aura ostatecznej próby.
+Ktoś lub coś czeka na ciebie w głębi tej przestrzeni...
+Udowodnij, że potrafisz myśleć samodzielnie i jesteś gotów zmierzyć się z prawdą!

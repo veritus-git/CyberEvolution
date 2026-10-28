@@ -378,7 +378,7 @@ export class Engine {
           2: 'Arena: Pożeracz Kluczy',
           3: 'Arena: Królowa Luster',
           4: 'Arena: Chronos Paniki',
-          5: 'Arena: Mędrzec Rozumu',
+          5: 'Arena: ???',
         };
         worldName = arenaBossNames[currentWn] || `Arena ${currentWn}`;
         defaultSpawnX = 250;
@@ -393,7 +393,7 @@ export class Engine {
           2: 'Świat 2: Krypty Kluczy',
           3: 'Świat 3: Maskarada Luster',
           4: 'Świat 4: Twierdza Kopii',
-          5: 'Świat 5: Sanktuarium Rozumu',
+          5: 'Świat 5: ???',
         };
         worldName = names[currentWn] || `Świat ${currentWn}`;
         defaultSpawnX = 300;
@@ -746,8 +746,8 @@ export class Engine {
 
       if (introText) {
         // 1.5s steady + 0.6s smooth fade out = 2.1s total (1:1 with Python INTRO_TITLE_TIME + INTRO_FADE_TIME)
-        // Title displays ONLY the pure world name (e.g. "Miasto Iluzji"), NOT "Świat 1: Miasto Iluzji"!
-        this.worldIntroTitle = worldNameFound || title.replace(/^Świat \d+:\s*/, '');
+        // Title displays ONLY the pure world name (e.g. "Miasto Iluzji", "???"), NOT "Świat 1: Miasto Iluzji"!
+        this.worldIntroTitle = wn === 5 ? '???' : (worldNameFound || title.replace(/^Świat \d+:\s*/, ''));
         this.worldIntroTimer = 2.1;
         this.pendingWorldIntroText = introText;
         this.worldIntroWn = wn;
@@ -1085,13 +1085,27 @@ export class Engine {
         const isArena = portal.targetWorld === 'arena';
         const isLobby = portal.targetWorld === 'lobby';
         const isEnding = portal.targetWorld === 'ending';
-        this.activeHint = isEnding
-          ? 'E: wróć do rzeczywistości'
-          : isLobby
-          ? 'E: powrót do lobby'
-          : isArena
-          ? 'E: wejdź do areny'
-          : 'E: wejdź do świata';
+        if (isEnding) {
+          this.activeHint = 'E: wróć do rzeczywistości';
+        } else if (isLobby) {
+          this.activeHint = 'E: powrót do lobby';
+        } else if (isArena) {
+          this.activeHint = 'E: wejdź do areny';
+        } else if (portal.targetWorld === 'dynamic_world') {
+          const maxCompleted = this.completedWorlds.size > 0 ? Math.max(...Array.from(this.completedWorlds)) : 0;
+          const targetWn = Math.min(5, Math.max(this.player.skinId, maxCompleted + 1));
+          const worldNames: Record<number, string> = {
+            1: 'Miasta Iluzji',
+            2: 'Krypt Kluczy',
+            3: 'Maskarady Luster',
+            4: 'Twierdzy Kopii',
+            5: '???',
+          };
+          const wTarget = worldNames[targetWn] || `Świata ${targetWn}`;
+          this.activeHint = `E: wejdź do ${wTarget}`;
+        } else {
+          this.activeHint = 'E: wejdź do świata';
+        }
 
         if (interactPressed) {
           let target = portal.targetWorld;
