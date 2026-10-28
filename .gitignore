@@ -3,6 +3,5 @@ dist/
 .vite/
 target/
 *.log
-public
 __pycache__/
 *.pyc

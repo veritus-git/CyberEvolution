@@ -2,7 +2,26 @@
   "name": "cyberevolution",
   "version": "1.0.0",
   "type": "module",
-  "main": "index.js",
+  "description": "CyberEvolution: Ścieżka Świadomości – zręcznościowa platformówka 2D ucząca cyberbezpieczeństwa, weryfikacji faktów i odporności na manipulację w mediach społecznościowych.",
+  "homepage": "https://cyberevolution.zsolawa.edu.pl/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/veritus-git/CyberEvolution.git"
+  },
+  "author": "ZSO Oława (zespół Veritus)",
+  "license": "MIT",
+  "keywords": [
+    "cybersecurity",
+    "game",
+    "platformer",
+    "education",
+    "typescript",
+    "canvas",
+    "synthwave",
+    "fake-news",
+    "phishing",
+    "fact-checking"
+  ],
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -10,10 +29,6 @@
     "deploy": "bash ./scripts/deploy.sh local",
     "deploy-final": "bash ./scripts/deploy.sh prod"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "devDependencies": {
     "@types/node": "^26.6.4",
     "typescript": "^7.0.2",

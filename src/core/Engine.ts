@@ -12,6 +12,9 @@ import { IntroSequence } from '../ui/IntroSequence';
 import { Bossfight } from '../world/Bossfight';
 import { AABB } from '../physics/AABB';
 import { InteractionParser, QuizData } from '../world/InteractionParser';
+import { sound } from './Audio';
+import { GameInfoModal } from '../ui/GameInfoModal';
+import { PauseModal } from '../ui/PauseModal';
 
 export class Engine {
   public canvas: HTMLCanvasElement;
@@ -25,6 +28,8 @@ export class Engine {
   public introSequence: IntroSequence;
   public bossfight: Bossfight;
   public joystick: VirtualJoystick;
+  public infoModal: GameInfoModal;
+  public pauseModal: PauseModal;
 
   // Screen-space overlay canvas for touch controls
   public overlayCanvas: HTMLCanvasElement;
@@ -82,6 +87,28 @@ export class Engine {
     this.dialog = new InteractionDialog(uiContainer);
     this.introSequence = new IntroSequence(uiContainer);
     this.bossfight = new Bossfight();
+    this.infoModal = new GameInfoModal(uiContainer);
+    this.pauseModal = new PauseModal(uiContainer);
+
+    this.pauseModal.onOpenHelp = () => {
+      this.infoModal.show();
+    };
+    this.pauseModal.onRestartLevel = () => {
+      const m = this.level.key.match(/^(?:world)?([1-5])(_arena)?$/);
+      if (m) {
+        const wn = parseInt(m[1], 10);
+        if (m[2]) {
+          this.retryBossfight(wn);
+        } else {
+          this.restartWorld(wn);
+        }
+      } else {
+        this.loadWorld('lobby');
+      }
+    };
+    this.pauseModal.onReturnToLobby = () => {
+      this.loadWorld('lobby');
+    };
 
     const hasSave = Boolean(localStorage.getItem('cyberevo_save'));
     this.startMenu = new StartMenu(uiContainer, hasSave);
@@ -104,12 +131,27 @@ export class Engine {
     // Mouse cursor hiding during platforming; only show when UI needs selection
     document.body.classList.add('cursor-hidden');
     window.addEventListener('mousemove', () => {
-      if (this.startMenu.isOpen || this.dialog.isChoicesVisible) {
+      if (this.startMenu.isOpen || this.dialog.isChoicesVisible || this.infoModal.isOpen || this.pauseModal.isOpen) {
         document.body.classList.remove('cursor-hidden');
       }
     });
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'F11' || (!this.startMenu.isOpen && !this.dialog.isChoicesVisible)) {
+      if (e.code === 'Escape') {
+        if (this.infoModal.isOpen) {
+          this.infoModal.hide();
+          return;
+        }
+        if (this.startMenu.isOpen || this.dialog.isOpen) return;
+
+        if (this.pauseModal.isOpen) {
+          this.pauseModal.hide();
+        } else {
+          this.pauseModal.show();
+        }
+        return;
+      }
+
+      if (e.key === 'F11' || (!this.startMenu.isOpen && !this.dialog.isChoicesVisible && !this.infoModal.isOpen && !this.pauseModal.isOpen)) {
         document.body.classList.add('cursor-hidden');
       }
     });
@@ -143,7 +185,7 @@ export class Engine {
         this.renderer.suppressLetterbox = true;
         this.loadWorld('lobby', false);
       } else if (action === 'exit') {
-        alert('CyberEvolution — edukacyjna gra 2D o cyberbezpieczeństwie.\n\nSterowanie:\n• A / D lub strzałki — ruch\n• Spacja / W / ↑ — skok\n• E — interakcja z postaciami i wspinaczka po drabinach\n• 1..5 — zmiana skórki / ewolucji\n• F2 — podgląd hitboxów\n• F11 — pełny ekran');
+        this.infoModal.show();
       }
     });
   }
@@ -221,7 +263,14 @@ export class Engine {
         isArena = true;
         maskPath = `/assets/worlds/${currentWn}/arena/map_mask.png`;
         bgPath = `/assets/worlds/${currentWn}/arena/bg.png`;
-        worldName = `Arena ${currentWn}`;
+        const arenaBossNames: Record<number, string> = {
+          1: 'Arena: Monolit Algorytmu',
+          2: 'Arena: Pożeracz Kluczy',
+          3: 'Arena: Królowa Luster',
+          4: 'Arena: Chronos Paniki',
+          5: 'Arena: Mędrzec Rozumu',
+        };
+        worldName = arenaBossNames[currentWn] || `Arena ${currentWn}`;
         defaultSpawnX = 250;
         this.renderer.suppressLetterbox = false;
       } else if (worldMatch) {
@@ -234,7 +283,7 @@ export class Engine {
           2: 'Świat 2: Krypty Kluczy',
           3: 'Świat 3: Maskarada Luster',
           4: 'Świat 4: Twierdza Kopii',
-          5: 'Świat 5: CyberOtchłań',
+          5: 'Świat 5: Sanktuarium Rozumu',
         };
         worldName = names[currentWn] || `Świat ${currentWn}`;
         defaultSpawnX = 300;
@@ -665,7 +714,7 @@ export class Engine {
       }
     }
 
-    if (this.transitionState !== 'wipe_out') {
+    if (this.transitionState !== 'wipe_out' && !this.pauseModal.isOpen && !this.infoModal.isOpen) {
       const maxSubstep = 0.010;
       const substeps = Math.max(1, Math.ceil(rawDt / maxSubstep));
       const subDt = rawDt / substeps;
@@ -837,6 +886,7 @@ export class Engine {
 
   public triggerWorldTransition(targetWorld: string): void {
     if (this.transitionState !== 'none') return;
+    sound.playPortal();
     this.transitionState = 'wipe_out';
     this.transitionTimer = 0;
     this.pendingWorldSwitch = targetWorld;

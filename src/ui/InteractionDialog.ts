@@ -1,3 +1,5 @@
+import { sound } from '../core/Audio';
+
 export interface ConversationLine {
   speaker: 'medrzec' | 'player' | string;
   text: string;
@@ -478,8 +480,13 @@ export class InteractionDialog {
     this.lastChoiceCorrect = (chosenText === correctText);
     const fb = this.lastChoiceCorrect ? this.quizData.goodFeedback : this.quizData.badFeedback;
 
-    if (this.lastChoiceCorrect && this.quizData.onSuccess) {
-      this.quizData.onSuccess();
+    if (this.lastChoiceCorrect) {
+      sound.playQuizCorrect();
+      if (this.quizData.onSuccess) {
+        this.quizData.onSuccess();
+      }
+    } else {
+      sound.playQuizWrong();
     }
 
     this.showQuizStage('feedback', fb);

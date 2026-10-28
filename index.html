@@ -8,8 +8,46 @@
     />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="CyberEvolution" />
     <meta name="theme-color" content="#07090e" />
-    <title>CyberEvolution — Nowy Silnik Gry</title>
+
+    <!-- Favicon & Icons (Official Game Identity) -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+    <link rel="alternate icon" type="image/png" sizes="64x64" href="/favicon.png" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/icon-192.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- SEO & Social Meta Tags -->
+    <title>CyberEvolution: Ścieżka Świadomości</title>
+    <meta
+      name="description"
+      content="CyberEvolution: Ścieżka Świadomości – zręcznościowa platformówka 2D ucząca cyberbezpieczeństwa, weryfikacji źródeł, higieny haseł i odporności na manipulację w mediach społecznościowych."
+    />
+    <meta name="keywords" content="CyberEvolution, cyberbezpieczeństwo, platformówka 2D, deepfake, phishing, fake news, UOKiK, edukacja, gra" />
+    <meta name="author" content="ZSO Oława (zespół Veritus)" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="CyberEvolution: Ścieżka Świadomości" />
+    <meta
+      property="og:description"
+      content="Zręcznościowy parkour w głąb internetowego szaleństwa. Pełnokrwista platformówka 2D z bossfightami na argumenty!"
+    />
+    <meta property="og:url" content="https://cyberevolution.zsolawa.edu.pl/" />
+    <meta property="og:image" content="/icon-512.png" />
+    <meta property="og:locale" content="pl_PL" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="CyberEvolution: Ścieżka Świadomości" />
+    <meta
+      name="twitter:description"
+      content="Edukacyjna platformówka 2D o cyberbezpieczeństwie. Pokonaj algorytmy i dezinformację!"
+    />
+    <meta name="twitter:image" content="/icon-512.png" />
+
     <link rel="stylesheet" href="/src/style.css" />
     <script>
       window.addEventListener('error', function(e) {
@@ -32,16 +70,35 @@
     <div id="app">
       <canvas id="game-canvas"></canvas>
       <div id="ui-container">
-        <!-- Floating mobile / debug top buttons -->
+        <!-- Player HUD Control Bar (Discrete & non-intrusive) -->
+        <div id="player-hud-bar" class="player-hud-bar">
+          <button id="btn-fullscreen" class="hud-circle-btn" aria-label="Pełny ekran" title="Włącz / Wyłącz pełny ekran (F11)">⛶</button>
+          <button id="btn-audio" class="hud-circle-btn" aria-label="Dźwięk" title="Włącz / Wycisz dźwięk i muzykę">🔊</button>
+          <button id="btn-help" class="hud-circle-btn" aria-label="Pomoc" title="Sterowanie i zasady gry (ESC)">❔</button>
+        </div>
+
+        <!-- Developer Debug Toolbar (Accessible ONLY via F2 or ?debug=1) -->
         <div id="mobile-top-bar" class="mobile-top-bar hidden">
-          <button id="btn-fullscreen" class="mobile-btn">⛶ Pełny ekran</button>
           <button id="btn-switch-world" class="mobile-btn">Świat: Lobby</button>
           <button id="btn-toggle-debug" class="mobile-btn">F2: Hitboxy</button>
           <button id="btn-cycle-skin" class="mobile-btn">Skin: 1</button>
         </div>
+
         <div id="error-banner" class="error-banner hidden"></div>
       </div>
     </div>
+
+    <!-- Mobile Device Orientation Lock Overlay (Landscape Required) -->
+    <div id="rotate-device-overlay" class="rotate-device-overlay hidden">
+      <div class="rotate-device-content">
+        <div class="rotate-device-phone-animation">
+          <div class="phone-screen"></div>
+        </div>
+        <h2 class="rotate-device-title">OBRÓĆ EKRAN POZIOMO</h2>
+        <p class="rotate-device-desc">CyberEvolution wymaga orientacji poziomej (Landscape) dla precyzyjnego parkouru.</p>
+      </div>
+    </div>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

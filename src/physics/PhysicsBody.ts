@@ -16,6 +16,7 @@ export class PhysicsBody {
   public vy: number = 0;
 
   public onGround: boolean = false;
+  public justJumped: boolean = false;
   public isClimbing: boolean = false;
   public climbStepout: number = 0;
   public climbTargetY: number = 0;
@@ -146,6 +147,7 @@ export class PhysicsBody {
       this.vy = -CONFIG.JUMP_SPEED;
       this.onGround = false;
       this.coyoteTimer = 0;
+      this.justJumped = true;
     }
 
     // Apply gravity

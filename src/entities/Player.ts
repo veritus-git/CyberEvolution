@@ -2,6 +2,7 @@ import { PhysicsBody, MovementInput } from '../physics/PhysicsBody';
 import { CONFIG } from '../core/Constants';
 import { AABB } from '../physics/AABB';
 import { Ladder } from '../world/Level';
+import { sound } from '../core/Audio';
 
 export interface SkinFrames {
   idle: HTMLImageElement | null;
@@ -104,6 +105,7 @@ export class Player {
   private onEvoCompleteCallback?: () => void;
 
   public evolveUp(onComplete?: () => void): void {
+    sound.playEvolution();
     const next = Math.min(5, this.skinId + 1);
     this.evoNextSkin = next;
     this.evoBlinkActive = true;
@@ -148,6 +150,11 @@ export class Player {
     }
 
     this.physics.update(dt, effectiveInput, solids, ladders, worldWidth);
+
+    if (this.physics.justJumped) {
+      sound.playJump();
+      this.physics.justJumped = false;
+    }
 
     // Evolution 4-blink sequence (1:1 with Python prototype: 2 blinks old skin, swap skin + Evolution UP, 2 blinks new skin)
     if (this.evoBlinkActive) {

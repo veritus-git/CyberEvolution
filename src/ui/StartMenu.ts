@@ -1,3 +1,5 @@
+import { GameInfoModal } from './GameInfoModal';
+
 export class StartMenu {
   public isOpen: boolean = true;
   public selectedIndex: number = 0;
@@ -5,7 +7,9 @@ export class StartMenu {
   private overlayElement: HTMLElement;
   private menuBox: HTMLElement;
   private titleElement: HTMLElement;
+  private subtitleElement: HTMLElement;
   private options: HTMLElement[] = [];
+  private infoModal: GameInfoModal;
   private onSelectCallback?: (action: 'new_game' | 'continue' | 'exit') => void;
 
   constructor(container: HTMLElement, hasSave: boolean = false) {
@@ -20,10 +24,15 @@ export class StartMenu {
     this.titleElement.textContent = 'CyberEvolution';
     this.menuBox.appendChild(this.titleElement);
 
+    this.subtitleElement = document.createElement('div');
+    this.subtitleElement.className = 'start-menu-subtitle';
+    this.subtitleElement.textContent = 'Ścieżka Świadomości';
+    this.menuBox.appendChild(this.subtitleElement);
+
     const labels: Array<{ label: string; action: 'new_game' | 'continue' | 'exit' }> = [
       { label: 'Nowa gra', action: 'new_game' },
       { label: hasSave ? 'Kontynuuj' : 'Kontynuuj (brak zapisu)', action: 'continue' },
-      { label: 'Informacje o grze', action: 'exit' },
+      { label: 'Informacje o grze i sterowaniu', action: 'exit' },
     ];
 
     const btnContainer = document.createElement('div');
@@ -49,9 +58,11 @@ export class StartMenu {
     this.overlayElement.appendChild(this.menuBox);
     container.appendChild(this.overlayElement);
 
+    this.infoModal = new GameInfoModal(container);
+
     // Keyboard support
     window.addEventListener('keydown', (e) => {
-      if (!this.isOpen) return;
+      if (!this.isOpen || this.infoModal.isOpen) return;
 
       if (e.code === 'ArrowUp' || e.code === 'KeyW') {
         e.preventDefault();
@@ -85,7 +96,15 @@ export class StartMenu {
     });
   }
 
+  public openInfoModal(tabName?: string): void {
+    this.infoModal.show(tabName);
+  }
+
   private triggerAction(action: 'new_game' | 'continue' | 'exit'): void {
+    if (action === 'exit') {
+      this.openInfoModal();
+      return;
+    }
     if (this.onSelectCallback) {
       this.onSelectCallback(action);
     }

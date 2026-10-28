@@ -2,6 +2,7 @@ import { CONFIG } from '../core/Constants';
 import { MaskParser } from './MaskParser';
 import { Player } from '../entities/Player';
 import { AABB } from '../physics/AABB';
+import { sound } from '../core/Audio';
 
 function shuffleArray<T>(arr: T[]): T[] {
   const result = [...arr];
@@ -340,6 +341,7 @@ export class Bossfight {
 
     const dmg = 100; // 1:1 with Python dmg = 100
     if (good) {
+      sound.playQuizCorrect();
       this.bossHp = Math.max(0, this.bossHp - dmg);
       this.bossShakeTimer = 0.35; // Boss shakes upon taking damage!
       this.bossBlinkActive = true;
@@ -348,6 +350,7 @@ export class Bossfight {
         this.triggerBossDefeat();
       }
     } else {
+      sound.playQuizWrong();
       this.playerHp = Math.max(0, this.playerHp - dmg);
       this.shakeTimer = 0.25; // screen shake on error
       if (this.playerHp <= 0) {
