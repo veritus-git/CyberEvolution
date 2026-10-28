@@ -123,7 +123,9 @@ export class InteractionDialog {
     this.hintElement = document.createElement('div');
     this.hintElement.className = 'retro-dialog-hint';
 
-    this.panelElement.appendChild(this.titleElement);
+    // Yellow event titles like "wstep" / "Świat 1: Miasto iluzji" removed per requirements
+    this.titleElement.style.display = 'none';
+
     this.panelElement.appendChild(this.speakerElement);
     this.panelElement.appendChild(this.bodyElement);
     this.panelElement.appendChild(this.choicesContainer);
@@ -325,7 +327,7 @@ export class InteractionDialog {
     this.containerElement.style.display = '';
     this.overlayElement.style.display = '';
     this.mode = 'conversation';
-    this.titleElement.textContent = `${title} — Wstęp`;
+    this.titleElement.textContent = `${title} - Wstęp`;
     this.speakerElement.textContent = '';
     
     // Worlds 1-4 show Sage avatar; World 5 has no avatar (empty)
@@ -364,7 +366,7 @@ export class InteractionDialog {
     this.containerElement.style.display = '';
     this.overlayElement.style.display = '';
     this.mode = 'conversation';
-    this.titleElement.textContent = stageTitle ? `${bossName} — ${stageTitle}` : `${bossName} — Wstęp`;
+    this.titleElement.textContent = stageTitle ? `${bossName} - ${stageTitle}` : `${bossName} - Wstęp`;
     this.speakerElement.textContent = `${bossName}:`;
     this.speakerElement.style.color = '#ff9999';
     this.avatarBox.style.display = '';
@@ -475,7 +477,7 @@ export class InteractionDialog {
       }
       this.showChoices();
       const isTouch = typeof window !== 'undefined' && (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
-      this.hintElement.textContent = isTouch ? 'Dotknij wybranej opcji' : '↑/↓ lub 1/2 — wybór, Enter/Spacja/E — zatwierdź';
+      this.hintElement.textContent = isTouch ? 'Dotknij wybranej opcji' : '↑/↓ lub 1/2 - wybór, Enter/Spacja/E - zatwierdź';
       this.isDoneTyping = true;
       document.body.classList.remove('cursor-hidden');
     } else if (stage === 'feedback') {

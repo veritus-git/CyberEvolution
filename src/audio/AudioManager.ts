@@ -119,7 +119,7 @@ export class AudioManager {
 
     this.container = document.createElement('div');
     this.container.id = 'sound-control-wrapper';
-    this.container.className = 'sound-control-wrapper';
+    this.container.className = 'sound-control-wrapper hidden';
 
     this.btnSound = document.createElement('button');
     this.btnSound.id = 'btn-sound-toggle';
@@ -201,6 +201,16 @@ export class AudioManager {
   public closePopup(): void {
     this.isPopupOpen = false;
     this.popup?.classList.add('hidden');
+  }
+
+  public setVisible(visible: boolean): void {
+    if (!this.container) return;
+    if (visible) {
+      this.container.classList.remove('hidden');
+    } else {
+      this.container.classList.add('hidden');
+      this.closePopup();
+    }
   }
 
   private updateUI(): void {

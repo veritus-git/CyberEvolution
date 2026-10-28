@@ -1,8 +1,8 @@
 BOSSNAME: Key Reaper
-INTRO: Spójrz na moje ostrze. Widzisz tę cyfrową czaszkę wykutą w moich zębach? Jestem Key Reaper — zwiastun twojej cyfrowej pustki. Zbieram każde lekkomyślnie zatwierdzone uprawnienie, każdy przejęty token i każdą tożsamość, którą oddałeś za darmowego lajka czy quiz. Gdy przekręcę ten klucz, twój profil przestanie istnieć dla ciebie, a zacznie pracować dla mnie. Myślisz, że potrafisz strzec swoich bram? Udowodnij to!
+INTRO: Spójrz na moje ostrze. Widzisz tę cyfrową czaszkę wykutą w moich zębach? Jestem Key Reaper - zwiastun twojej cyfrowej pustki. Zbieram każde lekkomyślnie zatwierdzone uprawnienie, każdy przejęty token i każdą tożsamość, którą oddałeś za darmowego lajka czy quiz. Gdy przekręcę ten klucz, twój profil przestanie istnieć dla ciebie, a zacznie pracować dla mnie. Myślisz, że potrafisz strzec swoich bram? Udowodnij to!
 Q: Dostajesz wiadomość na Instagramie: „Naruszyłeś prawa autorskie! Zaloguj się pod tym adresem w 24h”. Co robisz?
 A: Loguję się pod podanym linkiem, aby cofnąć zgłoszenie.
-B: Weryfikuję alert w Centrum Pomocy — to próba phishingu.
+B: Weryfikuję alert w Centrum Pomocy - to próba phishingu.
 C: Przesyłam swoje dane logowania w wiadomości zwrotnej.
 CORRECT: B
 ---
@@ -62,7 +62,7 @@ CORRECT: B
 ---
 Q: Otrzymujesz SMS z kodem logowania do konta, o który sam nie prosiłeś. Co to oznacza?
 A: Że operator sieci prowadzi rutynowe testy infrastruktury.
-B: Że ktoś usiłuje przejąć konto — zmień natychmiast hasło!
+B: Że ktoś usiłuje przejąć konto - zmień natychmiast hasło!
 C: Że zostałeś wylosowany do nagrody w oficjalnej loterii.
 CORRECT: B
 ---
@@ -92,7 +92,7 @@ CORRECT: A
 ---
 Q: Czy prawdziwy administrator platformy kiedykolwiek poprosi cię o podanie hasła w wiadomości prywatnej?
 A: Tak, w trakcie usuwania poważnej usterki na serwerze.
-B: Nigdy — pracownicy serwisu nie potrzebują twoich haseł.
+B: Nigdy - pracownicy serwisu nie potrzebują twoich haseł.
 C: Tylko po przesłaniu cyfrowego certyfikatu w załączniku.
 CORRECT: B
 ---

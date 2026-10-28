@@ -1,5 +1,5 @@
 BOSSNAME: Mędrzec Rozumu
-INTRO: Stoisz wreszcie przed moim obliczem. Przeszedłeś przez dymiące zgliszcza clickbaitu, oparłeś się pożeraczom tożsamości, odrzuciłeś maski pozorów i wygasiłeś pożar nienawiści. Dziś nie walczysz ze złem z krwi i kości — walczysz z własnymi słabościami z tamtej nocy. Odpowiedz mi nie z pamięci, lecz z dojrzałości, którą w sobie wykułeś. Pokaż, że jesteś gotów powrócić do swojego świata jako świadomy i wolny człowiek!
+INTRO: Stoisz wreszcie przed moim obliczem. Przeszedłeś przez dymiące zgliszcza clickbaitu, oparłeś się pożeraczom tożsamości, odrzuciłeś maski pozorów i wygasiłeś pożar nienawiści. Dziś nie walczysz ze złem z krwi i kości - walczysz z własnymi słabościami z tamtej nocy. Odpowiedz mi nie z pamięci, lecz z dojrzałości, którą w sobie wykułeś. Pokaż, że jesteś gotów powrócić do swojego świata jako świadomy i wolny człowiek!
 OUTRO: Udało ci się! Zbudowałeś w sobie prawdziwą cyfrową odporność. Zrozumiałeś, że najgroźniejszą bronią w sieci nie są kody ani wirusy, lecz manipulacja naszymi emocjami: wstydem, strachem i pośpiechem. Teraz to ty jesteś strażnikiem swojego rozumu. Otwieram portal powrotny. Obudź się i broń się w necie!
 Q: Jeśli w nocy trafisz na zmanipulowane wideo ze swoją twarzą i groźbą kompromitacji, co robisz najpierw?
 A: W panice klikam link obiecujący usunięcie wideo.
@@ -61,7 +61,7 @@ B: Zabezpieczeniem obudowy telefonu przed wnikaniem kurzu i wody.
 C: Efektem graficznym wygładzającym cerę na zdjęciach portretowych.
 CORRECT: A
 ---
-Q: Jeśli w relacji widzisz „Konkurs na darmowy telefon — podaj kod SMS, który właśnie otrzymałeś”, to:
+Q: Jeśli w relacji widzisz „Konkurs na darmowy telefon - podaj kod SMS, który właśnie otrzymałeś”, to:
 A: Bezpieczna okazja do wygrania drogiego smartfona.
 B: Podstęp służący kradzieży konta lub subskrypcji SMS.
 C: Oficjalny konkurs dobroczynny wspierany przez portal.

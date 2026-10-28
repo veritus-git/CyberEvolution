@@ -1,7 +1,7 @@
 {
   "name": "CyberEvolution",
   "short_name": "CyberEvo",
-  "description": "CyberEvolution — edukacyjna platformówka 2D o cyberbezpieczeństwie",
+  "description": "CyberEvolution - edukacyjna platformówka 2D o cyberbezpieczeństwie",
   "id": "/",
   "start_url": "/",
   "scope": "/",

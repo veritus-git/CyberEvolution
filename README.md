@@ -1,4 +1,4 @@
-# CyberEvolution — Nowy Silnik Gry 2D (Web & Multiplatform)
+# CyberEvolution - Nowy Silnik Gry 2D (Web & Multiplatform)
 
 Nowoczesny, modularny silnik platformowy 2D napisany od zera w **TypeScript** z wykorzystaniem **HTML5 Canvas (akceleracja GPU)**, przygotowany pod przeglądarki (PC, smartfony, tablety) oraz kompilację do natywnej binarki (np. przez **Tauri**).
 
@@ -30,8 +30,8 @@ Serwer dostępny jest pod adresem `http://localhost:5173/` (lub w sieci lokalnej
 | **Ruch poziomy** | `A` / `D` lub `←` / `→` | Półprzezroczysty wirtualny joystick (lewa strona) | Lewa gałka analogowa / D-Pad |
 | **Skok** | `SPACJA` lub `W` / `↑` | Przycisk ekranowy **[SKOK]** (prawa strona) | Przycisk `A` |
 | **Interakcja / Drabina** | `E` | Przycisk ekranowy **[AKCJA]** | Przycisk `X` lub `B` |
-| **Zmiana skórek (Ewolucja)** | Klawisze `1` .. `5` | Przycisk w prawym górnym rogu **[Skin: X]** | — |
-| **Podgląd Hitboxów (Debug)** | `F2` | Przycisk w prawym górnym rogu **[F2: Hitboxy]** | — |
+| **Zmiana skórek (Ewolucja)** | Klawisze `1` .. `5` | Przycisk w prawym górnym rogu **[Skin: X]** | - |
+| **Podgląd Hitboxów (Debug)** | `F2` | Przycisk w prawym górnym rogu **[F2: Hitboxy]** | - |
 
 ---
 
@@ -70,7 +70,7 @@ src/
 W starym kodzie pomyłka o 1 piksel psuła kafelek, ponieważ kod badał tylko jeden punkt w środku kafelka.  
 Nowy silnik w [`MaskParser.ts`](file:///mnt/dump/CyberEvolution/src/world/MaskParser.ts) rozwiązuje ten problem na dwa sposoby:
 
-### Sposób 1: Nowa metoda pikselowa (1 piksel = 1 cały kafelek) — **REKOMENDOWANA**
+### Sposób 1: Nowa metoda pikselowa (1 piksel = 1 cały kafelek) - **REKOMENDOWANA**
 - W programie graficznym (Aseprite, Photoshop, GIMP, Paint) tworzysz mały obrazek o rozmiarze np. **60 x 28 pikseli**.
 - Każdy postawiony piksel to dokładnie jeden kafelek (32x32px) w grze!
 - **Zaleta**: Nierealne jest pomylenie się o ułamek kafelka. Zawsze masz 100% precyzję, a plik maski waży kilka kilobajtów.

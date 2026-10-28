@@ -125,6 +125,9 @@ export class Level {
         p.animTimer = 0;
         p.frameIndex = p.frameIndex === 1 ? 0 : 1;
       }
+      if (p.alpha !== undefined && p.alpha < 1) {
+        p.alpha = Math.min(1, p.alpha + dt * 1.25);
+      }
     }
 
     // NPC 2-frame animation tick (0.80s rhythm, 1:1 with Python prototype)

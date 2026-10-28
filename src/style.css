@@ -48,7 +48,7 @@
 
 :root {
   --neon-cyan: #00e5ff;
-  --bg-dark: #07090e;
+  --bg-dark: #000000;
   --retro-panel-bg: rgba(16, 18, 24, 0.94);
   --retro-border: #b9b9dc;
 }
@@ -84,7 +84,7 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #020617;
+  background: #000000;
 }
 
 .hidden {
@@ -101,7 +101,7 @@ html, body {
   image-rendering: -webkit-crisp-edges;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
-  background: #0a0e17;
+  background: #000000;
 }
 
 #ui-container {
@@ -282,22 +282,36 @@ html, body {
    PREINTRO & ENDING OVERLAYS
    ========================================================================== */
 .intro-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: #000000;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  background: #000000 !important;
   display: flex;
   align-items: center;
   justify-content: center;
   pointer-events: auto;
-  z-index: 60;
+  z-index: 99999 !important;
   padding: 40px;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  caret-color: transparent !important;
+  outline: none !important;
 }
 
 .intro-overlay.hidden {
-  display: none;
+  display: none !important;
+}
+
+.intro-overlay * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  caret-color: transparent !important;
+  outline: none !important;
 }
 
 .intro-content-box {
@@ -306,6 +320,9 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: 40px;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  caret-color: transparent !important;
 }
 
 .intro-text {
@@ -313,12 +330,19 @@ html, body {
   line-height: 1.8;
   color: #e6e6e6;
   white-space: pre-wrap;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  caret-color: transparent !important;
+  outline: none !important;
 }
 
 .intro-hint {
   font-size: clamp(12px, 1.5vw, 16px);
   color: #969696;
   text-align: right;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  caret-color: transparent !important;
 }
 
 /* Cursor visibility control */
@@ -491,15 +515,7 @@ body.cursor-hidden #ui-container {
 }
 
 .retro-dialog-title {
-  font-family: 'Jersey 10', 'VT323', monospace;
-  color: #ffff00;
-  font-size: 21px;
-  margin: 0 0 2px 0;
-  font-weight: normal;
-  letter-spacing: 0.5px;
-  line-height: 1.1;
-  text-align: left;
-  opacity: 0.95;
+  display: none !important;
 }
 
 .retro-dialog-speaker {
@@ -689,10 +705,7 @@ body.cursor-hidden #ui-container {
   }
 
   .retro-dialog-title {
-    font-size: 12px !important;
-    color: #facc15 !important;
-    margin-bottom: 2px !important;
-    letter-spacing: 0.5px !important;
+    display: none !important;
   }
 
   .retro-dialog-speaker {
@@ -1358,6 +1371,10 @@ body.cursor-hidden #ui-container {
   pointer-events: auto;
   user-select: none;
   -webkit-user-select: none;
+}
+
+.sound-control-wrapper.hidden {
+  display: none !important;
 }
 
 .sound-btn {

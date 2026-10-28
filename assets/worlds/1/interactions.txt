@@ -1,12 +1,12 @@
 # world1_interactions.txt
-# Temat: Miasto Iluzji — Dezinformacja, clickbaity, fake giveaways, presja rówieśnicza
+# Temat: Miasto Iluzji - Dezinformacja, clickbaity, fake giveaways, presja rówieśnicza
 # Boss: Monolit Algorytmu
 
 AVATAR: kurier
-CONTEXT: Kurier stawia przed tobą karton:\n„Siemasz! Masz nagrodę z viralowego rozdania na TikToku — najnowszy smartfon!\nMusisz tylko szybko kliknąć ten link i uiścić 8,50 zł opłaty weryfikacyjnej, nim paczka przepadnie!”
+CONTEXT: Kurier stawia przed tobą karton:\n„Siemasz! Masz nagrodę z viralowego rozdania na TikToku - najnowszy smartfon!\nMusisz tylko szybko kliknąć ten link i uiścić 8,50 zł opłaty weryfikacyjnej, nim paczka przepadnie!”
 SAGE: Uważaj. Żerują na chciwości i pośpiechu. Prawdziwe firmy nie żądają nagłych dopłat przez podejrzane linki.
-A: Klikam w link i opłacam paczkę — przecież taka okazja nie może mi uciec!
-B: Nie klikam. Sprawdzam oficjalny profil twórcy i regulamin — to typowy fake giveaway.
+A: Klikam w link i opłacam paczkę - przecież taka okazja nie może mi uciec!
+B: Nie klikam. Sprawdzam oficjalny profil twórcy i regulamin - to typowy fake giveaway.
 GOOD: Świetnie! Nie dałeś się omamić darmowej błyskotce. Oszuści liczą na to, że chęć zysku uśpi twoją czujność.
 BAD: Zatrzymaj się! Właśnie oddałeś dane karty za obietnicę paczki, która nie istnieje. Odrzuć emocje i spróbuj ponownie.
 CORRECT: B
@@ -17,10 +17,10 @@ SPEED_FEEDBACK: 36
 AVATAR: mail
 CONTEXT: Robot z ekranem listu miga na czerwono:\n„PILNY ALERT DLA TWOJEGO MIASTA! Masowe zatrucie wody w kranach!\nPrześlij to ostrzeżenie do 10 osób w 5 minut, nim serwery zostaną zablokowane!”
 SAGE: Panika i łańcuszki to ulubiona pożywka dezinformacji. Strach wyłącza krytyczne myślenie. Zanim coś prześlesz, weź oddech.
-A: Wysyłam natychmiast na grupę klasową — muszę ostrzec wszystkich znajomych!
+A: Wysyłam natychmiast na grupę klasową - muszę ostrzec wszystkich znajomych!
 B: Zatrzymuję łańcuszek. Wchodzę na oficjalną stronę sanepidu i miasta, by zweryfikować newsa.
 GOOD: Doskonale. Zamiast stać się przekaźnikiem paniki, stałeś się tamą dla fałszu. Weryfikacja to twoja tarcza.
-BAD: Błąd! Właśnie wywołałeś fałszywą panikę wśród przyjaciół. Strach to zły doradca — cofnij się i pomyśl.
+BAD: Błąd! Właśnie wywołałeś fałszywą panikę wśród przyjaciół. Strach to zły doradca - cofnij się i pomyśl.
 CORRECT: B
 SPEED_CONTEXT: 38
 SPEED_SAGE: 32
@@ -29,7 +29,7 @@ SPEED_FEEDBACK: 36
 AVATAR: znajomy
 CONTEXT: Chłopak w bluzie pokazuje ci smartfon:\n„Stary, zobacz tę dramę! Ktoś wrzucił zmanipulowany filmik o dziewczynie z równoległej klasy.\nWszyscy cisną z niej bekę w komentarzach! Dawaj, zrób dueta i podaj dalej, nie bądź odludkiem!”
 SAGE: Presja rówieśnicza w sieci bywa bezwzględna. Łatwo dołączyć do tłumu, ale trudniej spojrzeć sobie potem w twarz. Co wybierzesz?
-A: Nagrywam z tego żart — skoro cała szkoła to robi, nie chcę wyjść na dziwaka.
+A: Nagrywam z tego żart - skoro cała szkoła to robi, nie chcę wyjść na dziwaka.
 B: Odmawiam. Nie będę brał udziału w nakręcaniu nagonki i rozpowszechnianiu plotek.
 GOOD: Wspaniale. Odwaga to nie płynięcie z prądem, lecz umiejętność powiedzenia 'stop', gdy tłum krzywdzi kogoś w sieci.
 BAD: Niestety… Uległeś presji tłumu. Dołączając do fali hejtu, stajesz się oprawcą. Zastanów się i wybierz jeszcze raz.

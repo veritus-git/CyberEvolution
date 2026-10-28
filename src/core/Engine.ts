@@ -175,6 +175,12 @@ export class Engine {
       this.pauseMenu.show();
       this.isPaused = true;
     }
+    this.updateSoundControlVisibility();
+  }
+
+  public updateSoundControlVisibility(): void {
+    const isMenuOpen = (this.startMenu && this.startMenu.isOpen) || (this.pauseMenu && this.pauseMenu.isOpen);
+    AudioManager.getInstance().setVisible(Boolean(isMenuOpen));
   }
 
   private setupStartMenu(): void {
@@ -203,7 +209,7 @@ export class Engine {
           this.player.physics.y = save.playerY;
         }
       } else if (action === 'exit') {
-        alert('CyberEvolution — edukacyjna gra 2D o cyberbezpieczeństwie.\n\nSterowanie:\n• A / D lub strzałki — ruch\n• Spacja / W / ↑ — skok\n• E — interakcja z postaciami i wspinaczka po drabinach\n• ESC — menu pauzy\n• 1..5 — zmiana skórki / ewolucji\n• F2 — podgląd hitboxów\n• F11 — pełny ekran');
+        alert('CyberEvolution - edukacyjna gra 2D o cyberbezpieczeństwie.\n\nSterowanie:\n• A / D lub strzałki - ruch\n• Spacja / W / ↑ - skok\n• E - interakcja z postaciami i wspinaczka po drabinach\n• ESC - menu pauzy\n• 1..5 - zmiana skórki / ewolucji\n• F2 - podgląd hitboxów\n• F11 - pełny ekran');
       }
     });
   }
@@ -278,6 +284,7 @@ export class Engine {
       this.startMenu.hide();
       await this.loadWorld(initialWorld, false);
     }
+    this.updateSoundControlVisibility();
   }
 
   /**
@@ -402,7 +409,7 @@ export class Engine {
       } else if (worldKey === 'lobby') {
         // Always drop in from above on every return to lobby (1:1 with Python prototype)
         this.player.physics.x = CONFIG.LOGICAL_WIDTH / 2 - CONFIG.PLAYER_WIDTH / 2;
-        this.player.physics.y = 80;
+        this.player.physics.y = -CONFIG.PLAYER_HEIGHT - 64;
         this.player.physics.vx = 0;
         this.player.physics.vy = 0;
         this.player.physics.facing = 'left';
@@ -497,7 +504,7 @@ export class Engine {
         setTimeout(() => {
           const outroText =
             this.bossfight.bossData?.outro ||
-            'Udało ci się.\nZrozumiałeś, że bezpieczeństwo nie polega na strachu, ale na świadomości.\nKażdy świat był lekcją — o zaufaniu, prywatności, ochronie i odpowiedzialności.\nTeraz to ty jesteś strażnikiem swojego świata.\nCyberEwolucja nie kończy się tu… ona trwa w każdym twoim wyborze.';
+            'Udało ci się.\nZrozumiałeś, że bezpieczeństwo nie polega na strachu, ale na świadomości.\nKażdy świat był lekcją - o zaufaniu, prywatności, ochronie i odpowiedzialności.\nTeraz to ty jesteś strażnikiem swojego świata.\nCyberEwolucja nie kończy się tu… ona trwa w każdym twoim wyborze.';
           this.dialog.startBossIntro(
             'Mędrzec',
             outroText,
@@ -526,18 +533,19 @@ export class Engine {
 
   private retryBossfight(wn: number): void {
     this.arenaIntroSkipBossDialog = true;
-    this.placePlayerOnGround(250);
-    const groundY = this.player.physics.y;
-    this.player.physics.x = -150;
-    this.player.physics.y = groundY;
-    this.player.physics.vx = 260;
+    this.arenaIntroActive = false;
+    this.arenaIntroWn = null;
+
+    // Po przegraniu z bossem i kliknięciu "Walcz ponownie" gracz od razu staje na arenie bez ponownej animacji wejścia
+    this.placePlayerOnGround(300);
+    this.player.physics.vx = 0;
     this.player.physics.vy = 0;
     this.player.physics.facing = 'right';
     this.player.physics.onGround = true;
     this.player.animTimer = 0;
     this.player.runFrameIndex = 0;
-    this.arenaIntroActive = true;
-    this.arenaIntroWn = wn;
+
+    // Natychmiast restartujemy walkę (reset HP gracza i bossa oraz pytań bez żadnej animacji wchodzenia)
     this.startBossfight(wn, true /* skipIntro */);
   }
 
@@ -794,19 +802,31 @@ export class Engine {
       ? Math.min(1.0, this.worldIntroTimer / 0.6)
       : 0;
 
-    this.renderer.render(
-      this.level,
-      this.player,
-      this.camera,
-      rawDt,
-      this.fps,
-      this.activeHint,
-      this.bossfight,
-      this.worldIntroTitle,
-      introAlpha,
-      this.transitionState,
-      this.transitionTimer / this.transitionDuration
-    );
+    if (this.introSequence.isActive) {
+      // Pełny czarny ekran na canvasie podczas odtwarzania wstępu i zakończenia
+      const ctx = this.canvas.getContext('2d');
+      if (ctx) {
+        ctx.fillStyle = '#000000';
+        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+      }
+    } else {
+      this.renderer.render(
+        this.level,
+        this.player,
+        this.camera,
+        rawDt,
+        this.fps,
+        this.activeHint,
+        this.bossfight,
+        this.worldIntroTitle,
+        introAlpha,
+        this.transitionState,
+        this.transitionTimer / this.transitionDuration
+      );
+    }
+
+    // Ikonka regulacji głośności widoczna wyłącznie w menu głównym oraz w menu pauzy (ESC)
+    this.updateSoundControlVisibility();
 
     // Mobile Touch Controls visibility
     const showControls = !this.startMenu.isOpen && !this.dialog.isOpen && !this.introSequence.isActive && !this.pauseMenu.isOpen;
@@ -935,20 +955,6 @@ export class Engine {
 
     // Check interaction hints and triggers
     this.checkHintsAndInteractions(rawInput.interactPressed);
-
-    // Update animated portals (two-frame vortex + alpha fade-in animation)
-    for (const portal of this.level.portals) {
-      portal.animTimer = (portal.animTimer || 0) + dt;
-      if (portal.animTimer >= 0.18) {
-        portal.animTimer = 0;
-        if (portal.frames && portal.frames.length > 0) {
-          portal.frameIndex = ((portal.frameIndex || 0) + 1) % portal.frames.length;
-        }
-      }
-      if (portal.alpha !== undefined && portal.alpha < 1) {
-        portal.alpha = Math.min(1, portal.alpha + dt * 1.25);
-      }
-    }
 
     // Dynamic visibility and active interaction highlight on mobile touch controls
     this.joystick.setInteractAvailable(this.activeHint !== null);

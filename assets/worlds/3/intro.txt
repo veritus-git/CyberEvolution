@@ -1,5 +1,5 @@
 WORLDNAME: Maskarada Luster
-INTROTEXT: To Maskarada Luster — świat pozorów, filtrów i bezwzględnej pogoni za poklaskiem.
+INTROTEXT: To Maskarada Luster - świat pozorów, filtrów i bezwzględnej pogoni za poklaskiem.
 Tutaj fałszywy uśmiech influencera potrafi ukryć finansową pułapkę, a boty udają szczerych przyjaciół.
 Im bardziej pragniesz aprobaty tłumu, tym łatwiej oddajesz kontrolę nad sobą.
-Patrz w głąb odbić — prawdziwa wartość nigdy nie zależy od cyfrowych lajków.
+Patrz w głąb odbić - prawdziwa wartość nigdy nie zależy od cyfrowych lajków.

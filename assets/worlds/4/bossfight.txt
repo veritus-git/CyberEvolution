@@ -1,5 +1,5 @@
 BOSSNAME: Chronos Paniki
-INTRO: Spójrz w moją bezlitosną tarczę! Widzisz, jak moje wskazówki tną sekundy, a czerwone obwody buzują alarmem? Jestem Chronos Paniki — zegar, który wyłącza wasze mózgi! 'Zostało tylko 5 minut!', 'Reaguj natychmiast!', 'Zobacz, zanim usuną!'. Gdy włączam odliczanie, gubicie rozsądek, a zaczynacie krzyczeć i nienawidzić. Czy potrafisz zatrzymać mój bieg i zachować spokój w samym oku cyfrowego cyklonu? Spróbuj, nim wybije twoja ostatnia godzina!
+INTRO: Spójrz w moją bezlitosną tarczę! Widzisz, jak moje wskazówki tną sekundy, a czerwone obwody buzują alarmem? Jestem Chronos Paniki - zegar, który wyłącza wasze mózgi! 'Zostało tylko 5 minut!', 'Reaguj natychmiast!', 'Zobacz, zanim usuną!'. Gdy włączam odliczanie, gubicie rozsądek, a zaczynacie krzyczeć i nienawidzić. Czy potrafisz zatrzymać mój bieg i zachować spokój w samym oku cyfrowego cyklonu? Spróbuj, nim wybije twoja ostatnia godzina!
 Q: Do czego służy manipulatorom sztuczna presja czasu („Masz tylko 3 minuty, działaj!”)?
 A: Do umożliwienia spokojnej i wnikliwej analizy faktów.
 B: Do wywołania paniki, która blokuje krytyczne myślenie.

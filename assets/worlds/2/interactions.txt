@@ -1,11 +1,11 @@
 # world2_interactions.txt
-# Temat: Krypty Kluczy — Kradzież tożsamości, fałszywy support, wycieki danych przez quizy
+# Temat: Krypty Kluczy - Kradzież tożsamości, fałszywy support, wycieki danych przez quizy
 # Boss: Key Reaper
 
 AVATAR: admin
 CONTEXT: Chłopak z plakietką i tabletem patrzy na ciebie surowo:\n„Dział bezpieczeństwa platformy. Twój profil został zgłoszony za naruszenie regulaminu!\nZaloguj się w naszym panelu weryfikacyjnym pod tym linkiem w 60 minut, inaczej bezpowrotnie usuniemy twoje konto!”
 SAGE: Oto maska fałszywego autorytetu. Oszuści straszą usunięciem konta, by wywołać panikę i wyłudzić login i hasło.
-A: Loguję się od razu przez podany link — nie mogę stracić profilu budowanego od lat!
+A: Loguję się od razu przez podany link - nie mogę stracić profilu budowanego od lat!
 B: Nie wpisuję danych. Otwieram oficjalną aplikację i sprawdzam status konta w 'Centrum Pomocy'.
 GOOD: Znakomicie! Prawdziwe wsparcie nigdy nie żąda logowania przez linki z prywatnych wiadomości. Opanowałeś strach.
 BAD: Zły ruch! Właśnie oddałeś swoje konto w ręce cyfrowego złodzieja. Strach przesłonił ci czujność. Popraw to!
@@ -17,7 +17,7 @@ SPEED_FEEDBACK: 36
 AVATAR: aplikacja
 CONTEXT: Na ekranie laptopa wyświetla się animacja viralowego testu:\n„Sprawdź, która postać z anime jest twoją bratnią duszą!\nAby poznać wynik, połącz swoje konto społecznościowe i zezwól aplikacji na dostęp do listy znajomych, wiadomości i zdjęć.”
 SAGE: Czy chwilowy quiz wart jest oddania dostępu do twojego prywatnego życia? Wiele z pozoru niewinnych testów służy do drenażu danych.
-A: Zezwalam na wszystkie uprawnienia — wszyscy znajomi wstawiają ten wynik na relację!
+A: Zezwalam na wszystkie uprawnienia - wszyscy znajomi wstawiają ten wynik na relację!
 B: Odrzucam. Nie przyznaję obcej aplikacji uprawnień do moich prywatnych danych.
 GOOD: Rozsądnie. Twoja prywatność ma ogromną wartość. Nie warto jej wymieniać na chwilowy, bezwartościowy trend.
 BAD: Błąd! Oddałeś prywatne rozmowy i zdjęcia za jeden obrazek z quizu. Cofnij ten krok i chroń swoje granice!
@@ -29,9 +29,9 @@ SPEED_FEEDBACK: 36
 AVATAR: vpn
 CONTEXT: Ekran telefonu wyświetla krzykliwą ikonę rakiety:\n„Darmowy Booster Zasięgów: Zdobądź +10 000 followersów w 24 godziny bez wysiłku!\nAby aktywować, pobierz ten profil konfiguracyjny urządzenia.”
 SAGE: Obietnica drogi na skróty to odwieczna pułapka. Pod nazwą 'darmowego boostera' kryje się złośliwe oprogramowanie przejmujące telefon.
-A: Pobieram i instaluję plik — zasięgi i popularność w social mediach są najważniejsze!
+A: Pobieram i instaluję plik - zasięgi i popularność w social mediach są najważniejsze!
 B: Ignoruję i usuwam. Instalowanie niesprawdzonych profili zagraża bezpieczeństwu całego smartfona.
-GOOD: Wspaniale. Nie ma darmowych skrótów do popularności — instalowanie obcych profili to prosta droga do utraty kontroli nad telefonem.
+GOOD: Wspaniale. Nie ma darmowych skrótów do popularności - instalowanie obcych profili to prosta droga do utraty kontroli nad telefonem.
 BAD: Źle! Twoje urządzenie zostało zainfekowane, a dane przekazane na obcy serwer. Nigdy nie instaluj plików z nieznanych źródeł!
 CORRECT: B
 SPEED_CONTEXT: 38

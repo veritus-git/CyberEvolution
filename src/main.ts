@@ -91,7 +91,7 @@ async function bootstrap() {
   // Prośba o ochronę zapisu gry przed czyszczeniem pamięci (Persistent Storage API)
   gameStorage.requestPersistentStorage().catch(() => {});
 
-  // Font loading with short timeout — never block on this
+  // Font loading with short timeout - never block on this
   try {
     await Promise.race([
       document.fonts?.load?.('16px "Jersey 10"') ?? Promise.resolve(),
