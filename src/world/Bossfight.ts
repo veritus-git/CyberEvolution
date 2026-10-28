@@ -68,7 +68,7 @@ export class Bossfight {
     // Preload questions & dialogue text
     if (!Bossfight.bossDataCache.has(worldNum)) {
       promises.push(
-        fetch(`/assets/worlds/${worldNum}/bossfight.txt`)
+        fetch(`/assets/worlds/${worldNum}/bossfight.txt?t=${Date.now()}`, { cache: 'no-store' })
           .then((res) => {
             if (!res.ok) throw new Error('HTTP ' + res.status);
             return res.text();
@@ -504,7 +504,7 @@ export class Bossfight {
 
   private async loadBossData(wn: number): Promise<void> {
     try {
-      const res = await fetch(`/assets/worlds/${wn}/bossfight.txt`);
+      const res = await fetch(`/assets/worlds/${wn}/bossfight.txt?t=${Date.now()}`, { cache: 'no-store' });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const text = await res.text();
       this.parseBossfightText(text);

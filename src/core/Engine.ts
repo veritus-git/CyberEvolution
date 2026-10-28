@@ -706,7 +706,7 @@ export class Engine {
 
   private async playGameIntroDialog(): Promise<void> {
     try {
-      const res = await fetch('/assets/game_intro_dialog.txt');
+      const res = await fetch(`/assets/game_intro_dialog.txt?t=${Date.now()}`, { cache: 'no-store' });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const raw = await res.text();
       const lines = this.parseConversationLines(raw);
@@ -719,10 +719,24 @@ export class Engine {
 
   private async playWorldSummaryDialog(wn: number): Promise<void> {
     try {
-      const res = await fetch(`/assets/worlds/${wn}/summary.txt`);
+      const res = await fetch(`/assets/worlds/${wn}/summary.txt?t=${Date.now()}`, { cache: 'no-store' });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const raw = await res.text();
-      const lines = this.parseConversationLines(raw);
+      let lines = this.parseConversationLines(raw);
+
+      // Zabezpieczenie fabularne: po świecie 4 Mędrzec ZAWSZE zniknął z lobby,
+      // a gracz mówi sam do siebie w pustce. Jeśli serwer lub stary cache zwrócił stary tekst
+      // z Mędrcem ("Zegar zamilkł..."), natychmiast nadpisujemy go właściwą reakcją gracza.
+      if (wn === 4) {
+        const hasOldText = raw.includes('Zegar zamilkł') || lines.some((l) => l.speaker === 'medrzec');
+        if (hasOldText) {
+          lines = [
+            { speaker: 'player', text: 'Mędrcu! Mędrcu! Wiesz co...' },
+            { speaker: 'player', text: 'Zaraz... Gdzie on się podział?' },
+            { speaker: 'player', text: 'Mędrcze?! ...Cisza, nie odpowiada. Dziwne... Muszę iść dalej sam.' },
+          ];
+        }
+      }
 
       // Trwale oznaczamy podsumowanie jako wyświetlone
       gameStorage.markSummaryShown(wn);
@@ -746,7 +760,7 @@ export class Engine {
 
   private async playWorldIntro(wn: number, title: string): Promise<void> {
     try {
-      const res = await fetch(`/assets/worlds/${wn}/intro.txt`);
+      const res = await fetch(`/assets/worlds/${wn}/intro.txt?t=${Date.now()}`, { cache: 'no-store' });
       if (!res.ok) return;
       const raw = await res.text();
       const lines = raw.split('\n');

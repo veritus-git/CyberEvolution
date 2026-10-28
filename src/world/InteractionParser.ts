@@ -86,7 +86,8 @@ export class InteractionParser {
 
   public static async loadFromFile(url: string): Promise<QuizData[]> {
     try {
-      const res = await fetch(url);
+      const sep = url.includes('?') ? '&' : '?';
+      const res = await fetch(`${url}${sep}t=${Date.now()}`, { cache: 'no-store' });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const text = await res.text();
       return this.parse(text);

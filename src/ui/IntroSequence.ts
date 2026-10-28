@@ -59,7 +59,7 @@ export class IntroSequence {
 
     let text = 'Witaj w CyberEvolution.\n\nPrzed Tobą podróż przez światy świadomości cyfrowej.\nUcz się, sprawdzaj fakty i nie klikaj bezmyślnie.\nTwoje decyzje zadecydują o ewolucji!';
     try {
-      const res = await fetch('/assets/game_intro.txt');
+      const res = await fetch(`/assets/game_intro.txt?t=${Date.now()}`, { cache: 'no-store' });
       if (res.ok) {
         text = await res.text();
       }
@@ -91,7 +91,7 @@ export class IntroSequence {
       'Nagle ocknąłęś się jak ze snu, siedząc przed komputerem\nJasna strona poczty na ekranie oświetla Ci twarz\n---\nTwój kursor znajduje sie na podejrzanym linku, ale...\nZamiast w niego kliknąć, przenosisz mail do kosza\n---\nNauki Mędrca czegoś cię naczyły\nIdź w świat z tą świadomością w głowie\n---\nKONIEC';
 
     try {
-      const res = await fetch('/assets/ending/ending_story.txt');
+      const res = await fetch(`/assets/ending/ending_story.txt?t=${Date.now()}`, { cache: 'no-store' });
       if (res.ok) {
         text = await res.text();
       }

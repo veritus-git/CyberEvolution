@@ -3,13 +3,13 @@
  * Service Worker dla CyberEvolution z pre-cachingiem pod instalowalność PWA w Brave/Chrome.
  */
 
-const CACHE_NAME = 'cyberevolution-v2';
+const CACHE_NAME = 'cyberevolution-v3';
 const STATIC_ASSETS = [
   '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png',
+  'index.html',
+  'manifest.json',
+  'icon-192.png',
+  'icon-512.png',
 ];
 
 self.addEventListener('install', (event) => {
@@ -47,10 +47,13 @@ self.addEventListener('fetch', (event) => {
     fetch(event.request)
       .then((networkResponse) => {
         if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache).catch(() => {});
-          });
+          // Nie zamrażamy w SW dialogów tekstowych ani żądań z parametrem t
+          if (!url.pathname.endsWith('.txt') && !url.searchParams.has('t')) {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache).catch(() => {});
+            });
+          }
         }
         return networkResponse;
       })
