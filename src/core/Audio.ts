@@ -299,43 +299,44 @@ export class AudioManager {
   }
 
   /**
-   * Soft, gentle footstep tap (warm low-passed sine wave with alternating left/right foot cadence)
+   * Crisp, dry shoe-to-ground tap (mid-range frequencies with highpass filter - no hollow wooden floorboard resonance!)
    */
   public playFootstep(): void {
     if (!this.ctx || !this.sfxGain || this.isMuted || this.sfxVolume <= 0) return;
     const now = performance.now();
-    if (now - this.lastFootstepTime < 180) return;
+    if (now - this.lastFootstepTime < 130) return;
     this.lastFootstepTime = now;
 
     const audioNow = this.ctx.currentTime;
     this.footstepStep = (this.footstepStep + 1) % 2;
+    const isLeft = this.footstepStep === 0;
 
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     const filter = this.ctx.createBiquadFilter();
 
-    // Mellow sine wave with soft lowpass so it's warm and never harsh on the ears
-    osc.type = 'sine';
-    const isLeft = this.footstepStep === 0;
-    const baseFreq = isLeft ? 138 : 126;
-    const endFreq = isLeft ? 60 : 54;
+    // Triangle wave provides a dry, tactile body without hollow bass or harsh hiss
+    osc.type = 'triangle';
+    const startFreq = isLeft ? 440 : 390;
+    const endFreq = isLeft ? 220 : 190;
 
-    osc.frequency.setValueAtTime(baseFreq + (Math.random() * 6 - 3), audioNow);
-    osc.frequency.exponentialRampToValueAtTime(endFreq, audioNow + 0.042);
+    osc.frequency.setValueAtTime(startFreq + (Math.random() * 10 - 5), audioNow);
+    osc.frequency.exponentialRampToValueAtTime(endFreq, audioNow + 0.024);
 
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(240, audioNow);
+    // Highpass filter at 220Hz strictly strips out any hollow wooden bass resonance
+    filter.type = 'highpass';
+    filter.frequency.setValueAtTime(220, audioNow);
 
-    // Very gentle volume - soft, pleasant, organic foot tap
-    gain.gain.setValueAtTime(0.12, audioNow);
-    gain.gain.exponentialRampToValueAtTime(0.0005, audioNow + 0.045);
+    // Short, crisp, dry envelope (26ms) - a subtle tactile shoe tap
+    gain.gain.setValueAtTime(0.08, audioNow);
+    gain.gain.exponentialRampToValueAtTime(0.0005, audioNow + 0.026);
 
     osc.connect(filter);
     filter.connect(gain);
     gain.connect(this.sfxGain);
 
     osc.start(audioNow);
-    osc.stop(audioNow + 0.048);
+    osc.stop(audioNow + 0.028);
   }
 
   public playDialogBlip(): void {

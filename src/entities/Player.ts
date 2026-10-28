@@ -20,8 +20,6 @@ export class Player {
   public animTimer: number = 0;
   public runFrameIndex: number = 0;
   public climbFrameIndex: number = 0;
-  private footstepTimer: number = 0;
-  private isRunningPrev: boolean = false;
 
   // Evolution animation sequence
   public evoBlinkActive: boolean = false;
@@ -227,31 +225,18 @@ export class Player {
         this.climbFrameIndex = (this.climbFrameIndex + 1) % 2;
         this.animTimer = 0;
       }
-      this.isRunningPrev = false;
     } else if (isRunning) {
-      // Steady running animation: 250ms per frame
-      if (this.animTimer >= 0.25) {
+      // 100% synchronized with skin animation:
+      // When the run frame switches (every 200ms), a footstep sound triggers at the exact same instant!
+      if (this.animTimer >= 0.20) {
         this.runFrameIndex = (this.runFrameIndex + 1) % 2;
         this.animTimer = 0;
-      }
-
-      // Steady, pleasant footstep cadence: 250ms between steps
-      if (!this.isRunningPrev) {
-        // First footfall lands naturally shortly after initiating stride (~80ms)
-        this.footstepTimer = 0.17;
-        this.isRunningPrev = true;
-      } else {
-        this.footstepTimer += dt;
-        if (this.footstepTimer >= 0.25) {
-          this.footstepTimer = 0;
-          sound.playFootstep();
-        }
+        sound.playFootstep();
       }
     } else {
-      this.animTimer = 0;
+      // Prime animTimer to 0.10s so the very first footstep lands at 100ms when moving from idle
+      this.animTimer = 0.10;
       this.runFrameIndex = 0;
-      this.footstepTimer = 0;
-      this.isRunningPrev = false;
     }
   }
   /**
