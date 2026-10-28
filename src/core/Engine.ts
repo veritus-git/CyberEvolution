@@ -469,7 +469,7 @@ export class Engine {
         this.player.physics.vy = 0;
         this.player.physics.facing = 'right';
         this.player.physics.onGround = true;
-        this.player.animTimer = 0;
+        this.player.animTimer = 0.12;
         this.player.runFrameIndex = 0;
         this.arenaIntroActive = true;
         this.arenaIntroWn = currentWn;
@@ -944,9 +944,10 @@ export class Engine {
         this.player.physics.onGround = true;
         // Advance player run animation so player actually runs at authentic calm pace
         this.player.animTimer += dt;
-        if (this.player.animTimer >= 0.28) {
+        if (this.player.animTimer >= 0.25) {
           this.player.runFrameIndex = (this.player.runFrameIndex + 1) % 2;
           this.player.animTimer = 0;
+          sound.playFootstep();
         }
       }
       return;
