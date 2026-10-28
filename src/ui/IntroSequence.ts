@@ -17,6 +17,7 @@ export class IntroSequence {
   private animFrame: number | null = null;
   private lastTime: number = 0;
   private lastAdvanceTime: number = 0;
+  private sequenceType: 'preIntro' | 'ending' = 'preIntro';
   private onFinishedCallback?: () => void;
 
   constructor(container: HTMLElement) {
@@ -38,8 +39,9 @@ export class IntroSequence {
     container.appendChild(this.overlayElement);
 
     // Click / touch to advance
-    this.overlayElement.addEventListener('click', () => {
+    this.overlayElement.addEventListener('click', (e) => {
       if (!this.isActive) return;
+      e.stopPropagation();
       this.advance();
     });
 
@@ -47,12 +49,14 @@ export class IntroSequence {
       if (!this.isActive) return;
       if (e.code === 'Space' || e.code === 'Enter' || e.code === 'KeyE') {
         e.preventDefault();
+        e.stopPropagation();
         this.advance();
       }
     });
   }
 
   public async playPreIntro(onFinished: () => void): Promise<void> {
+    this.sequenceType = 'preIntro';
     this.onFinishedCallback = onFinished;
     this.isActive = true;
     this.overlayElement.classList.remove('hidden');
@@ -83,6 +87,7 @@ export class IntroSequence {
   }
 
   public async playEnding(onFinished: () => void): Promise<void> {
+    this.sequenceType = 'ending';
     this.onFinishedCallback = onFinished;
     this.isActive = true;
     this.overlayElement.classList.remove('hidden');
@@ -153,14 +158,26 @@ export class IntroSequence {
   private updateHint(): void {
     const isTouch = typeof window !== 'undefined' && (('ontouchstart' in window) || (navigator.maxTouchPoints > 0));
     const isLast = this.currentPageIndex >= this.pages.length - 1;
-    if (isTouch) {
-      this.hintElement.textContent = isLast
-        ? 'Dotknij ekranu, aby rozpocząć'
-        : 'Dotknij ekranu, aby przejść dalej';
+    if (this.sequenceType === 'ending') {
+      if (isTouch) {
+        this.hintElement.textContent = isLast
+          ? 'Dotknij ekranu, aby powrócić do menu głównego'
+          : 'Dotknij ekranu, aby przejść dalej';
+      } else {
+        this.hintElement.textContent = isLast
+          ? 'Kliknij Enter, aby powrócić do menu głównego'
+          : 'Kliknij Enter aby przejść dalej';
+      }
     } else {
-      this.hintElement.textContent = isLast
-        ? 'Kliknij dowolny klawisz, aby rozpocząć'
-        : 'Kliknij Enter aby przejść dalej';
+      if (isTouch) {
+        this.hintElement.textContent = isLast
+          ? 'Dotknij ekranu, aby rozpocząć'
+          : 'Dotknij ekranu, aby przejść dalej';
+      } else {
+        this.hintElement.textContent = isLast
+          ? 'Kliknij dowolny klawisz, aby rozpocząć'
+          : 'Kliknij Enter aby przejść dalej';
+      }
     }
   }
 
@@ -191,7 +208,12 @@ export class IntroSequence {
     this.isActive = false;
     this.overlayElement.classList.add('hidden');
     if (this.onFinishedCallback) {
-      this.onFinishedCallback();
+      const cb = this.onFinishedCallback;
+      this.onFinishedCallback = undefined;
+      // Slight delay to prevent immediate keydown bleed-through to Start Menu buttons
+      setTimeout(() => {
+        cb();
+      }, 150);
     }
   }
 }

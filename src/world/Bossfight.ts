@@ -33,6 +33,38 @@ export class Bossfight {
   private static bossFramesCache: Map<number, [HTMLImageElement, HTMLImageElement]> = new Map();
   private static bossDataCache: Map<number, BossData> = new Map();
   private static scrollCache: Map<number, HTMLImageElement> = new Map();
+  private static bossPaletteCache: Map<number, string[]> = new Map();
+
+  public static extractAndCachePalette(worldNum: number, img: HTMLImageElement): void {
+    if (Bossfight.bossPaletteCache.has(worldNum)) return;
+    if (!img || !img.complete || img.naturalWidth <= 0) return;
+    try {
+      const offCanvas = document.createElement('canvas');
+      const sampleSize = 48;
+      offCanvas.width = sampleSize;
+      offCanvas.height = sampleSize;
+      const offCtx = offCanvas.getContext('2d', { willReadFrequently: true });
+      if (offCtx) {
+        offCtx.drawImage(img, 0, 0, sampleSize, sampleSize);
+        const imgData = offCtx.getImageData(0, 0, sampleSize, sampleSize).data;
+        const palette: string[] = [];
+        for (let i = 0; i < imgData.length; i += 4) {
+          const r = imgData[i];
+          const g = imgData[i + 1];
+          const b = imgData[i + 2];
+          const a = imgData[i + 3];
+          if (a > 120) {
+            palette.push(`rgb(${r}, ${g}, ${b})`);
+          }
+        }
+        if (palette.length > 0) {
+          Bossfight.bossPaletteCache.set(worldNum, palette);
+        }
+      }
+    } catch {
+      // Ignore
+    }
+  }
 
   public static async preloadBoss(worldNum: number): Promise<void> {
     const promises: Promise<any>[] = [];
@@ -45,6 +77,7 @@ export class Bossfight {
           MaskParser.loadImage(`/assets/worlds/${worldNum}/boss/boss2.png`),
         ]).then(([b1, b2]) => {
           Bossfight.bossFramesCache.set(worldNum, [b1, b2]);
+          Bossfight.extractAndCachePalette(worldNum, b1);
         }).catch((e) => {
           console.warn(`Boss frames preload failed for world ${worldNum}:`, e);
         })
@@ -646,23 +679,58 @@ export class Bossfight {
     this.scrollActive = false;
   }
 
+  public cleanup(): void {
+    this.active = false;
+    this.animState = 'hidden';
+    this.updateMobileUI();
+    this.bossDefeated = false;
+    this.deathParticles = [];
+  }
+
+  private extractBossPalette(): string[] {
+    if (Bossfight.bossPaletteCache.has(this.worldNumber)) {
+      return Bossfight.bossPaletteCache.get(this.worldNumber)!;
+    }
+
+    const frame = this.bossFrames ? this.bossFrames[this.bossFrameIndex] || this.bossFrames[0] : null;
+    if (frame && frame.complete && frame.naturalWidth > 0 && frame.naturalHeight > 0) {
+      Bossfight.extractAndCachePalette(this.worldNumber, frame);
+      if (Bossfight.bossPaletteCache.has(this.worldNumber)) {
+        return Bossfight.bossPaletteCache.get(this.worldNumber)!;
+      }
+    }
+
+    // Curated thematic fallbacks per boss matching their exact visual identity
+    const fallbackPalettes: Record<number, string[]> = {
+      1: ['#00c3ff', '#0077b6', '#023e8a', '#1e293b', '#94a3b8', '#38bdf8'],
+      2: ['#22c55e', '#15803d', '#166534', '#3b0764', '#581c87', '#4ade80'],
+      3: ['#ec4899', '#be185d', '#9d174d', '#fbbf24', '#f43f5e', '#f472b6'],
+      4: ['#ef4444', '#b91c1c', '#7f1d1d', '#450a0a', '#f97316', '#dc2626'],
+      5: ['#06b6d4', '#0891b2', '#0e7490', '#1e293b', '#e2e8f0', '#f8fafc'],
+    };
+    const fallback = fallbackPalettes[this.worldNumber] || ['#ff0055', '#ffffff', '#ffaa00'];
+    Bossfight.bossPaletteCache.set(this.worldNumber, fallback);
+    return fallback;
+  }
+
   private spawnBossDeathExplosion(): void {
     sound.playBossExplosion();
     const cx = this.bossX + this.bossW / 2;
     const cy = this.bossY + this.bossH / 2;
-    const colors = ['#00e5ff', '#ff007f', '#ffe600', '#ffffff', '#8a2be2', '#39ff14'];
-    for (let i = 0; i < 95; i++) {
+    const palette = this.extractBossPalette();
+    for (let i = 0; i < 115; i++) {
       const angle = Math.random() * Math.PI * 2;
-      const speed = 140 + Math.random() * 480;
+      const speed = 130 + Math.random() * 460;
+      const color = palette[Math.floor(Math.random() * palette.length)];
       this.deathParticles.push({
-        x: cx + (Math.random() - 0.5) * (this.bossW * 0.7),
-        y: cy + (Math.random() - 0.5) * (this.bossH * 0.7),
+        x: cx + (Math.random() - 0.5) * (this.bossW * 0.75),
+        y: cy + (Math.random() - 0.5) * (this.bossH * 0.75),
         vx: Math.cos(angle) * speed,
         vy: Math.sin(angle) * speed - 90,
         size: 4 + Math.random() * 8,
         life: 0.6 + Math.random() * 0.9,
         maxLife: 0.6 + Math.random() * 0.9,
-        color: colors[Math.floor(Math.random() * colors.length)],
+        color,
       });
     }
   }

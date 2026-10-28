@@ -17,7 +17,10 @@ export class StartMenu {
   private infoModal: GameInfoModal;
   private onSelectCallback?: (action: 'new_game' | 'continue' | 'exit') => void;
 
+  private openTime: number = 0;
+
   constructor(container: HTMLElement, hasSave: boolean = false) {
+    this.openTime = performance.now();
     this.overlayElement = document.createElement('div');
     this.overlayElement.className = 'start-menu-overlay';
 
@@ -70,6 +73,12 @@ export class StartMenu {
     // Keyboard support
     window.addEventListener('keydown', (e) => {
       if (!this.isOpen || this.infoModal.isOpen) return;
+
+      // Cooldown after menu appears so pressing Enter on ending screen doesn't immediately activate 'new_game'
+      if (performance.now() - this.openTime < 350) {
+        e.preventDefault();
+        return;
+      }
 
       if (e.code === 'ArrowUp' || e.code === 'KeyW') {
         e.preventDefault();
@@ -147,6 +156,7 @@ export class StartMenu {
 
   public show(): void {
     this.isOpen = true;
+    this.openTime = performance.now();
     this.overlayElement.classList.remove('hidden');
     this.selectedIndex = 0;
     this.setHasSave(gameStorage.hasSave());

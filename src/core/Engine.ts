@@ -748,7 +748,7 @@ export class Engine {
         if (wn === 5) {
           setTimeout(() => {
             this.introSequence.playEnding(() => {
-              this.startMenu.show();
+              this.returnToStartMenuAfterEnding();
             });
           }, 800);
         }
@@ -827,6 +827,19 @@ export class Engine {
     this.player.physics.onGround = true;
   }
 
+  private returnToStartMenuAfterEnding(): void {
+    this.isPaused = false;
+    this.bossfight.cleanup();
+    this.dialog.close();
+    sound.stopMusic();
+    this.completedWorlds.add(5);
+    this.saveGameProgress();
+    this.renderer.suppressLetterbox = true;
+    this.loadWorld('lobby', false).then(() => {
+      this.startMenu.show();
+    });
+  }
+
   public start(): void {
     if (this.isRunning) return;
     this.isRunning = true;
@@ -859,7 +872,7 @@ export class Engine {
           if (target === 'ending') {
             this.transitionState = 'none';
             this.introSequence.playEnding(() => {
-              this.startMenu.show();
+              this.returnToStartMenuAfterEnding();
             });
           } else {
             this.loadWorld(target).then(() => {
