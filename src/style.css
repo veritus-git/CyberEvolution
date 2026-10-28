@@ -117,7 +117,7 @@ html, body {
   z-index: 10;
 }
 
-/* Player HUD Bar (Fullscreen, Audio, Help) */
+/* Player HUD Bar (Fullscreen, Settings, Audio, Help) */
 .player-hud-bar {
   position: absolute;
   top: max(10px, env(safe-area-inset-top));
@@ -125,7 +125,7 @@ html, body {
   display: flex;
   align-items: center;
   gap: 8px;
-  z-index: 45;
+  z-index: 60; /* Higher than start-menu-overlay (50) so icons are accessible in menu, but below modals (900/1000) */
   pointer-events: auto;
 }
 
@@ -182,7 +182,7 @@ html, body {
 .mobile-top-bar {
   position: absolute;
   top: max(10px, env(safe-area-inset-top));
-  right: max(160px, calc(env(safe-area-inset-right) + 150px));
+  right: max(200px, calc(env(safe-area-inset-right) + 190px));
   display: flex;
   gap: 8px;
   z-index: 40;

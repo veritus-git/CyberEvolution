@@ -168,9 +168,24 @@ export class PauseModal {
     this.syncAudioUI();
   }
 
-  public show(): void {
+  public show(isFromStartMenu: boolean = false): void {
     this.isOpen = true;
     this.syncAudioUI();
+
+    const resumeBtn = this.cardElement.querySelector('#pause-resume') as HTMLElement;
+    const restartBtn = this.cardElement.querySelector('#pause-restart') as HTMLElement;
+    const lobbyBtn = this.cardElement.querySelector('#pause-lobby') as HTMLElement;
+
+    if (isFromStartMenu) {
+      if (resumeBtn) resumeBtn.textContent = '✓ Zamknij ustawienia';
+      if (restartBtn) restartBtn.style.display = 'none';
+      if (lobbyBtn) lobbyBtn.style.display = 'none';
+    } else {
+      if (resumeBtn) resumeBtn.textContent = '▶ Wznów grę';
+      if (restartBtn) restartBtn.style.display = '';
+      if (lobbyBtn) lobbyBtn.style.display = '';
+    }
+
     this.overlayElement.classList.remove('hidden');
     document.body.classList.remove('cursor-hidden');
   }

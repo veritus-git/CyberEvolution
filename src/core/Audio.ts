@@ -10,7 +10,7 @@ export interface AudioSettings {
   isMuted: boolean;
 }
 
-const SETTINGS_KEY = 'cyberevo_audio_settings_v1';
+const SETTINGS_KEY = 'cyberevo_audio_settings_v2';
 
 export class AudioManager {
   private ctx: AudioContext | null = null;
@@ -20,8 +20,8 @@ export class AudioManager {
 
   public isMuted: boolean = false;
   public masterVolume: number = 0.7;
-  public musicVolume: number = 0.45;
-  public sfxVolume: number = 0.35;
+  public musicVolume: number = 0.22;
+  public sfxVolume: number = 0.45;
 
   private isMusicPlaying: boolean = false;
   private musicTimer: number | null = null;
@@ -202,7 +202,7 @@ export class AudioManager {
       filter.frequency.setValueAtTime(380, now);
       filter.frequency.exponentialRampToValueAtTime(120, now + stepDuration * 1.8);
 
-      gain.gain.setValueAtTime(0.28, now);
+      gain.gain.setValueAtTime(0.18, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + stepDuration * 1.8);
 
       osc.connect(filter);
@@ -224,7 +224,7 @@ export class AudioManager {
       osc.type = 'square';
       osc.frequency.setValueAtTime(noteFreq, now);
 
-      gain.gain.setValueAtTime(0.065, now);
+      gain.gain.setValueAtTime(0.045, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + stepDuration * 0.9);
 
       osc.connect(gain);
@@ -244,7 +244,7 @@ export class AudioManager {
       osc.frequency.setValueAtTime(135, now);
       osc.frequency.exponentialRampToValueAtTime(38, now + 0.12);
 
-      gain.gain.setValueAtTime(0.38, now);
+      gain.gain.setValueAtTime(0.24, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.13);
 
       osc.connect(gain);
@@ -261,7 +261,7 @@ export class AudioManager {
       osc.frequency.setValueAtTime(190, now);
       osc.frequency.exponentialRampToValueAtTime(80, now + 0.08);
 
-      gain.gain.setValueAtTime(0.22, now);
+      gain.gain.setValueAtTime(0.14, now);
       gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
 
       osc.connect(gain);
@@ -300,25 +300,25 @@ export class AudioManager {
   public playFootstep(): void {
     if (!this.ctx || !this.sfxGain || this.isMuted || this.sfxVolume <= 0) return;
     const now = performance.now();
-    if (now - this.lastFootstepTime < 180) return;
+    if (now - this.lastFootstepTime < 160) return;
     this.lastFootstepTime = now;
 
     const audioNow = this.ctx.currentTime;
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
 
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(95 + Math.random() * 20, audioNow);
-    osc.frequency.exponentialRampToValueAtTime(45, audioNow + 0.045);
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(115 + Math.random() * 25, audioNow);
+    osc.frequency.exponentialRampToValueAtTime(45, audioNow + 0.055);
 
-    gain.gain.setValueAtTime(0.08, audioNow);
-    gain.gain.exponentialRampToValueAtTime(0.001, audioNow + 0.048);
+    gain.gain.setValueAtTime(0.28, audioNow);
+    gain.gain.exponentialRampToValueAtTime(0.001, audioNow + 0.06);
 
     osc.connect(gain);
     gain.connect(this.sfxGain);
 
     osc.start(audioNow);
-    osc.stop(audioNow + 0.05);
+    osc.stop(audioNow + 0.065);
   }
 
   public playDialogBlip(): void {

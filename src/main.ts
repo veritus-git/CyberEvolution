@@ -63,6 +63,7 @@ async function bootstrap() {
   const uiContainer = document.getElementById('ui-container') as HTMLElement;
   const mobileTopBar = document.getElementById('mobile-top-bar') as HTMLElement;
   const fullscreenBtn = document.getElementById('btn-fullscreen') as HTMLButtonElement;
+  const settingsBtn = document.getElementById('btn-settings') as HTMLButtonElement;
   const audioBtn = document.getElementById('btn-audio') as HTMLButtonElement;
   const helpBtn = document.getElementById('btn-help') as HTMLButtonElement;
   const debugBtn = document.getElementById('btn-toggle-debug') as HTMLButtonElement;
@@ -155,6 +156,12 @@ async function bootstrap() {
     if (e.code === 'KeyF' && !engine.dialog.isOpen && !engine.startMenu.isOpen && !engine.isPaused && !engine.infoModal.isOpen) {
       toggleFs();
     }
+  });
+
+  // Settings modal (volume sliders & sound controls)
+  settingsBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    engine.pauseModal.show(engine.startMenu.isOpen);
   });
 
   // Audio mute toggle
