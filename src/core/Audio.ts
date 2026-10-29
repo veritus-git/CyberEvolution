@@ -40,6 +40,14 @@ export class AudioManager {
 
   private silentAudio: HTMLAudioElement | null = null;
   public isAudioUnlocked: boolean = false;
+  private muteListeners: ((isMuted: boolean) => void)[] = [];
+
+  public onMuteChange(cb: (isMuted: boolean) => void): () => void {
+    this.muteListeners.push(cb);
+    return () => {
+      this.muteListeners = this.muteListeners.filter((fn) => fn !== cb);
+    };
+  }
 
   constructor() {
     this.loadSettings();
@@ -215,6 +223,13 @@ export class AudioManager {
       this.startMusic();
     }
     this.saveSettings();
+    for (const listener of this.muteListeners) {
+      try {
+        listener(this.isMuted);
+      } catch (err) {
+        console.warn('Error in muteListener:', err);
+      }
+    }
   }
 
   public toggleMute(): boolean {

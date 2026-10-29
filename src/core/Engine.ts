@@ -75,8 +75,9 @@ export class Engine {
   // Screen wipe transition state (1:1 with Python wipe_out_down / wipe_in_down)
   private transitionState: 'wipe_out' | 'wipe_in' | 'none' = 'none';
   private transitionTimer: number = 0;
-  private readonly transitionDuration: number = 0.28;
+  private readonly transitionDuration: number = 0.55;
   private pendingWorldSwitch: string | null = null;
+  private preloadPromise: Promise<void> | null = null;
 
   constructor(canvas: HTMLCanvasElement, uiContainer: HTMLElement) {
     this.canvas = canvas;
@@ -98,7 +99,22 @@ export class Engine {
       this.updateSoundControlVisibility();
     };
     this.pauseModal.onOpenHelp = () => {
-      this.infoModal.show();
+      const fromStart = this.startMenu.isOpen;
+      this.pauseModal.hide();
+      this.infoModal.show('tab-controls', {
+        fromSettings: true,
+        onBackToSettings: () => {
+          this.pauseModal.show(fromStart);
+        },
+        onResumeGame: () => {
+          this.pauseModal.hide();
+          if (!fromStart) {
+            this.isPaused = false;
+            this.dialog.isPaused = false;
+            this.updateSoundControlVisibility();
+          }
+        },
+      });
     };
     this.pauseModal.onRestartLevel = () => {
       this.isPaused = false;
@@ -166,7 +182,7 @@ export class Engine {
       (e) => {
         if (e.code === 'Escape' || e.key === 'Escape') {
           if (this.infoModal.isOpen) {
-            this.infoModal.hide();
+            this.infoModal.handleEscape();
             return;
           }
           if (this.pauseModal.isOpen) {
@@ -334,6 +350,9 @@ export class Engine {
 
     // Preload all bosses in background so arena entry immediately shows the right boss without delay
     Bossfight.preloadAllBosses().catch(() => {});
+
+    // Preload all dialogue avatars in background so dialogues appear instantly with zero avatar pop-in
+    InteractionDialog.preloadAllAvatars().catch(() => {});
 
     const params = new URLSearchParams(window.location.search);
     if (!params.has('world')) {
@@ -720,6 +739,7 @@ export class Engine {
       const wn = parseInt(arenaMatch[1], 10);
       promises.push(MaskParser.loadImage(`/assets/worlds/${wn}/arena/map_mask.png`).catch(() => null));
       promises.push(MaskParser.loadImage(`/assets/worlds/${wn}/arena/bg.png`).catch(() => null));
+      promises.push(MaskParser.loadImage(`/assets/worlds/${wn}/arena/zwoj.png`).catch(() => null));
       promises.push(Bossfight.preloadBoss(wn).catch(() => {}));
     } else if (worldMatch) {
       const wn = parseInt(worldMatch[1], 10);
@@ -731,6 +751,10 @@ export class Engine {
       promises.push(MaskParser.loadImage(`/assets/worlds/${wn}/portal/frame2.png`).catch(() => null));
       promises.push(MaskParser.loadImage('/assets/worlds/lobby/portal/frame1.png').catch(() => null));
       promises.push(MaskParser.loadImage('/assets/worlds/lobby/portal/frame2.png').catch(() => null));
+      for (let npcId = 1; npcId <= 3; npcId++) {
+        promises.push(MaskParser.loadImage(`/assets/worlds/${wn}/npc/npc${npcId}/npc1.png`).catch(() => null));
+        promises.push(MaskParser.loadImage(`/assets/worlds/${wn}/npc/npc${npcId}/npc2.png`).catch(() => null));
+      }
     } else if (worldKey === 'lobby') {
       const isLobbyEmpty = this.completedWorlds.has(4) || this.player.skinId >= 5;
       const bgPath = isLobbyEmpty ? '/assets/worlds/lobby/bg_empty.png' : '/assets/worlds/lobby/bg.png';
@@ -914,10 +938,20 @@ export class Engine {
               this.returnToStartMenuAfterEnding();
             });
           } else {
-            this.loadWorld(target).then(() => {
-              this.transitionState = 'wipe_in';
-              this.transitionTimer = 0;
-            });
+            const preloader = this.preloadPromise || Promise.resolve();
+            preloader
+              .then(() => {
+                return this.loadWorld(target);
+              })
+              .then(() => {
+                this.transitionState = 'wipe_in';
+                this.transitionTimer = 0;
+              })
+              .catch((err) => {
+                console.error('Failed to transition to world:', err);
+                this.transitionState = 'wipe_in';
+                this.transitionTimer = 0;
+              });
           }
         }
       }
@@ -1133,7 +1167,7 @@ export class Engine {
     this.transitionState = 'wipe_out';
     this.transitionTimer = 0;
     this.pendingWorldSwitch = targetWorld;
-    this.preloadWorldAssets(targetWorld).catch(() => {});
+    this.preloadPromise = this.preloadWorldAssets(targetWorld);
   }
 
   private checkHintsAndInteractions(interactPressed: boolean): void {

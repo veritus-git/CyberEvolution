@@ -3,11 +3,21 @@
  * Modern dialog with lore, controls, and project information.
  */
 
+export interface GameInfoModalOptions {
+  fromSettings?: boolean;
+  onBackToSettings?: () => void;
+  onResumeGame?: () => void;
+  onClose?: () => void;
+}
+
 export class GameInfoModal {
   public isOpen: boolean = false;
   private overlayElement: HTMLElement;
   private modalBox: HTMLElement;
   private onCloseCallback?: () => void;
+  private isFromSettings: boolean = false;
+  private onBackToSettings?: () => void;
+  private onResumeGame?: () => void;
 
   constructor(container: HTMLElement) {
     this.overlayElement = document.createElement('div');
@@ -130,13 +140,21 @@ export class GameInfoModal {
   private setupListeners(): void {
     const closeBtn = this.modalBox.querySelector('#btn-close-info');
     const confirmBtn = this.modalBox.querySelector('#btn-confirm-info');
-    closeBtn?.addEventListener('click', () => this.hide());
-    confirmBtn?.addEventListener('click', () => this.hide());
 
-    // Click outside modal
+    // Przycisk X (zamknięcie): jeśli otwarte z ustawień -> wracamy do ustawień, w przeciwnym razie powrót do gry
+    closeBtn?.addEventListener('click', () => {
+      this.handleClose();
+    });
+
+    // Przycisk "Powrót do gry": ZAWSZE całkowicie zamyka wszystkie okna i wraca bezpośrednio do gry!
+    confirmBtn?.addEventListener('click', () => {
+      this.handleConfirmResume();
+    });
+
+    // Kliknięcie w tło poza kartą (backdrop)
     this.overlayElement.addEventListener('click', (e) => {
       if (e.target === this.overlayElement) {
-        this.hide();
+        this.handleClose();
       }
     });
 
@@ -156,18 +174,58 @@ export class GameInfoModal {
       });
     });
 
-    // ESC key closes
+    // Klawisz ESC zamyka modal
     window.addEventListener('keydown', (e) => {
-      if (this.isOpen && (e.code === 'Escape' || e.key === 'Escape' || e.code === 'KeyE')) {
+      if (this.isOpen && (e.code === 'Escape' || e.key === 'Escape')) {
         e.preventDefault();
-        this.hide();
+        this.handleEscape();
       }
     });
   }
 
-  public show(tabName?: string, onClose?: () => void): void {
+  public handleClose(): void {
+    if (!this.isOpen) return;
+    if (this.isFromSettings && this.onBackToSettings) {
+      const back = this.onBackToSettings;
+      this.hide();
+      back();
+    } else {
+      const resume = this.onResumeGame;
+      this.hide();
+      resume?.();
+    }
+  }
+
+  public handleConfirmResume(): void {
+    if (!this.isOpen) return;
+    const resume = this.onResumeGame;
+    this.hide();
+    resume?.();
+  }
+
+  public handleEscape(): void {
+    this.handleClose();
+  }
+
+  public show(tabName?: string, opts?: GameInfoModalOptions | (() => void)): void {
     this.isOpen = true;
-    this.onCloseCallback = onClose;
+    if (typeof opts === 'function') {
+      this.onCloseCallback = opts;
+      this.isFromSettings = false;
+      this.onBackToSettings = undefined;
+      this.onResumeGame = opts;
+    } else if (opts) {
+      this.isFromSettings = Boolean(opts.fromSettings);
+      this.onBackToSettings = opts.onBackToSettings;
+      this.onResumeGame = opts.onResumeGame;
+      this.onCloseCallback = opts.onClose;
+    } else {
+      this.isFromSettings = false;
+      this.onBackToSettings = undefined;
+      this.onResumeGame = undefined;
+      this.onCloseCallback = undefined;
+    }
+
     this.overlayElement.classList.remove('hidden');
 
     if (tabName) {
@@ -180,8 +238,9 @@ export class GameInfoModal {
     this.isOpen = false;
     this.overlayElement.classList.add('hidden');
     if (this.onCloseCallback) {
-      this.onCloseCallback();
+      const cb = this.onCloseCallback;
       this.onCloseCallback = undefined;
+      cb();
     }
   }
 }

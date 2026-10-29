@@ -18,6 +18,7 @@ export type TileType =
   | 'BOSS';
 export class MaskParser {
   private static imageCache: Map<string, HTMLImageElement> = new Map();
+  private static pendingPromises: Map<string, Promise<HTMLImageElement>> = new Map();
 
   /**
    * Helper to load an HTMLImageElement asynchronously with generous timeout and in-memory caching.
@@ -28,22 +29,33 @@ export class MaskParser {
       return cached;
     }
 
-    return new Promise((resolve, reject) => {
+    const pending = this.pendingPromises.get(url);
+    if (pending) {
+      return pending;
+    }
+
+    const loadPromise = new Promise<HTMLImageElement>((resolve, reject) => {
       const img = new Image();
       const timer = setTimeout(() => {
+        MaskParser.pendingPromises.delete(url);
         reject(new Error(`Timeout loading image: ${url}`));
       }, 20000);
       img.onload = () => {
         clearTimeout(timer);
+        MaskParser.pendingPromises.delete(url);
         MaskParser.imageCache.set(url, img);
         resolve(img);
       };
       img.onerror = () => {
         clearTimeout(timer);
+        MaskParser.pendingPromises.delete(url);
         reject(new Error(`Failed to load image from: ${url}`));
       };
       img.src = url;
     });
+
+    this.pendingPromises.set(url, loadPromise);
+    return loadPromise;
   }
 
   /**

@@ -137,6 +137,12 @@ async function bootstrap() {
   updateFsIcon(isFullscreenActive());
   updateAudioIcon(sound.isMuted);
 
+  // Synchronizacja ikony dźwięku z ustawieniami i wszelkimi zmianami wyciszenia
+  sound.onMuteChange((isMuted) => {
+    updateAudioIcon(isMuted);
+    engine.pauseModal.updateSoundLabel(isMuted);
+  });
+
   // Fullscreen controls
   const toggleFs = async () => {
     await toggleGameFullscreen('landscape');
@@ -171,14 +177,26 @@ async function bootstrap() {
 
   // Audio mute toggle
   audioBtn?.addEventListener('click', () => {
-    const isMuted = sound.toggleMute();
-    updateAudioIcon(isMuted);
-    engine.pauseModal.updateSoundLabel(isMuted);
+    sound.toggleMute();
   });
 
-  // Help & Info modal
+  // Help & Info modal (czyste przejście z obsługą powrotu do gry)
   helpBtn?.addEventListener('click', () => {
-    engine.infoModal.show();
+    const fromStart = engine.startMenu.isOpen;
+    if (!fromStart) {
+      engine.isPaused = true;
+      engine.dialog.isPaused = true;
+    }
+    engine.infoModal.show('tab-lore', {
+      fromSettings: false,
+      onResumeGame: () => {
+        if (!fromStart) {
+          engine.isPaused = false;
+          engine.dialog.isPaused = false;
+          engine.updateSoundControlVisibility();
+        }
+      },
+    });
   });
 
   // World switching (dev button)

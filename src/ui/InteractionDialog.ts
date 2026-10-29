@@ -19,6 +19,61 @@ export interface QuizInteractionData {
 }
 
 export class InteractionDialog {
+  public static readonly avatarCache: Map<string, HTMLImageElement> = new Map();
+  private static preloadingPromise: Promise<void> | null = null;
+
+  public static readonly ALL_AVATARS: string[] = [
+    '/assets/avatars/admin.png',
+    '/assets/avatars/boss1.png',
+    '/assets/avatars/boss2.png',
+    '/assets/avatars/boss3.png',
+    '/assets/avatars/boss4.png',
+    '/assets/avatars/boss5.png',
+    '/assets/avatars/chatbot.png',
+    '/assets/avatars/fałszywy_naprawiacz.png',
+    '/assets/avatars/influencerka.png',
+    '/assets/avatars/kolega.png',
+    '/assets/avatars/kurier.png',
+    '/assets/avatars/mail.png',
+    '/assets/avatars/medrzec.png',
+    '/assets/avatars/player.png',
+    '/assets/avatars/player1.png',
+    '/assets/avatars/player2.png',
+    '/assets/avatars/player3.png',
+    '/assets/avatars/player4.png',
+    '/assets/avatars/player5.png',
+    '/assets/avatars/znajomy.png',
+    '/assets/avatars/znajomy_2.png',
+  ];
+
+  public static preloadAllAvatars(): Promise<void> {
+    if (this.preloadingPromise) return this.preloadingPromise;
+    this.preloadingPromise = Promise.all(
+      this.ALL_AVATARS.map((url) => {
+        return new Promise<void>((resolve) => {
+          if (this.avatarCache.has(url)) {
+            resolve();
+            return;
+          }
+          const img = new Image();
+          img.onload = () => {
+            this.avatarCache.set(url, img);
+            if (img.decode) {
+              img.decode().then(resolve).catch(resolve);
+            } else {
+              resolve();
+            }
+          };
+          img.onerror = () => {
+            resolve();
+          };
+          img.src = url;
+        });
+      })
+    ).then(() => {});
+    return this.preloadingPromise;
+  }
+
   public isOpen: boolean = false;
   public isPaused: boolean = false;
   public get isChoicesVisible(): boolean {
@@ -338,16 +393,40 @@ export class InteractionDialog {
     this.overlayElement.classList.remove('hidden');
   }
 
+  private resolveAvatarUrl(src: string, _fallbackSrc?: string): string {
+    const s = src.trim();
+    if (InteractionDialog.avatarCache.has(s)) return s;
+
+    const lower = s.toLowerCase();
+    if (lower.includes('aplikacja')) return '/assets/avatars/chatbot.png';
+    if (lower.includes('vpn')) return '/assets/avatars/admin.png';
+    if (lower.includes('system_restart')) return '/assets/avatars/fałszywy_naprawiacz.png';
+    if (lower.includes('fa%c5%82szywy_naprawiacz') || lower.includes('falszywy_naprawiacz') || lower.includes('fałszywy_naprawiacz')) {
+      return '/assets/avatars/fałszywy_naprawiacz.png';
+    }
+    if (lower.includes('znajomy_2')) return '/assets/avatars/znajomy_2.png';
+
+    return s;
+  }
+
   /**
    * Helper to safely set avatar source and prevent flashing previous avatar image.
+   * Leverages preloaded avatarCache so avatars display instantly with zero pop-in.
    */
   private setAvatarSrc(src: string, fallbackSrc?: string): void {
-    if (this.avatarImg.getAttribute('src') === src && this.avatarImg.complete && this.avatarImg.naturalWidth > 0) {
+    const targetSrc = this.resolveAvatarUrl(src, fallbackSrc);
+
+    if (this.avatarImg.getAttribute('src') === targetSrc && this.avatarImg.complete && this.avatarImg.naturalWidth > 0) {
       this.avatarImg.style.visibility = 'visible';
       return;
     }
 
-    this.avatarImg.style.visibility = 'hidden';
+    const cached = InteractionDialog.avatarCache.get(targetSrc);
+    if (cached && cached.complete && cached.naturalWidth > 0) {
+      this.avatarImg.src = targetSrc;
+      this.avatarImg.style.visibility = 'visible';
+      return;
+    }
 
     this.avatarImg.onload = () => {
       this.avatarImg.onload = null;
@@ -358,23 +437,14 @@ export class InteractionDialog {
     this.avatarImg.onerror = () => {
       this.avatarImg.onload = null;
       this.avatarImg.onerror = null;
-      if (fallbackSrc && this.avatarImg.getAttribute('src') !== fallbackSrc) {
-        this.avatarImg.src = fallbackSrc;
-        if (this.avatarImg.complete && this.avatarImg.naturalWidth > 0) {
-          this.avatarImg.style.visibility = 'visible';
-        } else {
-          this.avatarImg.onload = () => {
-            this.avatarImg.onload = null;
-            this.avatarImg.onerror = null;
-            this.avatarImg.style.visibility = 'visible';
-          };
-        }
-      } else {
-        this.avatarImg.style.visibility = 'visible';
+      const fb = fallbackSrc ? this.resolveAvatarUrl(fallbackSrc) : `/assets/avatars/player${this.playerEvoLevel}.png`;
+      if (this.avatarImg.getAttribute('src') !== fb) {
+        this.avatarImg.src = fb;
       }
+      this.avatarImg.style.visibility = 'visible';
     };
 
-    this.avatarImg.src = src;
+    this.avatarImg.src = targetSrc;
 
     if (this.avatarImg.complete && this.avatarImg.naturalWidth > 0) {
       this.avatarImg.onload = null;
@@ -388,8 +458,6 @@ export class InteractionDialog {
    */
   public startWorldIntro(title: string, text: string, wn: number = 1, onComplete?: () => void): void {
     this.resetDeathMenu();
-    this.containerElement.style.display = '';
-    this.overlayElement.style.display = '';
     this.mode = 'conversation';
     this.titleElement.textContent = `${title} - Wstęp`;
     this.speakerElement.textContent = '';
@@ -418,6 +486,8 @@ export class InteractionDialog {
 
     this.isOpen = true;
     this.hideChoices();
+    this.containerElement.style.display = '';
+    this.overlayElement.style.display = '';
     this.overlayElement.classList.remove('hidden');
 
     this.startTypewriter(text);
@@ -428,8 +498,6 @@ export class InteractionDialog {
    */
   public startBossIntro(bossName: string, introText: string, wn: number, onComplete?: () => void, stageTitle?: string): void {
     this.resetDeathMenu();
-    this.containerElement.style.display = '';
-    this.overlayElement.style.display = '';
     this.mode = 'conversation';
     this.titleElement.textContent = stageTitle ? `${bossName} - ${stageTitle}` : `${bossName} - Wstęp`;
     this.speakerElement.textContent = `${bossName}:`;
@@ -451,6 +519,8 @@ export class InteractionDialog {
 
     this.isOpen = true;
     this.hideChoices();
+    this.containerElement.style.display = '';
+    this.overlayElement.style.display = '';
     this.overlayElement.classList.remove('hidden');
 
     this.startTypewriter(introText);

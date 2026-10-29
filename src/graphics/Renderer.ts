@@ -156,10 +156,9 @@ export class Renderer {
       ctx.restore();
     }
 
-    // 11. Screen Wipe Transition (snappy smooth curtain)
+    // 11. Screen Wipe Transition (0.55s, 1:1 with Python wipe_out_down / wipe_in_down)
     if (transitionState !== 'none' && transitionProgress > 0) {
-      const rawP = Math.max(0, Math.min(1, transitionProgress));
-      const p = rawP * rawP * (3 - 2 * rawP);
+      const p = Math.max(0, Math.min(1, transitionProgress));
       const head = Math.round(p * CONFIG.LOGICAL_HEIGHT);
       ctx.save();
       if (transitionState === 'wipe_out') {
