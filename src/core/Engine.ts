@@ -75,7 +75,7 @@ export class Engine {
   // Screen wipe transition state (1:1 with Python wipe_out_down / wipe_in_down)
   private transitionState: 'wipe_out' | 'wipe_in' | 'none' = 'none';
   private transitionTimer: number = 0;
-  private readonly transitionDuration: number = 0.60;
+  private readonly transitionDuration: number = 0.28;
   private pendingWorldSwitch: string | null = null;
 
   constructor(canvas: HTMLCanvasElement, uiContainer: HTMLElement) {
@@ -637,39 +637,41 @@ export class Engine {
   }
 
   private async loadPortalsForLevel(lvl: Level, worldKey: string): Promise<void> {
-    for (const p of lvl.portals) {
-      let folder = '/assets/worlds/lobby/portal';
-      const tgt = p.targetWorld;
+    await Promise.all(
+      lvl.portals.map(async (p) => {
+        let folder = '/assets/worlds/lobby/portal';
+        const tgt = p.targetWorld;
 
-      if (tgt === 'lobby') {
-        // Exit portal leading back to Lobby: ALWAYS uses Lobby's dedicated cyan vortex sprite!
-        folder = '/assets/worlds/lobby/portal';
-      } else if (tgt === 'ending') {
-        folder = '/assets/ending/portal';
-      } else if (tgt === 'dynamic_world' || worldKey === 'lobby') {
-        const maxCompleted = this.completedWorlds.size > 0 ? Math.max(...Array.from(this.completedWorlds)) : 0;
-        const targetWn = Math.min(5, Math.max(this.player.skinId, maxCompleted + 1));
-        folder = `/assets/worlds/${targetWn}/portal`;
-      } else if (tgt.startsWith('world')) {
-        const wnStr = tgt.replace('world', '').replace('_arena', '');
-        folder = `/assets/worlds/${wnStr}/portal`;
-      } else if (worldKey.startsWith('world')) {
-        const wnStr = worldKey.replace('world', '').replace('_arena', '');
-        folder = `/assets/worlds/${wnStr}/portal`;
-      }
+        if (tgt === 'lobby') {
+          // Exit portal leading back to Lobby: ALWAYS uses Lobby's dedicated cyan vortex sprite!
+          folder = '/assets/worlds/lobby/portal';
+        } else if (tgt === 'ending') {
+          folder = '/assets/ending/portal';
+        } else if (tgt === 'dynamic_world' || worldKey === 'lobby') {
+          const maxCompleted = this.completedWorlds.size > 0 ? Math.max(...Array.from(this.completedWorlds)) : 0;
+          const targetWn = Math.min(5, Math.max(this.player.skinId, maxCompleted + 1));
+          folder = `/assets/worlds/${targetWn}/portal`;
+        } else if (tgt.startsWith('world')) {
+          const wnStr = tgt.replace('world', '').replace('_arena', '');
+          folder = `/assets/worlds/${wnStr}/portal`;
+        } else if (worldKey.startsWith('world')) {
+          const wnStr = worldKey.replace('world', '').replace('_arena', '');
+          folder = `/assets/worlds/${wnStr}/portal`;
+        }
 
-      try {
-        const [f1, f2] = await Promise.all([
-          MaskParser.loadImage(`${folder}/frame1.png`),
-          MaskParser.loadImage(`${folder}/frame2.png`),
-        ]);
-        p.frames = [f1, f2];
-        p.frameIndex = 0;
-        p.animTimer = 0;
-      } catch (err) {
-        console.warn(`Failed to load portal frames from ${folder}:`, err);
-      }
-    }
+        try {
+          const [f1, f2] = await Promise.all([
+            MaskParser.loadImage(`${folder}/frame1.png`),
+            MaskParser.loadImage(`${folder}/frame2.png`),
+          ]);
+          p.frames = [f1, f2];
+          p.frameIndex = 0;
+          p.animTimer = 0;
+        } catch (err) {
+          console.warn(`Failed to load portal frames from ${folder}:`, err);
+        }
+      })
+    );
   }
 
   private async loadNpcsForLevel(lvl: Level, wn: number): Promise<void> {
@@ -678,30 +680,66 @@ export class Engine {
       const maskImg = await MaskParser.loadImage(npcMaskUrl);
       const spawns = MaskParser.parseNpcSpawns(maskImg);
 
-      for (const sp of spawns) {
-        const npcFolder = `/assets/worlds/${wn}/npc/npc${sp.id}`;
-        let frames: [HTMLImageElement, HTMLImageElement] | null = null;
-        try {
-          const [f1, f2] = await Promise.all([
-            MaskParser.loadImage(`${npcFolder}/npc1.png`),
-            MaskParser.loadImage(`${npcFolder}/npc2.png`),
-          ]);
-          frames = [f1, f2];
-        } catch {
-          // Fallback
-        }
+      await Promise.all(
+        spawns.map(async (sp) => {
+          const npcFolder = `/assets/worlds/${wn}/npc/npc${sp.id}`;
+          let frames: [HTMLImageElement, HTMLImageElement] | null = null;
+          try {
+            const [f1, f2] = await Promise.all([
+              MaskParser.loadImage(`${npcFolder}/npc1.png`),
+              MaskParser.loadImage(`${npcFolder}/npc2.png`),
+            ]);
+            frames = [f1, f2];
+          } catch {
+            // Fallback
+          }
 
-        lvl.npcs.push({
-          id: sp.id,
-          bounds: sp.bounds,
-          frames,
-          frameIndex: 0,
-          animTimer: 0,
-        });
-      }
+          lvl.npcs.push({
+            id: sp.id,
+            bounds: sp.bounds,
+            frames,
+            frameIndex: 0,
+            animTimer: 0,
+          });
+        })
+      );
     } catch {
       // NPC mask may not exist
     }
+  }
+
+  private async preloadWorldAssets(worldKey: string): Promise<void> {
+    if (worldKey === 'ending') return;
+    const arenaMatch = worldKey.match(/^(?:world)?([1-5])_arena$/);
+    const worldMatch = worldKey.match(/^(?:world)?([1-5])$/);
+
+    const promises: Promise<unknown>[] = [];
+
+    if (arenaMatch) {
+      const wn = parseInt(arenaMatch[1], 10);
+      promises.push(MaskParser.loadImage(`/assets/worlds/${wn}/arena/map_mask.png`).catch(() => null));
+      promises.push(MaskParser.loadImage(`/assets/worlds/${wn}/arena/bg.png`).catch(() => null));
+      promises.push(Bossfight.preloadBoss(wn).catch(() => {}));
+    } else if (worldMatch) {
+      const wn = parseInt(worldMatch[1], 10);
+      promises.push(MaskParser.loadImage(`/assets/worlds/${wn}/map/map_mask.png`).catch(() => null));
+      promises.push(MaskParser.loadImage(`/assets/worlds/${wn}/map/bg.png`).catch(() => null));
+      promises.push(InteractionParser.loadFromFile(`/assets/worlds/${wn}/interactions.txt`).catch(() => []));
+      promises.push(MaskParser.loadImage(`/assets/worlds/${wn}/npc/npc_mask.png`).catch(() => null));
+      promises.push(MaskParser.loadImage(`/assets/worlds/${wn}/portal/frame1.png`).catch(() => null));
+      promises.push(MaskParser.loadImage(`/assets/worlds/${wn}/portal/frame2.png`).catch(() => null));
+      promises.push(MaskParser.loadImage('/assets/worlds/lobby/portal/frame1.png').catch(() => null));
+      promises.push(MaskParser.loadImage('/assets/worlds/lobby/portal/frame2.png').catch(() => null));
+    } else if (worldKey === 'lobby') {
+      const isLobbyEmpty = this.completedWorlds.has(4) || this.player.skinId >= 5;
+      const bgPath = isLobbyEmpty ? '/assets/worlds/lobby/bg_empty.png' : '/assets/worlds/lobby/bg.png';
+      promises.push(MaskParser.loadImage('/assets/worlds/lobby/map_mask.png').catch(() => null));
+      promises.push(MaskParser.loadImage(bgPath).catch(() => null));
+      promises.push(MaskParser.loadImage('/assets/worlds/lobby/portal/frame1.png').catch(() => null));
+      promises.push(MaskParser.loadImage('/assets/worlds/lobby/portal/frame2.png').catch(() => null));
+    }
+
+    await Promise.all(promises);
   }
 
   private async playGameIntroDialog(): Promise<void> {
@@ -1093,6 +1131,7 @@ export class Engine {
     this.transitionState = 'wipe_out';
     this.transitionTimer = 0;
     this.pendingWorldSwitch = targetWorld;
+    this.preloadWorldAssets(targetWorld).catch(() => {});
   }
 
   private checkHintsAndInteractions(interactPressed: boolean): void {

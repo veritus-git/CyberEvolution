@@ -106,19 +106,33 @@ export function showPwaModal(title: string, messageHtml: string): void {
     modal.className = 'pwa-modal-overlay';
     modal.innerHTML = `
       <div class="pwa-modal-card">
-        <h3 id="pwa-modal-title" class="pwa-modal-title"></h3>
+        <div class="pwa-modal-header">
+          <h3 id="pwa-modal-title" class="pwa-modal-title"></h3>
+          <button id="pwa-modal-close-x" class="pwa-modal-close-x" title="Zamknij (ESC)">&times;</button>
+        </div>
         <div id="pwa-modal-body" class="pwa-modal-body"></div>
-        <button id="pwa-modal-close" class="pwa-modal-btn">Rozumiem</button>
+        <div class="pwa-modal-footer">
+          <button id="pwa-modal-close" class="pwa-modal-btn">Rozumiem</button>
+        </div>
       </div>
     `;
     document.body.appendChild(modal);
 
-    const closeBtn = modal.querySelector('#pwa-modal-close');
-    closeBtn?.addEventListener('click', () => {
+    const closeAction = () => {
       modal?.classList.add('hidden');
-    });
+    };
+
+    modal.querySelector('#pwa-modal-close')?.addEventListener('click', closeAction);
+    modal.querySelector('#pwa-modal-close-x')?.addEventListener('click', closeAction);
+
     modal.addEventListener('click', (e) => {
-      if (e.target === modal) modal?.classList.add('hidden');
+      if (e.target === modal) closeAction();
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Escape' && !modal?.classList.contains('hidden')) {
+        closeAction();
+      }
     });
   }
 

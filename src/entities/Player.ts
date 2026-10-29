@@ -316,22 +316,12 @@ export class Player {
       ctx.restore();
     }
 
-    // 2. Draw "Evolution UP!" text and green aura above player (1:1 with Python prototype)
+    // 2. Draw "Evolution UP!" text above player
     if (this.evoMsgTimer > 0) {
       ctx.save();
       const pCenterX = Math.round(this.physics.bounds.centerX - cameraX);
       const floatUp = (2.0 - this.evoMsgTimer) * 18; // gentle float upward
       const textY = Math.round(this.physics.y - cameraY - 24 - floatUp);
-
-      // Expanding green pulse aura ring
-      const auraProgress = (2.0 - this.evoMsgTimer) % 0.8;
-      const auraRadius = 35 + auraProgress * 70;
-      const auraAlpha = Math.max(0, 1.0 - auraProgress / 0.8) * 0.7;
-      ctx.beginPath();
-      ctx.arc(pCenterX, Math.round(this.physics.bounds.centerY - cameraY), auraRadius, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(0, 255, 102, ${auraAlpha})`;
-      ctx.lineWidth = 3;
-      ctx.stroke();
 
       // "Evolution UP!" text
       const evoText = 'Evolution UP!';

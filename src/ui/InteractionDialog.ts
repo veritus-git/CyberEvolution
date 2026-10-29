@@ -145,6 +145,11 @@ export class InteractionDialog {
     this.deathMenuOverlay.className = 'death-menu-overlay hidden';
     this.deathMenuOverlay.style.display = 'none';
 
+    const deathVhsIndicator = document.createElement('div');
+    deathVhsIndicator.className = 'vhs-death-indicator';
+    deathVhsIndicator.textContent = 'SYGNAŁ PRZERWANY ⚠️';
+    this.deathMenuOverlay.appendChild(deathVhsIndicator);
+
     this.deathMenuElement = document.createElement('div');
     this.deathMenuElement.className = 'death-menu-panel';
 
