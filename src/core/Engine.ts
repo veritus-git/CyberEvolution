@@ -251,8 +251,9 @@ export class Engine {
         this.startMenu.hide();
         this.renderer.suppressLetterbox = true;
 
-        this.introSequence.playPreIntro(() => {
-          this.loadWorld('lobby', true);
+        this.introSequence.playPreIntro(async () => {
+          await this.loadWorld('lobby', true);
+          this.introSequence.hide();
         });
       } else if (action === 'continue') {
         const save = this.loadGameProgress();
@@ -865,7 +866,7 @@ export class Engine {
     this.player.physics.onGround = true;
   }
 
-  private returnToStartMenuAfterEnding(): void {
+  private async returnToStartMenuAfterEnding(): Promise<void> {
     this.isPaused = false;
     this.bossfight.cleanup();
     this.dialog.close();
@@ -873,9 +874,9 @@ export class Engine {
     this.completedWorlds.add(5);
     this.saveGameProgress();
     this.renderer.suppressLetterbox = true;
-    this.loadWorld('lobby', false).then(() => {
-      this.startMenu.show();
-    });
+    await this.loadWorld('lobby', false);
+    this.startMenu.show();
+    this.introSequence.hide();
   }
 
   public start(): void {
@@ -1081,8 +1082,9 @@ export class Engine {
     // When dialog is open OR during active bossfight OR during lobby drop-in OR respawn/evo blinking, controls are locked!
     // (1:1 with Python prototype: cannot move, cannot jump while fighting boss, respawning or evolving)
     const rawInput = this.input.getMovementInput();
+    const isBossDying = this.bossfight.bossDefeated && this.bossfight.bossDeathTimer > 0;
     const isControlLocked = this.dialog.isOpen ||
-      (this.bossfight.active && !this.bossfight.bossDefeated) ||
+      (this.bossfight.active && (!this.bossfight.bossDefeated || isBossDying)) ||
       this.lobbyDropinActive ||
       this.player.physics.respawnState === 'blinking' ||
       this.player.evoBlinkActive;
@@ -1118,7 +1120,7 @@ export class Engine {
       !this.dialog.isOpen &&
       !this.arenaIntroActive &&
       this.transitionState === 'none' &&
-      (!this.bossfight.active || this.bossfight.bossDefeated) &&
+      (!this.bossfight.active || (this.bossfight.bossDefeated && !isBossDying)) &&
       !this.lobbyDropinActive;
 
     this.joystick.setVisible(shouldShowTouch);
@@ -1176,7 +1178,7 @@ export class Engine {
         const isLobby = portal.targetWorld === 'lobby';
         const isEnding = portal.targetWorld === 'ending';
         if (isEnding) {
-          this.activeHint = 'E: wróć do rzeczywistości';
+          this.activeHint = 'WRÓĆ DO RZECZYWISTOŚCI';
         } else if (isLobby) {
           this.activeHint = 'E: powrót do lobby';
         } else if (isArena) {

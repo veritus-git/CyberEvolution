@@ -1,5 +1,33 @@
 import { sound } from '../core/Audio';
 
+const DEFAULT_PRE_INTRO = `Witaj w CyberEvolution.
+
+Przed Tobą podróż przez światy świadomości cyfrowej.
+Ucz się, sprawdzaj fakty i nie klikaj bezmyślnie.
+Twoje decyzje zadecydują o ewolucji!`;
+
+const DEFAULT_ENDING_STORY = `Nagle otwierasz oczy z głośnym wdechem.
+Siedzisz na łóżku w swoim pokoju, a wokół panuje kojąca cisza.
+W dłoni czujesz ciepło smartfona.
+---
+Na ekranie nadal wisi to samo wideo ze zmanipulowaną miniaturą twojej twarzy:
+„PATRZCIE CO ON ODVALIŁ! 😂 Zgłoś usunięcie tutaj: [link]”
+---
+Kciuk zawisa nad ekranem, ale... ręka już ci się nie trzęsie.
+Wstyd i panika zniknęły bez śladu.
+Patrzysz chłodnym okiem: nienaturalne rozmycie wokół ust zdradza deepfake AI,
+a konto powstało wczoraj i służy wyłącznie do wyłudzania danych.
+---
+Zamiast w histerii klikać w podejrzany link:
+Robisz zrzut ekranu, zgłaszasz platformie zmanipulowaną treść i blokujesz profil.
+Wiesz, że prawda i prawo stoją po twojej stronie.
+---
+Nauki Mędrca nie poszły na marne.
+Odkładasz telefon na szafkę nocną i spokojnie gasisz lampkę.
+Twoja CyberEwolucja dobiegła końca - myślisz krytycznie i potrafisz obronić się w necie.
+---
+KONIEC`;
+
 export class IntroSequence {
   public isActive: boolean = false;
 
@@ -20,6 +48,9 @@ export class IntroSequence {
   private sequenceType: 'preIntro' | 'ending' = 'preIntro';
   private onFinishedCallback?: () => void;
 
+  private cachedPreIntroText: string = DEFAULT_PRE_INTRO;
+  private cachedEndingText: string = DEFAULT_ENDING_STORY;
+
   constructor(container: HTMLElement) {
     this.overlayElement = document.createElement('div');
     this.overlayElement.className = 'intro-overlay hidden';
@@ -38,6 +69,9 @@ export class IntroSequence {
     this.overlayElement.appendChild(this.contentBox);
     container.appendChild(this.overlayElement);
 
+    // Preload intro and ending story files in background so they are ready synchronously
+    this.preloadStories();
+
     // Click / touch to advance
     this.overlayElement.addEventListener('click', (e) => {
       if (!this.isActive) return;
@@ -55,24 +89,35 @@ export class IntroSequence {
     });
   }
 
-  public async playPreIntro(onFinished: () => void): Promise<void> {
+  public async preloadStories(): Promise<void> {
+    try {
+      const resIntro = await fetch(`/assets/game_intro.txt?t=${Date.now()}`);
+      if (resIntro.ok) {
+        this.cachedPreIntroText = await resIntro.text();
+      }
+    } catch {}
+
+    try {
+      const resEnding = await fetch(`/assets/ending/ending_story.txt?t=${Date.now()}`);
+      if (resEnding.ok) {
+        this.cachedEndingText = await resEnding.text();
+      }
+    } catch {}
+  }
+
+  public playPreIntro(onFinished: () => void): void {
+    if (this.animFrame) {
+      cancelAnimationFrame(this.animFrame);
+      this.animFrame = null;
+    }
     this.sequenceType = 'preIntro';
     this.onFinishedCallback = onFinished;
     this.isActive = true;
+    this.textElement.textContent = '';
+    this.hintElement.textContent = '';
     this.overlayElement.classList.remove('hidden');
 
-    let text = 'Witaj w CyberEvolution.\n\nPrzed Tobą podróż przez światy świadomości cyfrowej.\nUcz się, sprawdzaj fakty i nie klikaj bezmyślnie.\nTwoje decyzje zadecydują o ewolucji!';
-    try {
-      const res = await fetch(`/assets/game_intro.txt?t=${Date.now()}`, { cache: 'no-store' });
-      if (res.ok) {
-        text = await res.text();
-      }
-    } catch {
-      // Use fallback
-    }
-
-    // Split text into slides separated by '---' (1:1 with Python prototype _split_pages)
-    const normalized = text.replace(/\\n/g, '\n');
+    const normalized = this.cachedPreIntroText.replace(/\\n/g, '\n');
     this.pages = normalized
       .split(/\n?\s*---+\s*\n?/)
       .map((p) => p.trim())
@@ -86,25 +131,19 @@ export class IntroSequence {
     this.showPage(0);
   }
 
-  public async playEnding(onFinished: () => void): Promise<void> {
+  public playEnding(onFinished: () => void): void {
+    if (this.animFrame) {
+      cancelAnimationFrame(this.animFrame);
+      this.animFrame = null;
+    }
     this.sequenceType = 'ending';
     this.onFinishedCallback = onFinished;
     this.isActive = true;
+    this.textElement.textContent = '';
+    this.hintElement.textContent = '';
     this.overlayElement.classList.remove('hidden');
 
-    let text =
-      'Nagle ocknąłęś się jak ze snu, siedząc przed komputerem\nJasna strona poczty na ekranie oświetla Ci twarz\n---\nTwój kursor znajduje sie na podejrzanym linku, ale...\nZamiast w niego kliknąć, przenosisz mail do kosza\n---\nNauki Mędrca czegoś cię naczyły\nIdź w świat z tą świadomością w głowie\n---\nKONIEC';
-
-    try {
-      const res = await fetch(`/assets/ending/ending_story.txt?t=${Date.now()}`, { cache: 'no-store' });
-      if (res.ok) {
-        text = await res.text();
-      }
-    } catch {
-      // Use fallback
-    }
-
-    const normalized = text.replace(/\\n/g, '\n');
+    const normalized = this.cachedEndingText.replace(/\\n/g, '\n');
     this.pages = normalized
       .split(/\n?\s*---+\s*\n?/)
       .map((p) => p.trim())
@@ -116,6 +155,17 @@ export class IntroSequence {
 
     this.currentPageIndex = 0;
     this.showPage(0);
+  }
+
+  public hide(): void {
+    if (this.animFrame) {
+      cancelAnimationFrame(this.animFrame);
+      this.animFrame = null;
+    }
+    this.isActive = false;
+    this.overlayElement.classList.add('hidden');
+    this.textElement.textContent = '';
+    this.hintElement.textContent = '';
   }
 
   private showPage(index: number): void {
@@ -205,15 +255,12 @@ export class IntroSequence {
     }
 
     // Completed all slides
-    this.isActive = false;
-    this.overlayElement.classList.add('hidden');
     if (this.onFinishedCallback) {
       const cb = this.onFinishedCallback;
       this.onFinishedCallback = undefined;
-      // Slight delay to prevent immediate keydown bleed-through to Start Menu buttons
-      setTimeout(() => {
-        cb();
-      }, 150);
+      cb();
+    } else {
+      this.hide();
     }
   }
 }
