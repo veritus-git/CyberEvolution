@@ -1191,10 +1191,11 @@ export class Engine {
     const playerBounds = this.player.bounds;
     const isGrounded = this.player.physics.onGround;
 
-    // 1. Ladder hint (when overlapping ladder and not already climbing)
+    // 1. Ladder hint (only when overlapping ladder, not already climbing, and standing/rising/still — never while falling!)
+    const isNotFalling = this.player.physics.onGround || this.player.physics.vy <= 0;
     const ladder = this.level.ladders.find((lad) => lad.bounds.intersects(playerBounds));
-    if (ladder && !this.player.physics.isClimbing && this.player.physics.climbStepout <= 0) {
-      this.activeHint = 'E: wejdź na górę';
+    if (ladder && !this.player.physics.isClimbing && this.player.physics.climbStepout <= 0 && isNotFalling) {
+      this.activeHint = 'E: wspinaj się';
     }
 
     // 2. Arena entrance zones (World -> Bossfight Arena, 1:1 with Python prototype)

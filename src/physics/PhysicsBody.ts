@@ -108,14 +108,15 @@ export class PhysicsBody {
       this.currentLadder = touchingLadder;
       this.climbRect = touchingLadder.bounds;
 
-      // Mount ladder if pressing UP (W), DOWN (S), or Interact (E)
-      const wantsMount = input.moveY < -0.1 || (input.moveY > 0.1 && !this.onGround) || input.interactPressed;
-      if (!this.isClimbing && wantsMount) {
+      // Mount ladder ONLY via Interact button (E / touch action button)
+      // Allowed ONLY when standing on ground, moving up, or still in air — NEVER while falling down (vy > 0)!
+      const isNotFalling = this.onGround || this.vy <= 0;
+      if (!this.isClimbing && isNotFalling && input.interactPressed) {
         this.isClimbing = true;
-        this.autoClimbing = input.interactPressed || input.moveY < -0.1;
+        this.autoClimbing = true;
         this.x = touchingLadder.bounds.centerX - this.width / 2;
         this.vx = 0;
-        this.vy = this.autoClimbing ? -CONFIG.CLIMB_SPEED : 0;
+        this.vy = -CONFIG.CLIMB_SPEED;
         this.onGround = false;
         this.climbStepout = 0;
       }
