@@ -103,8 +103,9 @@ export class PhysicsBody {
       this.currentLadder = touchingLadder;
       this.ladderHoverTime += dt;
 
-      // Start climbing if hovering on ladder and pressed interact (E / tap action)
-      if (!this.isClimbing && this.climbStepout <= 0 && input.interactPressed && this.ladderHoverTime >= CONFIG.LADDER_INTERACT_DELAY) {
+      // Start climbing if hovering on ladder, not falling down, and pressed interact (E / tap action)
+      const isNotFalling = this.onGround || this.vy <= 0;
+      if (!this.isClimbing && this.climbStepout <= 0 && isNotFalling && input.interactPressed && this.ladderHoverTime >= CONFIG.LADDER_INTERACT_DELAY) {
         this.climbRect = touchingLadder.bounds;
         this.climbTargetY = this.climbRect.top - this.height;
         this.climbSideDir = (this.bounds.centerX < this.climbRect.centerX) ? 1 : -1;

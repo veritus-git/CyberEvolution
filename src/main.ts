@@ -130,10 +130,14 @@ async function bootstrap() {
     }
   };
 
-  // Sync initial state
-  document.addEventListener('fullscreenchange', () => {
+  // Sync fullscreen state across all standard and vendor prefixed events
+  const syncFsState = () => {
     updateFsIcon(isFullscreenActive());
-  });
+  };
+  document.addEventListener('fullscreenchange', syncFsState);
+  document.addEventListener('webkitfullscreenchange', syncFsState);
+  document.addEventListener('mozfullscreenchange', syncFsState);
+  document.addEventListener('MSFullscreenChange', syncFsState);
   updateFsIcon(isFullscreenActive());
   updateAudioIcon(sound.isMuted);
 
@@ -143,15 +147,29 @@ async function bootstrap() {
     engine.pauseModal.updateSoundLabel(isMuted);
   });
 
-  // Fullscreen controls
-  const toggleFs = async () => {
+  // Fullscreen controls with debouncing and instant touch support
+  let lastFsToggleTime = 0;
+  const toggleFs = async (e?: Event) => {
+    const now = Date.now();
+    if (now - lastFsToggleTime < 350) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      return;
+    }
+    lastFsToggleTime = now;
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     await toggleGameFullscreen('landscape');
-    setTimeout(() => updateFsIcon(isFullscreenActive()), 60);
+    syncFsState();
+    setTimeout(syncFsState, 100);
   };
-  fullscreenBtn?.addEventListener('click', async (e) => {
-    e.stopPropagation();
-    await toggleFs();
-  });
+
+  fullscreenBtn?.addEventListener('click', toggleFs);
+  fullscreenBtn?.addEventListener('touchend', toggleFs, { passive: false });
 
   // Skróty klawiszowe F11 i F dla komputerów (desktop)
   window.addEventListener('keydown', (e) => {

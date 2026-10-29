@@ -1181,9 +1181,10 @@ export class Engine {
     const playerBounds = this.player.bounds;
     const isGrounded = this.player.physics.onGround;
 
-    // 1. Ladder hint
+    // 1. Ladder hint (only when grounded or moving up / at rest, never while falling)
+    const isNotFalling = this.player.physics.onGround || this.player.physics.vy <= 0;
     const ladder = this.level.ladders.find((lad) => lad.bounds.intersects(playerBounds));
-    if (ladder && !this.player.physics.isClimbing && this.player.physics.climbStepout <= 0 && this.player.physics.ladderHoverTime >= CONFIG.LADDER_INTERACT_DELAY) {
+    if (ladder && !this.player.physics.isClimbing && this.player.physics.climbStepout <= 0 && isNotFalling && this.player.physics.ladderHoverTime >= CONFIG.LADDER_INTERACT_DELAY) {
       this.activeHint = 'E: wspinaj się';
     }
 

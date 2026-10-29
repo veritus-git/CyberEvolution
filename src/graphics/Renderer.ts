@@ -46,8 +46,8 @@ export class Renderer {
       (ctx as unknown as { imageSmoothingQuality: string }).imageSmoothingQuality = 'low';
     }
 
-    // Clear frame
-    ctx.fillStyle = '#080a0e';
+    // Clear frame (pure black #000000 to eliminate any cyan/light fringe on curved AMOLED screens)
+    ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, CONFIG.LOGICAL_WIDTH, CONFIG.LOGICAL_HEIGHT);
 
     // Play area
@@ -134,7 +134,7 @@ export class Renderer {
     // 10. World Intro Title Card (1.5s steady + 0.6s smooth fade out, 1:1 with Python)
     if (worldIntroTitle && worldIntroAlpha > 0) {
       ctx.save();
-      ctx.fillStyle = `rgba(7, 9, 14, ${0.85 * worldIntroAlpha})`;
+      ctx.fillStyle = `rgba(0, 0, 0, ${0.85 * worldIntroAlpha})`;
       ctx.fillRect(0, 0, CONFIG.LOGICAL_WIDTH, CONFIG.LOGICAL_HEIGHT);
 
       ctx.globalAlpha = Math.max(0, Math.min(1, worldIntroAlpha));
