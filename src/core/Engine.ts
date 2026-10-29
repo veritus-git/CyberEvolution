@@ -1076,12 +1076,22 @@ export class Engine {
         this.player.physics.vx = 260;
         this.player.physics.facing = 'right';
         this.player.physics.onGround = true;
-        // Advance player run animation so player actually runs at authentic calm pace
+        // Advance player run animation so player runs with full 8-frame cycle and synced footsteps
+        const currentSkin = this.player.skins.get(this.player.skinId) || this.player.skins.get(1);
+        const numRunFrames = currentSkin?.run?.length || 2;
+        const frameDuration = numRunFrames >= 8 ? 0.085 : 0.20;
+
         this.player.animTimer += dt;
-        if (this.player.animTimer >= 0.25) {
-          this.player.runFrameIndex = (this.player.runFrameIndex + 1) % 2;
+        if (this.player.animTimer >= frameDuration) {
+          this.player.runFrameIndex = (this.player.runFrameIndex + 1) % numRunFrames;
           this.player.animTimer = 0;
-          sound.playFootstep();
+          if (numRunFrames >= 8) {
+            if (this.player.runFrameIndex === 0 || this.player.runFrameIndex === 4) {
+              sound.playFootstep();
+            }
+          } else {
+            sound.playFootstep();
+          }
         }
       }
       return;
@@ -1181,11 +1191,10 @@ export class Engine {
     const playerBounds = this.player.bounds;
     const isGrounded = this.player.physics.onGround;
 
-    // 1. Ladder hint (only when grounded or moving up / at rest, never while falling)
-    const isNotFalling = this.player.physics.onGround || this.player.physics.vy <= 0;
+    // 1. Ladder hint (when overlapping ladder and not already climbing)
     const ladder = this.level.ladders.find((lad) => lad.bounds.intersects(playerBounds));
-    if (ladder && !this.player.physics.isClimbing && this.player.physics.climbStepout <= 0 && isNotFalling && this.player.physics.ladderHoverTime >= CONFIG.LADDER_INTERACT_DELAY) {
-      this.activeHint = 'E: wspinaj się';
+    if (ladder && !this.player.physics.isClimbing && this.player.physics.climbStepout <= 0) {
+      this.activeHint = 'E: wejdź na górę';
     }
 
     // 2. Arena entrance zones (World -> Bossfight Arena, 1:1 with Python prototype)

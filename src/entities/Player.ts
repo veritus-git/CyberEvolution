@@ -6,8 +6,12 @@ import { sound } from '../core/Audio';
 
 export interface SkinFrames {
   idle: HTMLImageElement | null;
+  idleFrames: HTMLImageElement[];
   run: HTMLImageElement[];
   jump: HTMLImageElement | null;
+  jumpFrames: HTMLImageElement[];
+  fall: HTMLImageElement | null;
+  fallFrames: HTMLImageElement[];
   climb: HTMLImageElement[];
 }
 
@@ -20,6 +24,7 @@ export class Player {
   public animTimer: number = 0;
   public runFrameIndex: number = 0;
   public climbFrameIndex: number = 0;
+  public idleFrameIndex: number = 0;
 
   // Evolution animation sequence
   public evoBlinkActive: boolean = false;
@@ -57,28 +62,63 @@ export class Player {
       });
     };
 
-    const [idle, r1, r2, jump, c1, c2] = await Promise.all([
+    const runPromises: Promise<HTMLImageElement | null>[] = [];
+    for (let i = 1; i <= 8; i++) {
+      runPromises.push(loadImage(`${basePath}/r${i}.png`));
+    }
+
+    const idlePromises: Promise<HTMLImageElement | null>[] = [];
+    for (let i = 1; i <= 4; i++) {
+      idlePromises.push(loadImage(`${basePath}/idle${i}.png`));
+    }
+
+    const jumpPromises: Promise<HTMLImageElement | null>[] = [
+      loadImage(`${basePath}/jump1.png`),
+      loadImage(`${basePath}/jump2.png`),
+    ];
+
+    const fallPromises: Promise<HTMLImageElement | null>[] = [
+      loadImage(`${basePath}/fall1.png`),
+      loadImage(`${basePath}/fall2.png`),
+    ];
+
+    const climbPromises: Promise<HTMLImageElement | null>[] = [];
+    for (let i = 1; i <= 4; i++) {
+      climbPromises.push(loadImage(`${basePath}/climb${i}.png`));
+    }
+
+    const [idle, jump, fall, loadedClimb, loadedIdle, loadedRun, loadedJump, loadedFall] = await Promise.all([
       loadImage(`${basePath}/idle.png`),
-      loadImage(`${basePath}/r1.png`),
-      loadImage(`${basePath}/r2.png`),
       loadImage(`${basePath}/jump.png`),
-      loadImage(`${basePath}/climb1.png`),
-      loadImage(`${basePath}/climb2.png`),
+      loadImage(`${basePath}/fall.png`),
+      Promise.all(climbPromises),
+      Promise.all(idlePromises),
+      Promise.all(runPromises),
+      Promise.all(jumpPromises),
+      Promise.all(fallPromises),
     ]);
 
-    // Match Python prototype fallback logic:
-    // If run frames missing, fallback to idle.
-    const runFrames = [r1, r2].filter((f): f is HTMLImageElement => f !== null);
-    // If climb frames missing, fallback to run frames.
-    const climbFrames = [c1, c2].filter((f): f is HTMLImageElement => f !== null);
-    const finalClimb = climbFrames.length > 0 ? climbFrames : (runFrames.length > 0 ? runFrames : (idle ? [idle] : []));
-    // If jump frame missing, fallback to idle.
-    const finalJump = jump || idle;
+    const runFrames = loadedRun.filter((f): f is HTMLImageElement => f !== null);
+    const climbFrames = loadedClimb.filter((f): f is HTMLImageElement => f !== null);
+    const idleFrames = loadedIdle.filter((f): f is HTMLImageElement => f !== null);
+    const jumpFrames = loadedJump.filter((f): f is HTMLImageElement => f !== null);
+    const fallFrames = loadedFall.filter((f): f is HTMLImageElement => f !== null);
+
+    const finalIdle = idle || (idleFrames.length > 0 ? idleFrames[0] : null);
+    const finalIdleFrames = idleFrames.length > 0 ? idleFrames : (finalIdle ? [finalIdle] : []);
+    const finalRun = runFrames.length > 0 ? runFrames : (finalIdle ? [finalIdle] : []);
+    const finalClimb = climbFrames.length > 0 ? climbFrames : finalRun;
+    const finalJump = jump || (jumpFrames.length > 0 ? jumpFrames[0] : finalIdle);
+    const finalFall = fall || (fallFrames.length > 0 ? fallFrames[0] : finalJump);
 
     this.skins.set(id, {
-      idle,
-      run: runFrames.length > 0 ? runFrames : (idle ? [idle] : []),
+      idle: finalIdle,
+      idleFrames: finalIdleFrames,
+      run: finalRun,
       jump: finalJump,
+      jumpFrames: jumpFrames.length > 0 ? jumpFrames : (finalJump ? [finalJump] : []),
+      fall: finalFall,
+      fallFrames: fallFrames.length > 0 ? fallFrames : (finalFall ? [finalFall] : []),
       climb: finalClimb,
     });
   }
@@ -220,25 +260,64 @@ export class Player {
 
     const isRunning = this.physics.onGround && Math.abs(this.physics.vx) > 30;
 
-    if (this.physics.isClimbing || this.physics.climbStepout > 0) {
-      if (this.animTimer >= 0.28) {
-        this.climbFrameIndex = (this.climbFrameIndex + 1) % 2;
-        this.animTimer = 0;
+    if (this.physics.isClimbing) {
+      let currentSkin = this.skins.get(this.skinId);
+      if (!currentSkin || !currentSkin.idle) {
+        currentSkin = this.skins.get(1);
+      }
+      const numClimbFrames = currentSkin?.climb?.length || 4;
+      // Only advance animation frames when moving vertically on the ladder!
+      if (Math.abs(this.physics.vy) > 10) {
+        if (this.animTimer >= 0.12) {
+          this.climbFrameIndex = (this.climbFrameIndex + 1) % numClimbFrames;
+          this.animTimer = 0;
+        }
       }
     } else if (isRunning) {
-      // 100% synchronized with skin animation:
-      // When the run frame switches (every 200ms), a footstep sound triggers at the exact same instant!
-      if (this.animTimer >= 0.20) {
-        this.runFrameIndex = (this.runFrameIndex + 1) % 2;
-        this.animTimer = 0;
-        sound.playFootstep();
+      let currentSkin = this.skins.get(this.skinId);
+      if (!currentSkin || !currentSkin.idle) {
+        currentSkin = this.skins.get(1);
       }
+      const numRunFrames = currentSkin?.run?.length || 2;
+      const frameDuration = numRunFrames >= 8 ? 0.085 : 0.20;
+
+      if (this.animTimer >= frameDuration) {
+        this.runFrameIndex = (this.runFrameIndex + 1) % numRunFrames;
+        this.animTimer = 0;
+
+        // Footstep sound synchronized with foot plants:
+        // In 8-frame cycle: Frame 0 (Right foot strike) and Frame 4 (Left foot strike)
+        if (numRunFrames >= 8) {
+          if (this.runFrameIndex === 0 || this.runFrameIndex === 4) {
+            sound.playFootstep();
+          }
+        } else {
+          sound.playFootstep();
+        }
+      }
+    } else if (this.physics.onGround) {
+      // Idle state - gentle breathing animation
+      let currentSkin = this.skins.get(this.skinId);
+      if (!currentSkin || !currentSkin.idle) {
+        currentSkin = this.skins.get(1);
+      }
+      const numIdleFrames = currentSkin?.idleFrames?.length || 0;
+      if (numIdleFrames > 1) {
+        if (this.animTimer >= 0.24) {
+          this.idleFrameIndex = (this.idleFrameIndex + 1) % numIdleFrames;
+          this.animTimer = 0;
+        }
+      } else {
+        this.idleFrameIndex = 0;
+      }
+      this.runFrameIndex = 0;
     } else {
-      // Prime animTimer to 0.10s so the very first footstep lands at 100ms when moving from idle
-      this.animTimer = 0.10;
+      // In air (jump / fall)
+      this.animTimer = 0;
       this.runFrameIndex = 0;
     }
   }
+
   /**
    * Render the player at its current position, applying flipping if facing left.
    */
@@ -257,14 +336,38 @@ export class Player {
     let frameToDraw: HTMLImageElement | null = null;
 
     if (currentSkin) {
-      if (this.physics.isClimbing || this.physics.climbStepout > 0) {
-        frameToDraw = currentSkin.climb[this.climbFrameIndex] || currentSkin.idle;
+      if (this.physics.isClimbing) {
+        const climbLen = currentSkin.climb.length;
+        frameToDraw = (climbLen > 0 ? currentSkin.climb[this.climbFrameIndex % climbLen] : null) || currentSkin.idle;
       } else if (!this.physics.onGround) {
-        frameToDraw = currentSkin.jump || currentSkin.idle;
+        // Airborne: Dynamic Jump vs Fall based on vertical velocity
+        if (this.physics.vy > 60) {
+          // Falling downward
+          const fallFrames = currentSkin.fallFrames || [];
+          if (fallFrames.length >= 2) {
+            frameToDraw = this.physics.vy > 450 ? fallFrames[1] : fallFrames[0];
+          } else {
+            frameToDraw = currentSkin.fall || currentSkin.jump || currentSkin.idle;
+          }
+        } else {
+          // Rising upward (Jump)
+          const jumpFrames = currentSkin.jumpFrames || [];
+          if (jumpFrames.length >= 2) {
+            // Explosive takeoff launch (vy < -400) vs soaring/apex (-400 <= vy <= 60)
+            frameToDraw = this.physics.vy < -400 ? jumpFrames[0] : jumpFrames[1];
+          } else {
+            frameToDraw = currentSkin.jump || currentSkin.idle;
+          }
+        }
       } else if (Math.abs(this.physics.vx) > 30) {
-        frameToDraw = currentSkin.run[this.runFrameIndex] || currentSkin.idle;
+        const runLen = currentSkin.run.length;
+        frameToDraw = currentSkin.run[this.runFrameIndex % runLen] || currentSkin.idle;
       } else {
-        frameToDraw = currentSkin.idle;
+        if (currentSkin.idleFrames && currentSkin.idleFrames.length > 0) {
+          frameToDraw = currentSkin.idleFrames[this.idleFrameIndex % currentSkin.idleFrames.length] || currentSkin.idle;
+        } else {
+          frameToDraw = currentSkin.idle;
+        }
       }
     }
 
@@ -289,7 +392,7 @@ export class Player {
       const drawX = Math.round(playerCenterX - targetW / 2);
       const drawY = screenY;
 
-      if (this.physics.facing === 'left') {
+      if (this.physics.facing === 'left' && !this.physics.isClimbing) {
         ctx.translate(playerCenterX, 0);
         ctx.scale(-1, 1);
         ctx.drawImage(frameToDraw, Math.round(-targetW / 2), drawY, targetW, targetH);

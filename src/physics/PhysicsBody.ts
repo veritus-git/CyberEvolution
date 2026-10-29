@@ -19,10 +19,15 @@ export class PhysicsBody {
   public onGround: boolean = false;
   public justJumped: boolean = false;
   public isClimbing: boolean = false;
+  public autoClimbing: boolean = false;
   public climbStepout: number = 0;
   public climbTargetY: number = 0;
   public climbSideDir: number = 1;
   public climbRect: AABB | null = null;
+  public mantleStartX: number = 0;
+  public mantleStartY: number = 0;
+  public mantleTargetX: number = 0;
+  public mantleTargetY: number = 0;
   public ladderHoverTime: number = 0;
   public currentLadder: Ladder | null = null;
   public facing: 'left' | 'right' = 'right';
@@ -96,35 +101,32 @@ export class PhysicsBody {
       input = { moveX: 0, moveY: 0, jumpPressed: false, jumpHeld: false, interactPressed: false };
     }
 
-    // 1. Ladder proximity check
+    // 1. Universal Ladder & Vine proximity check (works on ladders, vines, ropes, chains)
     const touchingLadder = ladders.find((lad) => lad.bounds.intersects(this.bounds)) || null;
 
     if (touchingLadder && this.respawnState === 'normal') {
       this.currentLadder = touchingLadder;
-      this.ladderHoverTime += dt;
+      this.climbRect = touchingLadder.bounds;
 
-      // Start climbing if hovering on ladder, not falling down, and pressed interact (E / tap action)
-      const isNotFalling = this.onGround || this.vy <= 0;
-      if (!this.isClimbing && this.climbStepout <= 0 && isNotFalling && input.interactPressed && this.ladderHoverTime >= CONFIG.LADDER_INTERACT_DELAY) {
-        this.climbRect = touchingLadder.bounds;
-        this.climbTargetY = this.climbRect.top - this.height;
-        this.climbSideDir = (this.bounds.centerX < this.climbRect.centerX) ? 1 : -1;
-        this.facing = this.climbSideDir > 0 ? 'right' : 'left';
+      // Mount ladder if pressing UP (W), DOWN (S), or Interact (E)
+      const wantsMount = input.moveY < -0.1 || (input.moveY > 0.1 && !this.onGround) || input.interactPressed;
+      if (!this.isClimbing && wantsMount) {
         this.isClimbing = true;
-        this.climbStepout = 0;
+        this.autoClimbing = input.interactPressed || input.moveY < -0.1;
+        this.x = touchingLadder.bounds.centerX - this.width / 2;
         this.vx = 0;
-        this.vy = 0;
+        this.vy = this.autoClimbing ? -CONFIG.CLIMB_SPEED : 0;
         this.onGround = false;
+        this.climbStepout = 0;
       }
-    } else {
+    } else if (!this.isClimbing) {
       this.currentLadder = null;
-      this.ladderHoverTime = 0;
+      this.climbRect = null;
     }
 
-    // 2. Handle Climbing State (1:1 with Python logic)
-    if (this.isClimbing || this.climbStepout > 0) {
-      this.handleClimbing(dt, solids);
-      this.clampToWorld(worldWidth);
+    // 2. Handle Universal Climbing State (Ladders, Vines, Ropes)
+    if (this.isClimbing) {
+      this.handleUniversalClimbing(dt, input, solids, worldWidth);
       return;
     }
 
@@ -195,45 +197,136 @@ export class PhysicsBody {
   }
 
   /**
-   * 1:1 Ladder Climbing and automatic top step-out onto platform
+   * Ladder Climbing and true physical Ledge Mantle onto platform floor
    */
-  private handleClimbing(dt: number, solids: AABB[]): void {
-    if (this.climbStepout > 0) {
-      // Step-out phase: walk horizontally onto upper floor
-      const walkOutSpeed = CONFIG.MOVE_SPEED * 0.6;
-      const dtStep = Math.min(dt, this.climbStepout);
-      this.moveHorizontal(this.climbSideDir * walkOutSpeed * dtStep, solids);
-      this.moveVertical(180.0 * dtStep, solids); // slight downward push to detect ground
-      this.climbStepout -= dtStep;
+  /**
+   * Universal 2D Platformer Ladder & Vine Climbing
+   * Supports ladders, vines, ropes, chains across all worlds:
+   * - Centered on climbing element (back-view)
+   * - Climb up/down smoothly with W/S or Arrow keys
+   * - Jump off in any direction anytime with Space
+   * - Dismount cleanly onto solid platform at top or bottom
+   */
+  private handleUniversalClimbing(dt: number, input: MovementInput, solids: AABB[], worldWidth: number): void {
+    if (!this.climbRect) {
+      this.isClimbing = false;
+      this.autoClimbing = false;
+      return;
+    }
 
-      if (this.climbStepout <= 0) {
-        this.isClimbing = false;
-        this.vy = 0;
-        this.onGround = true;
+    // 1. Jump off ladder (Space)
+    if (input.jumpPressed) {
+      this.isClimbing = false;
+      this.autoClimbing = false;
+      this.vy = -CONFIG.JUMP_SPEED * 0.85;
+      if (Math.abs(input.moveX) > 0.1) {
+        this.vx = Math.sign(input.moveX) * CONFIG.MOVE_SPEED * 0.9;
+        this.facing = input.moveX > 0 ? 'right' : 'left';
+      } else {
+        this.vx = 0;
       }
-    } else {
-      // Ascending ladder vertically
-      const step = CONFIG.CLIMB_SPEED * dt;
-      this.y = Math.max(this.climbTargetY, this.y - step);
-      this.vx = 0;
-      this.vy = 0;
       this.onGround = false;
+      this.coyoteTimer = 0;
+      this.justJumped = true;
+      return;
+    }
 
-      // Stick to ladder side
-      if (this.climbRect) {
-        if (this.climbSideDir > 0) {
-          this.x = Math.max(this.x, this.climbRect.right - this.width);
+    // Cancel autoClimbing if user explicitly presses down (moveY > 0.1)
+    if (input.moveY > 0.1) {
+      this.autoClimbing = false;
+    }
+
+    // Center horizontally on ladder/vine
+    this.x = this.climbRect.centerX - this.width / 2;
+    this.vx = 0;
+
+    const climbSpeed = CONFIG.CLIMB_SPEED;
+    const floorY = this.climbRect.top;
+
+    // 2. Vertical movement: Auto-climb UP or manual UP
+    if (this.autoClimbing || input.moveY < -0.1) {
+      this.y -= climbSpeed * dt;
+      this.vy = -climbSpeed;
+
+      // Reaching top of ladder / platform rim: automatically step onto floor
+      if (this.y + this.height <= floorY + 12) {
+        // Detect which side has solid floor platform
+        let stepDir: 'left' | 'right' = 'right';
+        let hasLeft = false;
+        let hasRight = false;
+        for (const s of solids) {
+          if (s.top <= floorY + 40 && s.top >= floorY - 40) {
+            if (s.right <= this.climbRect.centerX + 15 && s.right >= this.climbRect.left - 120) {
+              hasLeft = true;
+            }
+            if (s.left >= this.climbRect.centerX - 15 && s.left <= this.climbRect.right + 120) {
+              hasRight = true;
+            }
+          }
+        }
+        if (hasLeft && !hasRight) stepDir = 'left';
+        else if (hasRight && !hasLeft) stepDir = 'right';
+        else if (input.moveX < -0.1) stepDir = 'left';
+        else if (input.moveX > 0.1) stepDir = 'right';
+
+        this.isClimbing = false;
+        this.autoClimbing = false;
+        this.onGround = true;
+        this.facing = stepDir;
+        this.y = floorY - this.height;
+        if (stepDir === 'left') {
+          this.x = this.climbRect.left - this.width * 0.75;
         } else {
-          this.x = Math.min(this.x, this.climbRect.left);
+          this.x = this.climbRect.right - this.width * 0.25;
+        }
+        this.vx = 0;
+        this.vy = 0;
+        return;
+      }
+    } else if (input.moveY > 0.1) {
+      // Climbing DOWN
+      this.y += climbSpeed * dt;
+      this.vy = climbSpeed;
+
+      // Check if touching solid ground at bottom:
+      const pLeft = this.bounds.left - 50;
+      const pRight = this.bounds.right + 50;
+      const nearbySolids = solids.filter((s) => s.left <= pRight && s.right >= pLeft);
+      for (const s of nearbySolids) {
+        if (this.bounds.intersects(s) && this.bounds.bottom >= s.top - 5 && this.bounds.bottom <= s.top + 32) {
+          this.isClimbing = false;
+          this.autoClimbing = false;
+          this.onGround = true;
+          this.y = s.top - this.height;
+          this.vy = 0;
+          return;
         }
       }
 
-      // Check reached ladder top
-      if (this.y <= this.climbTargetY + 0.5 && this.climbStepout <= 0) {
-        this.y = this.climbTargetY;
-        this.climbStepout = CONFIG.CLIMB_STEPOUT_TIME;
+      // If dropped below bottom of ladder:
+      if (this.y > this.climbRect.bottom - 40) {
+        this.isClimbing = false;
+        this.autoClimbing = false;
+        this.vy = 0;
+        return;
+      }
+    } else {
+      // Stationary on ladder (holding steady)
+      this.vy = 0;
+      // Allow stepping off to adjacent platform at top if pressing left or right
+      if (Math.abs(input.moveX) > 0.1 && this.y + this.height <= floorY + 40) {
+        this.isClimbing = false;
+        this.autoClimbing = false;
+        this.onGround = true;
+        this.y = floorY - this.height;
+        this.x += Math.sign(input.moveX) * 25;
+        this.facing = input.moveX > 0 ? 'right' : 'left';
+        this.vy = 0;
+        return;
       }
     }
+
+    this.clampToWorld(worldWidth);
   }
 
   public moveHorizontal(dx: number, solids: AABB[]): void {

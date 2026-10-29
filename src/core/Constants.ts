@@ -17,7 +17,7 @@ export const CONFIG = {
   GRAVITY: 2700.0,
   JUMP_SPEED: 875.0,
   CLIMB_SPEED: 700.0,
-  CLIMB_STEPOUT_TIME: 0.21,
+  CLIMB_STEPOUT_TIME: 0.65,
   LADDER_INTERACT_DELAY: 0.05,
 
   // Game feel / timers (matching original)
